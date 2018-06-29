@@ -1,0 +1,6 @@
+test:
+    script:
+        - apt-get update -qy
+        - apt-get install -y python3.6 python3.6-dev python3.6-pip
+        - pip install virtualenv
+        - python3 .CI_Emulator.py
