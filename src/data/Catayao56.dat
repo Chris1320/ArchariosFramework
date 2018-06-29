@@ -1,0 +1,14 @@
+# This is the default configuration file for Shadow Suite.
+# Every line that starts with '#' is a comment.
+
+username="2E86E8CC084035F88DA91E834910B55890F017AE01B9348EA842A1A08A4AB44D"
+userpass="D577ADC54E95F42F15DE2E7C134669888B7D6FB74DF97BD62CB4F5B73C281DB4"
+rootname="4813494D137E1631BBA301D5ACAB6E7BB7AA74CE1185D456565EF51D737677B2"
+rootpass="CE5CA673D13B36118D54A7CF13AEB0CA012383BF771E713421B4D1FD841F539A"
+
+module_path="modules/"
+services_path="services/"
+output_path="output/"
+binary_path="/data/data/com.termux/files/usr/bin/"
+
+notes_maxlines=20

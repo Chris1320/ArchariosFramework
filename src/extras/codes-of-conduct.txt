@@ -1,0 +1,479 @@
+============================
+=     Codes of Conduct     =
+= Copyright (C) 2017-2018  =
+= Christopher Andrei Tayao =
+============================
+
+============================================================
+=                    ATTENTION                             =
+=                                                          =
+= This document includes the professional codes of conduct =
+=      for use by anyone who wanted to implement these     =
+=             codes to their everyday IT life.             =
+=                                                          =
+============================================================
+
+===TABLE OF CONTENTS===
+
+Section 1: Principal Values
+      1.0: How hackers are judged
+      1.1: Access to Computers
+      1.2: Freedom of Information
+      1.3: Decentralization
+      1.4: Art and Beauty
+      1.5: Promises
+      
+Section 2: The Ten Commandments of Computer Ethics
+      2.0: Harming other people
+      2.1: Interfering with other people's computer work
+      2.2: Snooping in other people's computer files
+      2.3: Stealing
+      2.4: False Witness
+      2.5: Piracy
+      2.6: Using other people's computer resources
+      2.7: Appropriation
+      2.8: Social Consequences
+      2.9: Consideration and Respect
+      
+Section 3: The right of Privacy
+      3.0: Copyright
+      3.1: Patent
+      3.2: Trade Secrets
+      
+Section 4: The right of Equality
+      4.0: (Pending...)
+
+Section 5: Intellectual Property
+      5.0: (Pending...)
+
+Section 6: Programming Ethics
+      6.0: Contribution
+      6.1: Harm
+      6.2: Honesty and Trustworthy
+      6.3: Intellectual Property
+      6.4: Privacy
+      6.5: Confidentiality
+      6.6: Software Approval
+      6.7: Responsibility
+      6.8: Not knowingly use software that is obtained illegally
+      6.9: Identify, define, and address issues related to work projects
+      6.A: User Satisfaction
+      6.B: Ensure adequate testing, debugging and review of software
+      6.C: Financial Deception
+      6.D: Quality Software Creation
+      
+Section 7: (Pending...)
+      7.0: (Pending...)
+
+===PROFESSIONAL CODES OF CONDUCT===
+
+Section 1: Principal Values
+
+      1.0: How hackers are judged
+
+           -Hackers should be judged by their hacking,
+            not bogus criteria such as academic
+            excellence, age, race, nor position.
+
+      1.1: Access to Computers
+
+           -Access to computers, and anything which
+            might teach you something about the way
+            the world works, should be unlimited and
+            total.
+
+      1.2: Freedom of Information
+
+           -All information should be free. Whether
+            it is useful or not, you should let the
+            other people know what is happening.
+
+      1.3: Decentralization
+
+           -Mistrust Authority. Promote
+            Decentralization. Authorities don't
+            expose information to public, unless
+            they wanted us to know, putting us
+            inside the cells.
+
+      1.4: Art and Beauty
+
+           -Remember that you can create art and
+            beauty on a computer.
+
+      1.5: Promises
+
+           -A hacker must do his promises.
+
+Section 2: The Ten Commandments of Computer Ethics
+
+      2.0: Harming other people
+      
+           -Thou shalt not use a computer to harm
+            other people.
+            
+           -Do not use the computer in ways that may
+            harm other people. This commandment says
+            that it is unethical to use a computer
+            to harm another user. It is not limited
+            to physical injury. It includes harming
+            or corrupting other users' data or files.
+            The commandment states that it is wrong
+            to use a computer to steal someone's
+            personal information. Manipulating or
+            destroying files of other users is
+            ethically wrong. It is unethical to
+            write programs, which on execution lead
+            to stealing, copying or gaining
+            unauthorized access to other users'
+            data. Being involved in practices like
+            hacking, spamming, phishing or cyber
+            bullying does not conform to computer
+            ethics.
+      
+      2.1: Interfering with other people's computer work
+      
+           -Thou shalt not interfere with other
+            people's computer work.
+      
+           -Do not use computer technology to cause
+            interference in other users' work.
+            Computer software can be used in ways
+            that disturb other users or disrupt
+            their work. Viruses, for example, are
+            programs meant to harm useful computer
+            programs or interfere with the normal
+            functioning of a computer. Malicious
+            software can disrupt the functioning of
+            computers in more ways than one. It may
+            overload computer memory through excessive
+            consumption of computer resources, thus
+            slowing its functioning. It may cause a
+            computer to function wrongly or even stop
+            working. Using malicious software to
+            attack a computer is unethical.
+      
+      2.2: Snooping in other people's computer files
+      
+           -Thou shalt not snoop around in other
+            people's computer files.
+      
+           -Do not spy on another person's computer
+            data. We know it is wrong to read
+            someone's personal letters. On the same
+            lines, it is wrong to read someone else's
+            email messages or files. Obtaining data
+            from another person's private files is
+            nothing less than breaking into someone's
+            room. Snooping around in another person's
+            files or reading someone else's personal
+            messages is the invasion of his privacy.
+            There are exceptions to this. For example,
+            spying is necessary and cannot be called
+            unethical when it is done against
+            illegitimate use of computers. For example,
+            intelligence agencies working on cybercrime
+            cases need to spy on the internet activity
+            of suspects.
+      
+      2.3: Stealing
+      
+           -Thou shalt not use a computer to steal.
+      
+           -Do not use computer technology to steal
+            information. Stealing sensitive information
+            or leaking confidential information is as
+            good as robbery. It is wrong to acquire
+            personal information of employees from an
+            employee database or patient history from a
+            hospital database or other such information
+            that is meant to be confidential. Similarly,
+            breaking into a bank account to collect
+            information about the account or account
+            holder is wrong. Illegal electronic transfer
+            of funds is a type of fraud. With the use of
+            technology, stealing of information is much
+            easier. Computers can be used to store
+            stolen information.
+      
+      2.4: False Witness
+      
+           -Thou shalt not use a computer to bear false
+            witness.
+      
+           -Do not contribute to the spread of
+            misinformation using computer technology.
+            Spread of information has become viral today,
+            because of the Internet. This also means that
+            false news or rumors can spread speedily
+            through social networking sites or emails.
+            Being involved in the circulation of
+            incorrect information is unethical. Mails and
+            pop-ups are commonly used to spread the wrong
+            information or give false alerts with the
+            only intent of selling products. Mails from
+            untrusted sources advertising certain products
+            or spreading some hard-to-believe information,
+            are not uncommon. Direct or indirect
+            involvement in the circulation of false
+            information is ethically wrong. Giving wrong
+            information can hurt other parties or
+            organizations that are affected by that
+            particular theme.
+      
+      2.5: Piracy
+      
+           -Thou shalt not copy or use proprietary
+            software for which you have not paid,
+            without permission.
+      
+           -Refrain from copying software or buying
+            pirated copies. Pay for software unless
+            it is free. Like any other artistic or
+            literary work, software is copyrighted.
+            A piece of code is the original work of the
+            individual who created it. It is copyrighted
+            in his/her name. In case of a developer writing
+            software for the organization she works for,
+            the organization holds the copyright for it.
+            Copyright holds true unless its creators
+            announce it is not. Obtaining illegal copies
+            of copyrighted software is unethical and also
+            encourages others to make copies illegally.
+      
+      2.6: Using other people's computer resources
+      
+           -Thou shalt not use other people's computer
+            resources without authorization or proper
+            compensation.
+            
+           -Do not use someone else's computer resources
+            unless authorized to. Multi-user systems have
+            user specific passwords. Breaking into some
+            other user's password, thus intruding his/her
+            private space is unethical. It is not ethical
+            to hack passwords for gaining unauthorized
+            access to a password-protected computer system.
+            Accessing data that you are not authorized to
+            access or gaining access to another user's computer
+            without her permission is not ethical.
+      
+      2.7: Appropriation
+      
+           -Thou shalt not appropriate other people's
+            intellectual output.
+            
+           -It is wrong to claim ownership on a work which
+            is the output of someone else's intellect.
+            Programs developed by a software developer are
+            her property. If he is working with an
+            organization, they are the organization's
+            property. Copying them and propagating them in
+            one's own name is unethical. This applies to any
+            creative work, program or design. Establishing
+            ownership on a work which is not yours is ethically
+            wrong.
+      
+      2.8: Social Consequences
+      
+           -Thou shalt think about the social consequences
+            of the program you are writing or the system
+            you are designing.
+            
+           -Before developing a software, think about the
+            social impact it can have. Looking at the social
+            consequences that a program can have, describes a
+            broader perspective of looking at technology. A
+            computer software on release, reaches millions.
+            Software like video games and animations or
+            educational software can have a social impact on
+            their users. When working on animation films or
+            designing video games, for example, it is the
+            programmer's responsibility to understand his
+            target audience/users and the effect it may have
+            on them. For example, a computer game for kids
+            should not have content that can influence them
+            negatively. Similarly, writing malicious software
+            is ethically wrong. A software developer/development
+            firm should consider the influence their code can
+            have on the society at large.
+      
+      2.9: Consideration and Respect
+
+           -Thou shalt always use a computer in ways that ensure
+            consideration and respect for your fellow humans.
+            
+           -In using computers for communication, be respectful
+            and courteous with the fellow members. The
+            communication etiquette we follow in the real world
+            applies to communication over computers as well.
+            While communicating over the Internet, one should
+            treat others with respect. One should not intrude
+            others' private space, use abusive language, make
+            false statements or pass irresponsible remarks about
+            others. One should be courteous while communicating
+            over the web and should respect others' time and
+            resources. Also, one should be considerate with a
+            novice computer user.
+
+Section 3: The right of Privacy
+
+      3.0: Copyright
+      
+           -Computer programs are protected as literary works.
+            Authors of computer programs and producers of sound
+            recordings have the right to prohibit the commercial
+            rental of their works to the public.
+            
+      3.1: Patent
+      
+           -Patent protection must be available for inventions
+            for at least 20 years and for both products and processes
+            in almost all fields of technology. (Controversy has arisen
+            over whether this protection applies to computer software.)
+            
+      3.2: Trade Secrets
+           
+           -Trade secrets and other types of undisclosed information
+            that have commercial value must be protected against breach of
+            confidence and other acts that are contrary to honest commercial
+            practices. However, reasonable steps must have been taken to
+            keep the information secret.
+      
+Section 4: The right of Equality
+
+      4.0: 
+      
+           -
+
+Section 5: Intellectual Property
+
+      5.0: 
+      
+           -
+
+Section 6: Programming ethics
+
+      6.0: Contribution
+      
+           -Contribute to society and human well-being. Programmers should
+            work to develop computer systems that can reduce negative
+            consequences to society, such as threats to safety and health,
+            and that can make everyday activities and work easier. It is
+            an obligation to develop to high standards (Savage).
+
+      6.1: Harm
+      
+           -Avoid harm to others. Computer systems have an indirect impact
+            on third parties. They can cause loss of information and
+            resources that might result severely harmful for users, the
+            general public, or employers. Therefore, software developers
+            should minimize the risk of harming others due to coding
+            errors, or security issues, by following standards to design
+            and test systems (Code of Ethics and Professional Conduct).
+            
+      6.2: Honesty and Trustworthy
+      
+           -Be honest and trustworthy. This principle encourages
+            programmers to be honest and aware of their limitations in
+            knowledge and education when writing computer systems.
+            Also, if a programmer knows there is something wrong with a
+            computer system, he or she should report it immediately to
+            avoid undesirable consequences.
+            
+      6.3: Intellectual Property
+      
+           -Give proper credit for intellectual property. It is mandatory
+            for every software developer to never use and take credit for
+            someone else's work, even when it has not been protected by a
+            copyright law, patent, etc. They must recognize and fully
+            credit other people's works, and they should use their own
+            ideas to develop software.
+            
+      6.4: Privacy
+      
+           -Respect the privacy of others. Computer systems are wrongly
+            used by some people to violate the privacy of others. Software
+            developers should write programs that can protect users' private
+            information and that can avoid other undesired people to have
+            unauthorized access to it (Code of Ethics and Professional Conduct).
+            
+      6.5: Confidentiality
+      
+           -Honor confidentiality. Unless required by law or any other ethical
+            guideline, a programmer must keep secret any additional information
+            related to his or her employer that arises from working in a project.
+            
+      6.6: Software Approval
+      
+           -Approve software only if they have a well-founded belief it is safe
+            and meets specifications. Programmers cannot assume that a system is
+            ready to use only because it performs the tasks needed. They should
+            make sure these systems are also safe and meet every specification
+            required by the user. If programs are not safe, users are unprotected
+            from hackers that could steal important information or money.
+            Therefore, several tests should be performed in order to ensure a
+            system's security before approving it.
+            
+      6.7: Responsibility
+      
+           -Accept full responsibility for their own work. If a program presents
+            errors, the software developer should accept full responsibility for
+            his or her work, and should work on revising, correcting, modifying,
+            and testing it.
+            
+      6.8: Not knowingly use software that is obtained illegally
+
+           -Not knowingly use software that is obtained or retained either
+            illegally or unethically. If a computer system will be used as a base
+            for the creation of another, then permission to do so should be asked
+            by the programmer. This principle prohibits using any other software
+            for any purpose if the way it was gotten is not clear or is known to
+            be illegal or unethical.
+            
+      6.9: Identify, define, and address issues related to work projects
+      
+           -Identify, define, and address ethical, economic, cultural, legal
+            and environmental issues related to work projects. If a programmer
+            notices and identifies that working on a project will lead to any
+            kind of problems, then the programmer should report it to his or her
+            employer before continuing.
+            
+      6.A: User Satisfaction
+      
+           -Ensure that specifications for software on which they work satisfy the
+            users' requirements and they have the appropriate approvals. Software
+            developers should come to their employers to ask for the correspondent
+            approval to the system they are creating before continuing working on
+            the next part. If it doesn't meet the requirements, then a modification
+            to the source code of the system should be made.
+           
+      6.B: Ensure adequate testing, debugging and review of software
+           
+           -Ensure adequate testing, debugging and review of software. Programmers
+            should perform the appropriate tests to the pieces of software they
+            work with, and should check for errors and system security holes to make
+            sure that the programs are well implemented.
+           
+      6.C: Financial Deception
+      
+           -Not engage in deceptive financial practices such as bribery, double
+            billing, or other improper financial practices. Programmers are exposed
+            to be participants in illegal activities to get money. They get involved
+            in them due to threats, economic issues, or simply because they want to
+            obtain easy money by taking advantage of their knowledge about how
+            computer systems work. This guideline prohibits programmer involvement
+            in such unlawful actions.
+            
+      6.D: Quality Software Creation
+      
+           -Improve their ability to create safe, reliable, and useful quality
+            software. Since technology advances faster year by year, and so does
+            virtual criminality, the need of well-structured and designed programs
+            is increasing. Computer systems get old and limited by new ones and new
+            devices. Programmers should further their knowledge of developments in
+            the analysis, specification, design, development, maintenance, and
+            testing software and related documents (Software Engineering Code of
+            Ethics and Professional Practice)[4] in order to create better pieces
+            of software.
+           
