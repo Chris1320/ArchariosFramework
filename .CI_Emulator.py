@@ -55,31 +55,6 @@ class testEnvLinux:
         else:
             sys.exit(rc)
 
-    """
-    def run(self, command):
-        self.job_no += 1
-        print(self.CG, "$ " + command, self.END)
-        if command.startswith('cd '):
-            os.chdir(command.partition('cd ')[2])
-
-        else:
-            self.result = gso(command)
-
-        print(self.result[1])
-        print()
-        if self.result[0] != 0:
-            print(self.CR, "Job #{} failed! Exited with code #{}".format(str(self.job_no), str(self.result[0])), self.END)
-            self.retcode = 1
-            self.justContinue = True
-
-        else:
-            self.retcode = 0
-
-        self.report.append(self.result)
-        timeout(1)
-        return self.retcode
-    """
-
     def run(self, command):
         self.job_no += 1
         print(self.CG, "$ " + command, self.END)
@@ -160,6 +135,8 @@ class testEnvLinux:
         return(retcode)
 
 def run():
+    print("{} [recreate/no_virtualenv]".format(sys.argv[0]))
+    print()
     if 'recreate' in sys.argv:
         gso('rm -rf ' + testEnvLinux().py36)
 
