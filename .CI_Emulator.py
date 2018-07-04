@@ -1,9 +1,28 @@
 #!/usr/bin/env python3
+
+"""
+Archarios Framework :: The Novice's Ethical Hacking Framework
+Copyright(C) 2018 :: Catayao56 <Catayao56@gmail.com>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+"""
+
 import os
 import sys
-import importlib
 from time import sleep as timeout
 from subprocess import getstatusoutput as gso
+
 
 class testEnvLinux:
 
@@ -15,11 +34,11 @@ class testEnvLinux:
         self.justContinue = False
         self.report = []
         self.rootdir = ''
-        self.CG   = '\033[32m'
-        self.CY   = '\033[33m'
-        self.CR   = '\033[31m'
-        self.CGR  = '\033[90m'
-        self.END  = '\033[0m'
+        self.CG = '\033[32m'
+        self.CY = '\033[33m'
+        self.CR = '\033[31m'
+        self.CGR = '\033[90m'
+        self.END = '\033[0m'
 
         self.py36 = 'test-env-3.6'
 
@@ -49,36 +68,13 @@ class testEnvLinux:
                 sys.exit(rc)
 
             else:
-                print(self.CR, "[i] Cannot pop previous stash! Please manually type 'git stash pop' to get back to work.", self.END)
+                print(self.CR, "[i] Cannot pop previous stash! Please\
+manually type 'git stash pop' to get back\
+to work.", self.END)
                 sys.exit(rc + 1)
 
         else:
             sys.exit(rc)
-
-    """
-    def run(self, command):
-        self.job_no += 1
-        print(self.CG, "$ " + command, self.END)
-        if command.startswith('cd '):
-            os.chdir(command.partition('cd ')[2])
-
-        else:
-            self.result = gso(command)
-
-        print(self.result[1])
-        print()
-        if self.result[0] != 0:
-            print(self.CR, "Job #{} failed! Exited with code #{}".format(str(self.job_no), str(self.result[0])), self.END)
-            self.retcode = 1
-            self.justContinue = True
-
-        else:
-            self.retcode = 0
-
-        self.report.append(self.result)
-        timeout(1)
-        return self.retcode
-    """
 
     def run(self, command):
         self.job_no += 1
@@ -91,7 +87,9 @@ class testEnvLinux:
 
         print()
         if self.result[0] != 0:
-            print(self.CR, "Job #{} failed! Exited with code #{}".format(str(self.job_no), str(self.result[0])), self.END)
+            print(self.CR, "Job #{} failed! Exited with code\
+#{}".format(str(self.job_no),
+                        str(self.result[0])), self.END)
             self.retcode = 1
             self.justContinue = True
 
@@ -109,23 +107,29 @@ class testEnvLinux:
                 gso('virtualenv --python=python3.6 ' + self.py36)
 
             else:
-                print(self.CGR, "[i] Reusing Previous Environment...", self.END)
-                print(self.CGR, "[i] Remove {} to recreate...".format(self.py36))
+                print(self.CGR, "[i] Reusing Previous\
+Environment...", self.END)
+                print(self.CGR, "[i] Remove {} to\
+recreate...".format(self.py36))
 
             os.chdir(self.py36)
 
         else:
-            print(self.CY, "[i] Not testing on a virtual environment!", self.END)
+            print(self.CY, "[i] Not testing on a\
+virtual environment!", self.END)
             if gso('git stash push')[0] == 0:
                 pass
 
             else:
-                print(self.CR, "[i] Cannot stash current changes! Please manually")
-                print("stash or commit your current changes to continue.", self.END)
+                print(self.CR, "[i] Cannot stash\
+current changes! Please manually")
+                print("stash or commit your current\
+changes to continue.", self.END)
                 sys.exit(6)
 
         self.rootdir = os.getcwd()
-        print(self.CGR, "[i] Environment set! Now starting to test...", self.END)
+        print(self.CGR, "[i] Environment set!\
+Now starting to test...", self.END)
         timeout(1)
 
     def get_results(self):
@@ -136,7 +140,10 @@ class testEnvLinux:
             iterator += 1
             if result[0] == 0:
                 retcode = 0
-                print(self.CG, "Job #{} exited with code ".format(str(iterator)) + str(result[0]) + "!", self.END)
+                print(self.CG, "Job #{} exited\
+with code ".format(
+                            str(iterator)) +
+                        str(result[0]) + "!", self.END)
                 print()
                 print("="*50)
                 """
@@ -147,7 +154,8 @@ class testEnvLinux:
 
             else:
                 retcode = 1
-                print(self.CR, "Job #{} exited with code ".format(str(iterator)) + str(result[0]) + "!", self.END)
+                print(self.CR, "Job #{} exited with\
+code ".format(str(iterator)) + str(result[0]) + "!", self.END)
                 print()
                 print("="*50)
                 """
@@ -159,7 +167,10 @@ class testEnvLinux:
         print()
         return(retcode)
 
+
 def run():
+    print("{} [recreate/no_virtualenv]".format(sys.argv[0]))
+    print()
     if 'recreate' in sys.argv:
         gso('rm -rf ' + testEnvLinux().py36)
 
@@ -182,6 +193,7 @@ def run():
         cleanup = []
 
     testEnvLinux(newenv).main(setup, test, cleanup)
+
 
 if __name__ == '__main__':
     if os.name == 'nt':

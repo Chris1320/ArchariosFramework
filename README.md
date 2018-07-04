@@ -5,7 +5,9 @@ It was created on Wednesday, June 27, 2018.
 It provides tools that you need for
 reconnaissance, scanning, exploitation,
 encryption, password cracking, and more!
-Archarios Framework is maintained by Catayao56.
+Archarios Framework is maintained by Catayao56,
+and is the child of the old toolkit and framework,
+Shadow Suite Toolkit.
 
 ## What's new?
 + Initial Release
@@ -65,7 +67,13 @@ Archarios Framework is maintained by Catayao56.
 
 ## Credits
 
-	Project Lead: Catayao56
+* Development Team
+    + Project Lead: Catayao56
+
+* Others
+    + Offensive Security: Kali Linux, exploit-db, and Kali NetHunter
+    + Termux Development Team: Termux Android Emulator
+
 ## Requirements
 + Tested Operating Systems are Kali, Mint, Ubuntu, Termux Terminal Emulator for Android, and Cygwin Terminal Emulator for Windows
 	
