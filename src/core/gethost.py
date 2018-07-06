@@ -17,11 +17,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import socket
-import sys
-import os
+
 
 def current():
-    # return the current hostname
+    """
+    def current():
+        return the current hostname
+    """
+
     try:
         hostname = socket.gethostname()
 
@@ -31,8 +34,19 @@ def current():
     else:
         return hostname
 
+
 def byname(domain):
-    # map a hostname to its IP number
+    """
+    def byname():
+        map a hostname to its IP number
+
+        :param domain: Domain to map.
+        :type str:
+
+        :returns: ip or error exception
+        :return type: str <specific>Exception
+    """
+
     try:
         ip = socket.gethostbyname(domain)
         return ip
@@ -43,8 +57,19 @@ def byname(domain):
     else:
         return ip
 
+
 def byaddr(ip):
-    # map an IP number or hostname to DNS info
+    """
+    def byaddr():
+        map an IP number or hostname to DNS info
+
+        :param ip: IP to map.
+        :type str:
+
+        :returns: ip or Exception
+        :return type: str or <specific>Exception
+    """
+
     try:
         host = socket.gethostbyaddr(ip)
 

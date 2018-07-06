@@ -16,27 +16,19 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import urllib.request
 
-
-def getHTML(target):
+class InvalidParameterError(Exception):
     """
-    def getHTML():
-        Download the HTML file of <target>.
-
-        :param target: Target IP or domain to download HTML file.
-        :type str:
-
-        :returns: HTML string or Exception
-        :return type: str or <specific>Exception
+    class InvalidParameterError():
+        An exception class.
     """
 
-    try:
-        if 'http' not in target:
-            target = 'http://' + target
+    pass
 
-        page = urllib.request.urlopen(target)
-        return page
+class UnknownHashTypeError(Exception):
+    """
+    class UnknownHashTypeError():
+        An exception class.
+    """
 
-    except Exception as error:
-        return error
+    pass

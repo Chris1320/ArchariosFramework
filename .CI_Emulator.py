@@ -69,8 +69,8 @@ class testEnvLinux:
 
             else:
                 print(self.CR, "[i] Cannot pop previous stash! Please\
-manually type 'git stash pop' to get back\
-to work.", self.END)
+ manually type 'git stash pop' to get back\
+ to work.", self.END)
                 sys.exit(rc + 1)
 
         else:
@@ -88,7 +88,7 @@ to work.", self.END)
         print()
         if self.result[0] != 0:
             print(self.CR, "Job #{} failed! Exited with code\
-#{}".format(str(self.job_no),
+ #{}".format(str(self.job_no),
                         str(self.result[0])), self.END)
             self.retcode = 1
             self.justContinue = True
@@ -108,28 +108,28 @@ to work.", self.END)
 
             else:
                 print(self.CGR, "[i] Reusing Previous\
-Environment...", self.END)
-                print(self.CGR, "[i] Remove {} to\
-recreate...".format(self.py36))
+ Environment...", self.END)
+                print(self.CGR, "[i] Remove {} or run with \
+`--recreate` switch to recreate virtual environment...".format(self.py36))
 
             os.chdir(self.py36)
 
         else:
             print(self.CY, "[i] Not testing on a\
-virtual environment!", self.END)
+ virtual environment!", self.END)
             if gso('git stash push')[0] == 0:
                 pass
 
             else:
                 print(self.CR, "[i] Cannot stash\
-current changes! Please manually")
+ current changes! Please manually")
                 print("stash or commit your current\
-changes to continue.", self.END)
+ changes to continue.", self.END)
                 sys.exit(6)
 
         self.rootdir = os.getcwd()
         print(self.CGR, "[i] Environment set!\
-Now starting to test...", self.END)
+ Now starting to test...", self.END)
         timeout(1)
 
     def get_results(self):
@@ -141,7 +141,7 @@ Now starting to test...", self.END)
             if result[0] == 0:
                 retcode = 0
                 print(self.CG, "Job #{} exited\
-with code ".format(
+ with code ".format(
                             str(iterator)) +
                         str(result[0]) + "!", self.END)
                 print()
@@ -155,7 +155,7 @@ with code ".format(
             else:
                 retcode = 1
                 print(self.CR, "Job #{} exited with\
-code ".format(str(iterator)) + str(result[0]) + "!", self.END)
+ code ".format(str(iterator)) + str(result[0]) + "!", self.END)
                 print()
                 print("="*50)
                 """
@@ -169,29 +169,38 @@ code ".format(str(iterator)) + str(result[0]) + "!", self.END)
 
 
 def run():
-    print("{} [recreate/no_virtualenv]".format(sys.argv[0]))
     print()
-    if 'recreate' in sys.argv:
-        gso('rm -rf ' + testEnvLinux().py36)
+    for arg in sys.argv:
+        if arg.lower() == '--recreate':
+            gso('rm -rf ' + testEnvLinux().py36)
+            gso('ls -a')
+            recreates = "[Recreate Virtual Environment]"
 
-    if 'no_virtualenv' in sys.argv:
-        newenv = False
+        else:
+            recreates = ""
 
-    else:
-        newenv = True
+        if arg.lower() == '--no_virtualenv':
+            newenv = False
+            newenvs = "[No Virtual Environment]"
+
+        else:
+            newenv = True
+            newenvs = ""
 
     if newenv:
         # Write pipeline here if you will use virtual environment.
         setup = ['ls', 'cp -r ../src ./Archarios', 'ls', 'cd Archarios', 'pwd']
-        test = ['python3 archarios_framework.py --test']
+        test = ['python3 ArchariosFramework.py --test']
         cleanup = ['cd ..', 'rm -rf Archarios/']
 
     else:
         # Write pipeline here if you will NOT use virtual environment.
         setup = ['ls', 'cd src', 'pwd']
-        test = ['python3 archarios_framework.py --test']
+        test = ['python3 ArchariosFramework.py --test']
         cleanup = []
 
+    print("{0} Activated switches: {1} {2}".format(sys.argv[0],
+        newenvs, recreates))
     testEnvLinux(newenv).main(setup, test, cleanup)
 
 

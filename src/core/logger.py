@@ -16,6 +16,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+import time
+import random
+import logging
+
 """
 logger.py
 
@@ -44,10 +48,6 @@ Basic Usage:
     log_obj.critical("Sample critical message.")
     ```
 """
-
-import time
-import random
-import logging
 
 
 class LoggingObject:
@@ -131,6 +131,20 @@ class LoggingObject:
         """
 
         return self.log_datas
+
+    def get_log_data(self, log_number):
+        """
+        def get_log_data():
+            Get a specific log data.
+
+            :param log_number: The index number to get the data of log number.
+            :type int:
+
+            :returns: Return the content of the specified log number.
+            :return type: str
+        """
+
+        return self.log_datas[log_number]
 
     def get_latest_log_data(self):
         """

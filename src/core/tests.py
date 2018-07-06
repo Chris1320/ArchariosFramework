@@ -16,27 +16,22 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import urllib.request
-
-
-def getHTML(target):
+class TestingClass:
     """
-    def getHTML():
-        Download the HTML file of <target>.
-
-        :param target: Target IP or domain to download HTML file.
-        :type str:
-
-        :returns: HTML string or Exception
-        :return type: str or <specific>Exception
+    class TestingClass():
+        The testing class of Archários Framework.
     """
 
-    try:
-        if 'http' not in target:
-            target = 'http://' + target
+    def __init__(self):
+        """
+        def __init__():
+            Initialization method for testing.
+        """
+        pass
 
-        page = urllib.request.urlopen(target)
-        return page
-
-    except Exception as error:
-        return error
+    def main(self):
+        """
+        def main():
+            The main method of TestingClass() class.
+        """
+        pass

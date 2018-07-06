@@ -41,7 +41,6 @@ import locale
 import time
 import curses
 import random
-from collections import namedtuple
 import sys
 PYTHON2 = sys.version_info.major < 3
 locale.setlocale(locale.LC_ALL, '')
@@ -69,6 +68,7 @@ MATRIX_CODE_CHARS = "ɀɁɂŧϢϣϤϥϦϧϨϫϬϭϮϯϰϱϢϣϤϥϦϧϨϩϪϫϬ�
 COLOR_CHAR_NORMAL = 1
 COLOR_CHAR_HIGHLIGHT = 2
 COLOR_WINDOW = 3
+
 
 class FallingChar(object):
     matrixchr = list(MATRIX_CODE_CHARS)
@@ -128,6 +128,7 @@ class FallingChar(object):
 
         return -1, -1, None
 
+
 class WindowAnimation(object):
     def __init__(self, x, y):
         self.x = x
@@ -136,7 +137,7 @@ class WindowAnimation(object):
 
     def tick(self, scr, steps):
         if self.step > WINDOW_SIZE:
-            #stop window animation after some steps
+            # stop window animation after some steps
             self.draw_frame(scr, self.x - self.step, self.y - self.step,
                             self.x + self.step, self.y + self.step,
                             curses.A_NORMAL)
@@ -148,14 +149,14 @@ class WindowAnimation(object):
             self.draw_frame(scr, self.x - anistep, self.y - anistep,
                             self.x + anistep, self.y + anistep,
                             curses.A_NORMAL, ' ')
-        #cancel last animation
+        # cancel last animation
         self.draw_frame(scr, self.x - self.step, self.y - self.step,
                         self.x + self.step, self.y + self.step,
                         curses.A_NORMAL)
-        #next step
+        # next step
         self.step += WINDOW_ANIMATION_SPEED
 
-        #draw outer frame
+        # draw outer frame
         self.draw_frame(scr, self.x - self.step, self.y - self.step,
                         self.x + self.step, self.y + self.step,
                         curses.A_REVERSE)
@@ -189,18 +190,22 @@ def rand():
     # ~ 2 x as fast as random.randint
     a = 9328475634
     while True:
-        a ^= (a << 21) & 0xffffffffffffffff;
-        a ^= (a >> 35);
-        a ^= (a << 4) & 0xffffffffffffffff;
+        a ^= (a << 21) & 0xffffffffffffffff
+        a ^= (a >> 35)
+        a ^= (a << 4) & 0xffffffffffffffff
         yield a
 
+
 r = rand()
+
+
 def randint(_min, _max):
     if PYTHON2:
         n = r.next()
     else:
         n = r.__next__()
     return (n % (_max - _min)) + _min
+
 
 def main():
     steps = 0
@@ -235,13 +240,13 @@ def main():
             scr.addstr(y, x, ' ')
         if randint(0, WINDOW_CHANCE) == 1:
             if window_animation is None:
-                #start window animation
+                # start window animation
                 line = random.choice(lines)
                 window_animation = WindowAnimation(line.x, line.y)
-        if not window_animation is None:
-           still_active = window_animation.tick(scr, steps)
-           if not still_active:
-               window_animation = None
+        if window_animation is not None:
+            still_active = window_animation.tick(scr, steps)
+            if not still_active:
+                window_animation = None
 
         scr.refresh()
         time.sleep(SLEEP_MILLIS)
@@ -250,4 +255,3 @@ def main():
             if key_pressed:
                 raise KeyboardInterrupt()
         steps += 1
-
