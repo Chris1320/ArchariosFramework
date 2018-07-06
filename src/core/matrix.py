@@ -46,6 +46,9 @@ PYTHON2 = sys.version_info.major < 3
 locale.setlocale(locale.LC_ALL, '')
 encoding = locale.getpreferredencoding()
 
+objects = ['main', 'randint', 'rand', 'WindowAnimation',
+        'FallingChar']
+
 ########################################################################
 # TUNABLES
 

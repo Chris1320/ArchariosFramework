@@ -22,8 +22,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # Licensed under the GNU LGPL version 3.0
 
 # NOTE: Modified by Catayao56
+
 import textwrap
 
+objects = ['cowsay', '_build_cow', '_build_bubble', '_normalize_text', '_get_border']
 
 def cowsay(phrase, length=40):
     """
