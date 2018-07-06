@@ -16,6 +16,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+objects = ['LoggingObject']
+
 import time
 import random
 import logging
@@ -118,7 +120,7 @@ class LoggingObject:
         result = ":{}: [{}] ({}) {}".format(
                 logtype.upper(),
                 str(self.session_id),
-                time.asctime(),
+                time.strftime("%b %d %Y"),
                 message
                 )
 

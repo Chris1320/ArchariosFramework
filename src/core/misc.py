@@ -19,6 +19,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+objects = ['CR', 'CG', 'CY', 'CB', 'CGR', 'CP', 'CC', 'CLM', 'CLB',
+        'CLG', 'CLY', 'CLR', 'CLC', 'CLGR', 'BW', 'BR', 'BG', 'BY',
+        'BB', 'BM', 'BC', 'BGR', 'BLGR', 'BLR', 'BLG', 'BLY', 'BLB',
+        'BLM', 'BLC', 'BLW', 'FB', 'FI', 'FU', 'FE', 'END',
+        'ProgramFunctions']
+
 import os
 import sys
 
@@ -399,7 +405,7 @@ class ProgramFunctions:
             Return a random color.
         """
 
-        color_list = [CW, CR, CG, CY, CB, CGR, CP, CC, CK, CLM, CLB, CLG, CLY,
+        color_list = [CR, CG, CY, CB, CGR, CP, CC, CLM, CLB, CLG, CLY,
                 CLR, CLC, CLGR]
         randomizer = random.randint(0, 15)
         return color_list[randomizer]

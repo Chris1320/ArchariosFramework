@@ -16,6 +16,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+objects = ['CSI', 'OSC', 'BEL', 'code_to_chars', 'set_title',
+        'clear_screen', 'clear_line', 'AnsiCodes', 'AnsiCursor'
+        ]
+
 # Constants
 CSI = '\033['
 OSC = '\033]'

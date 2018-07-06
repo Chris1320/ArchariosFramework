@@ -16,6 +16,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+objects = ['InvalidParameterError', 'UnknownHashTypeError',
+        'UnknownUserLevelError']
 
 class InvalidParameterError(Exception):
     """
@@ -28,6 +30,14 @@ class InvalidParameterError(Exception):
 class UnknownHashTypeError(Exception):
     """
     class UnknownHashTypeError():
+        An exception class.
+    """
+
+    pass
+
+class UnknownUserLevelError(Exception):
+    """
+    class UnknownUserLevelError():
         An exception class.
     """
 
