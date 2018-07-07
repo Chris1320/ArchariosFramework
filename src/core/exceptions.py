@@ -50,3 +50,11 @@ class InvalidCommandError(Exception):
     """
 
     pass
+
+class NameTooLongError(Exception):
+    """
+    class NameTooLong():
+        An exception class.
+    """
+
+    pass
