@@ -23,10 +23,13 @@ try:
     # Import system libraries.
     import os
     import sys
+    import time
     import atexit
     import signal
     import readline
+    import importlib
     import traceback
+    import subprocess
 
     # Import core libraries
     from core import ansi
@@ -35,11 +38,10 @@ try:
     from core import tests
     from core import cowsay
     from core import logger
-    from core import matrix
     from core import gethost
+    from core import printer
     from core import exceptions
     from core import asciigraphs
-    from core import touchingsky
     from core import random_phrases
     from core import html_downloader
 
@@ -75,7 +77,7 @@ class ArchariosFramework:
         # Program Information
         self.logger.info('Defining program information.')
         self.name = "Archários Framework"
-        self.version = "0.0.0.3"
+        self.version = "0.0.0.5"
         self.codename = "Alpha"
         self.description = "The Novice's Ethical Hacking Framework"
         self.banner = r"""{0}
@@ -125,7 +127,8 @@ class ArchariosFramework:
                 'data/default.dat')  # Get config file.
         self.logger.info("Config file used: {0}".format(self.config_file))
         self.logger.info("Checking if debug is True...")
-        if kwargs.get('debug', False) is True:  # Enable debugging.
+        self.debug = kwargs.get('debug', False)
+        if self.debug is True:  # Enable debugging.
             self.logger.info("Debug is True, showing logs...")
             self.logger.enable_logging()
             self.logger.info("Debugging started.")
@@ -169,6 +172,12 @@ class ArchariosFramework:
                 misc.CG, self.filename, misc.END,
                 misc.CC, self.hostname
                 )
+
+        self.latest_exceptions = traceback.format_exc()
+        self.module_call = """ArchariosFrameworkModule(debug=self.debug, \
+fname=self.name, fversion=self.version, fcodename=self.codename, \
+fdescription=self.description, fbanner=self.banner, \
+userlevel=self.userlevel, logger=self.logger)"""  # To be used with `eval()`.
 
         # Setup interpreter history
         self.logger.info("Setting up interpreter history...")
@@ -221,9 +230,12 @@ will use the default settings.".format(self.name),
                 "",
                 "INTERACTIVE MODE COMMANDS:",
                 "",
-                "help              Show this help menu.",
-                "restart reboot    Restart {0}.".format(self.name),
-                "quit exit         Exit {0}.".format(self.name)
+                "help                  Show this help menu.",
+                "show [OPTION]         Show information about <option>.",
+                "module [OPTION]       Manage modules. (Type `module ?` for info.)",
+                "run exec [COMMAND]    Pass <command> to the shell.",
+                "restart reboot        Restart {0}.".format(self.name),
+                "quit exit             Exit {0}.".format(self.name)
                 ]
 
         self.logger.info("Return type recieved: {0}".format(rtype))
@@ -241,7 +253,8 @@ will use the default settings.".format(self.name),
             return result
 
         else:
-            self.logger.error("Cannot identify what `{0} means.`".format(rtype))
+            self.latest_exceptions = traceback.format_exc()
+            self.logger.error("Cannot identify what `{0}` means.".format(rtype))
             raise exceptions.InvalidParameterError("Unknown parameter passed! Must be `default` or `list`.")
 
     def _set_interpreter_history(self):
@@ -342,11 +355,18 @@ will use the default settings.".format(self.name),
                     continue
 
         except(FileNotFoundError):
+            self.latest_exceptions = traceback.format_exc()
             self.logger.error("{0} was not found.".format(self.config_file))
-            print(error.ErrorClass().ERROR0001(self.config_file))
+            printer.Printer().print_with_status(str(
+                error.ErrorClass().ERROR0001(self.config_file)), 2)
             self._proper_exit(1)
 
     def _proper_exit(self, exit_code=0):
+        """
+        def _proper_exit():
+            Performs `cleanup` before exit.
+        """
+
         if exit_code == 0:
             self.logger.info("SystemExit raised with error code `{0}`.".format(
                 str(exit_code)))
@@ -357,6 +377,44 @@ will use the default settings.".format(self.name),
 
         ansi.set_title("")
         sys.exit(exit_code)
+
+    def _import_module(self, module):
+        """
+        def _import_module():
+            Import <module> using importlib.
+        """
+
+        try:
+            module_object = importlib.import_module('modules.' + module)
+
+        except Exception as err:
+            self.latest_exceptions = traceback.format_exc()
+            printer.Printer().print_with_status(str(err), 2)
+            printer.Printer().print_with_status("Use `show tracebacks` \
+for more info.", 2)
+            return None
+
+        else:
+            return module_object
+
+    def _reload_module(self, module):
+        """
+        def _reload_module():
+            Reload <module> using importlib.
+        """
+
+        try:
+            module_object = importlib.reload_module('modules.' + module)
+
+        except Exception as err:
+            self.latest_exceptions = traceback.format_exc()
+            printer.Printer().print_with_status(str(err), 2)
+            printer.Printer().print_with_status("Use `show tracebacks` \
+for more info.", 2)
+            return None
+
+        else:
+            return module_object
 
     def console(self):
         """
@@ -392,18 +450,261 @@ will use the default settings.".format(self.name),
                 else:
                     raise exceptions.UnknownUserLevelError("There is a problem obtaining the userlevel.")
 
-                self.parse_input(self.command)
+                if ' && ' in self.command:
+                    iterator = 0
+                    self.command = self.command.split(' && ')
+                    for command in self.command:
+                        iterator += 1
+                        print()
+                        print("{0}Command {1}#{2}{3}: {4}".format(
+                            misc.CG, misc.CB, str(iterator),
+                            misc.END, command
+                            ))
+                        self.parse_input(command)
+                        time.sleep(1)
+
+                else:
+                    self.parse_input(self.command)
 
             except(KeyboardInterrupt):
-                print(error.ErrorClass().ERROR0002())
+                self.latest_exceptions = traceback.format_exc()
+                printer.Printer().print_with_status(str(
+                    error.ErrorClass().ERROR0002()), 2)
                 self.logger.warning(error.ErrorClass().ERROR0002())
                 self._proper_exit(2)
+
+            except(EOFError):
+                print("More Options")
+                print()
+                print("[01] Standby")
+                print("[02] Force Shutdown")
+                print()
+                print("[99] Back to console")
+                print()
+                while True:
+                    try:
+                        ctrl_d_option = int(input(" >>> "))
+                        if ctrl_d_option == 1:
+                            try:
+                                print(cowsay.cowsay("I'm sleeping, but my \
+eyes were open").replace('(oo)', '(==)'))
+                                while True:
+                                    time.sleep(60)
+
+                            except(KeyboardInterrupt, EOFError):
+                                break
+
+                        elif ctrl_d_option == 2:
+                            sys.exit(1024)
+
+                        else:
+                            printer.Printer().print_with_status(
+                                    "Unknown option!", 2)
+                            continue
+
+                    except(KeyboardInterrupt, EOFError):
+                        continue
 
     def parse_input(self, command='help'):
         self.logger.info("Command recieved: `{0}`".format(command))
         if command.lower() in ('help', '?'):
             self.logger.info("Printing help menu.")
             print(self.help())
+
+        elif command.lower().startswith('show'):
+            command = command.lower().partition(' ')[2]
+            self.logger.info("Looking for matches of `{0}`...".format(
+                command
+                ))
+            if command in ('traceback', 'tracebacks'):
+                self.logger.info("Printing traceback information...")
+                print()
+                print("{0}{1}{2}{3} Latest Exceptions {3}{4}".format(
+                    misc.FB, misc.FI, misc.CC, ('=' * 25),
+                    misc.END
+                    ))
+                print()
+                print(self.latest_exceptions)
+                print()
+                print("{0}{1}{2}{3} Latest Exceptions {3}{4}".format(
+                    misc.FB, misc.FI, misc.CC, ('=' * 25),
+                    misc.END
+                    ))
+                print()
+
+            else:
+                self.logger.info("`{0}` is an unknown option to `show`.".format(
+                    command
+                    ))
+                printer.Printer().print_with_status(
+                        "Unknown option: {0}".format(command), 2)
+
+                print("""
+USAGE: show [OPTIONS]
+
+OPTIONS:
+    traceback tracebacks    Show the latest traceback information.
+""")
+
+        elif command.lower().startswith('module'):
+            try:
+                command = command.split(' ')
+                self.logger.info("Looking for matches of `{0}`...".format(
+                    command[1]
+                    ))
+                if command[1] == ('info'):
+                    self.logger.info("Importing {0} module...".format(
+                        command[2]
+                        ))
+                    module_obj = self._import_module(command[2])
+                    self.logger.info("Checking if importing succeeded...")
+                    if module_obj is None:
+                        self.logger.error("Importing failed.")
+                        return None
+
+                    else:
+                        self.logger.info("Importing succeeded; Calling \
+show_module_info()...")
+                        try:
+                            eval("module_obj.{0}.show_module_info()".format(
+                                self.module_call
+                                ))
+
+                        except(SystemExit):
+                            self.logger.info("SystemExit detected from module..")
+                            return None
+
+                        except Exception as exception:
+                            self.latest_exceptions = traceback.format_exc()
+                            printer.Printer().print_with_status(
+                                    str(exception), 2
+                                    )
+
+                elif command[1] in ('generate', 'new'):
+                    print("{0}{1}Create new module...{2}".format(
+                        misc.FB, misc.CG, misc.END
+                        ))
+                    while True:
+                        try:
+                            gen_module_name = input("Module name: ")
+                            gen_description = input("Brief Description about \
+the module: ")
+                            gen_author = input("Module Author's/Your Name: ")
+                            if len(gen_module_name) > 20 or len(
+                                    gen_module_name) < 1:
+                                printer.Printer().print_with_status(
+                                        "Module name must be 1-20 characters!",
+                                        2
+                                        )
+                                continue
+
+                            if len(gen_description) > 100 or len(
+                                    gen_description) < 1:
+                                printer.Printer().print_with_status(
+                                        "Module's brief description must \
+be 1-100 characters!", 2
+                                        )
+                                continue
+
+                            if len(gen_author) < 1 or len(gen_author) > 50:
+                                printer.Printer().print_with_status(
+                                        "`author` variable must be 1-50 \
+characters!", 2
+                                        )
+                                continue
+
+                        except(KeyboardInterrupt, EOFError):
+                            printer.Printer().print_with_status(
+                                    "Module creation cancelled...", 1
+                                    )
+                            return None
+
+                        gen_filename = gen_module_name.lower().replace(' ',
+                                '_')
+                        try:
+                            with open('core/module_template.py',
+                                    'r') as fopen:
+                                gen_module_data = fopen.read()
+
+                        except(IOError, FileNotFoundError, OSError, \
+                                PermissionError):
+                            self.latest_exceptions = traceback.format_exc()
+                            printer.Printer().print_with_status(
+                                    "Error while reading template!", 2
+                                    )
+                            return None
+
+                        else:
+                            gen_module_data = gen_module_data.replace(
+                                    "<MODULE_NAME>",
+                                    gen_module_name).replace(
+                                    "<BRIEF_DESCRIPTION>", gen_description
+                                    ).replace(
+                                    "<MODULE_AUTHOR>", gen_author
+                                    ).replace(
+                                    "<DATE_CREATED>", time.strftime("%b. \
+%d %Y")
+                                    )
+
+                            try:
+                                with open(
+                                        "output/{0}.py".format(
+                                        gen_filename), 'a') as fopen:
+                                            fopen.write(gen_module_data)
+
+                                printer.Printer().print_with_status(
+                                        "{0}.py module created \
+successfully!".format(gen_filename))
+                                print("Now, edit your module located in \
+output/{0}.py and create your amazing extension module!".format(gen_filename))
+
+                            except(IOError, OSError, PermissionError):
+                                self.latest_exceptions = traceback.format_exc()
+                                printer.Printer().print_with_status(
+                                        "Error while writing to file!", 2)
+                                return None
+
+                            break
+
+                else:
+                    self.logger.info("No match for {0}... Showing help \
+menu...".format(command[1]))
+                    printer.Printer().print_with_status("Unknown option \
+`{0}`!".format(command[1]), 2)
+                    raise IndexError
+
+            except IndexError:
+                print("""
+USAGE: module [OPTIONS]
+
+OPTIONS:
+    info [MODULE]   Show information of the specified module.
+    new generate    Generate a new module from template.
+""")
+
+        elif command.lower().startswith(('run', 'exec')):
+            command = command.partition(' ')[2]
+            self.logger.info("Running command `{0}`...".format(
+                command
+                ))
+            try:
+                if command == '':
+                    raise exceptions.InvalidCommandError("Command must not be NoneType!")
+
+                else:
+                    print()
+                    # subprocess.call(command)  # DEV0004: Use subprocess
+                    os.system(command)
+                    print()
+
+            except(PermissionError, OSError):
+                self.latest_exceptions = traceback.format_exc()
+                printer.Printer().print_with_status(str(
+                    error.ErrorClass().ERROR0004('command')), 2)
+
+            except Exception as err:
+                self.latest_exceptions = traceback.format_exc()
+                printer.Printer().print_with_status(str(err), 2)
 
         elif command.lower() in ('restart', 'reboot'):
             self.logger.info("Restarting...")
@@ -413,13 +714,18 @@ will use the default settings.".format(self.name),
                     0.10
                     )
             misc.ProgramFunctions().clrscrn()
+            readline.write_history_file()
             misc.ProgramFunctions().program_restart()
 
         elif command.lower() in ('quit', 'exit'):
+            print(misc.FB + misc.FI + misc.ProgramFunctions().random_color() +
+                    random_phrases.phrases() + misc.END)
             self._proper_exit(0)
 
         else:
-            print(error.ErrorClass().ERROR0003(command))
+            self.latest_exceptions = traceback.format_exc()
+            printer.Printer().print_with_status(str(
+                error.ErrorClass().ERROR0003(command)), 2)
             self.logger.error("Unknown or invalid input recieved: {0}".format(
                 command))
             print("{0} Type '{1}help{0}' for more information.{2}".format(

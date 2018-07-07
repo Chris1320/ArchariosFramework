@@ -17,7 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 objects = ['InvalidParameterError', 'UnknownHashTypeError',
-        'UnknownUserLevelError']
+        'UnknownUserLevelError', 'InvalidCommandError']
 
 class InvalidParameterError(Exception):
     """
@@ -38,6 +38,22 @@ class UnknownHashTypeError(Exception):
 class UnknownUserLevelError(Exception):
     """
     class UnknownUserLevelError():
+        An exception class.
+    """
+
+    pass
+
+class InvalidCommandError(Exception):
+    """
+    class InvalidCommandError():
+        An exception class.
+    """
+
+    pass
+
+class NameTooLongError(Exception):
+    """
+    class NameTooLong():
         An exception class.
     """
 
