@@ -46,19 +46,25 @@ class Printer:
             :type object:
 
             :param status: Status number.
-            :type int: 0 = Normal; 1 = Warning; 2 = Error
+            :type int:
+                0 = Normal;
+                1 = Warning;
+                2 = Error
         """
 
         if status == 0:
-            print(misc.CG, obj, misc.END)
+            print('{2}[{0}+{2}]{1}'.format(misc.CG, misc.END, misc.CGR),
+                    misc.CG, obj, misc.END)
             return None
 
         elif status == 1:
-            print(misc.CY, obj, misc.END)
+            print('{2}[{0}!{2}]{1}'.format(misc.CY, misc.END, misc.CGR),
+                    misc.CY, obj, misc.END)
             return None
 
         elif status == 2:
-            print(misc.CR, obj, misc.END)
+            print('{2}[{0}E{2}]{1}'.format(misc.CR, misc.END, misc.CGR),
+                    misc.CR, obj, misc.END)
             return None
 
         else:

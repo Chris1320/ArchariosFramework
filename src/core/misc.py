@@ -407,7 +407,7 @@ class ProgramFunctions:
 
         color_list = [CR, CG, CY, CB, CGR, CP, CC, CLM, CLB, CLG, CLY,
                 CLR, CLC, CLGR]
-        randomizer = random.randint(0, 15)
+        randomizer = random.randint(0, (len(color_list) - 1))
         return color_list[randomizer]
 
     def captcha_picker(self, list_of_strings=[]):

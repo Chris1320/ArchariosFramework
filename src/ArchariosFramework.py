@@ -27,6 +27,7 @@ try:
     import signal
     import readline
     import traceback
+    import subprocess
 
     # Import core libraries
     from core import ansi
@@ -37,6 +38,7 @@ try:
     from core import logger
     from core import matrix
     from core import gethost
+    from core import printer
     from core import exceptions
     from core import asciigraphs
     from core import touchingsky
@@ -75,7 +77,7 @@ class ArchariosFramework:
         # Program Information
         self.logger.info('Defining program information.')
         self.name = "Archários Framework"
-        self.version = "0.0.0.3"
+        self.version = "0.0.0.4"
         self.codename = "Alpha"
         self.description = "The Novice's Ethical Hacking Framework"
         self.banner = r"""{0}
@@ -170,6 +172,8 @@ class ArchariosFramework:
                 misc.CC, self.hostname
                 )
 
+        self.latest_exceptions = traceback.format_exc()
+
         # Setup interpreter history
         self.logger.info("Setting up interpreter history...")
         self.history_file = "data/history.log"
@@ -221,9 +225,10 @@ will use the default settings.".format(self.name),
                 "",
                 "INTERACTIVE MODE COMMANDS:",
                 "",
-                "help              Show this help menu.",
-                "restart reboot    Restart {0}.".format(self.name),
-                "quit exit         Exit {0}.".format(self.name)
+                "help                  Show this help menu.",
+                "run exec [COMMAND]    Pass <command> to the shell.",
+                "restart reboot        Restart {0}.".format(self.name),
+                "quit exit             Exit {0}.".format(self.name)
                 ]
 
         self.logger.info("Return type recieved: {0}".format(rtype))
@@ -241,7 +246,8 @@ will use the default settings.".format(self.name),
             return result
 
         else:
-            self.logger.error("Cannot identify what `{0} means.`".format(rtype))
+            self.latest_exceptions = traceback.format_exc()
+            self.logger.error("Cannot identify what `{0}` means.".format(rtype))
             raise exceptions.InvalidParameterError("Unknown parameter passed! Must be `default` or `list`.")
 
     def _set_interpreter_history(self):
@@ -342,8 +348,10 @@ will use the default settings.".format(self.name),
                     continue
 
         except(FileNotFoundError):
+            self.latest_exceptions = traceback.format_exc()
             self.logger.error("{0} was not found.".format(self.config_file))
-            print(error.ErrorClass().ERROR0001(self.config_file))
+            printer.Printer().print_with_status(str(
+                error.ErrorClass().ERROR0001(self.config_file)), 2)
             self._proper_exit(1)
 
     def _proper_exit(self, exit_code=0):
@@ -395,15 +403,63 @@ will use the default settings.".format(self.name),
                 self.parse_input(self.command)
 
             except(KeyboardInterrupt):
-                print(error.ErrorClass().ERROR0002())
+                self.latest_exceptions = traceback.format_exc()
+                printer.Printer().print_with_status(str(
+                    error.ErrorClass().ERROR0002()), 2)
                 self.logger.warning(error.ErrorClass().ERROR0002())
                 self._proper_exit(2)
+
+            except(EOFError):
+                print()
+                print("No options yet!")  # DEV0004
+                print()
 
     def parse_input(self, command='help'):
         self.logger.info("Command recieved: `{0}`".format(command))
         if command.lower() in ('help', '?'):
             self.logger.info("Printing help menu.")
             print(self.help())
+
+        elif command.lower().startswith('show'):
+            command = command.lower().partition(' ')[2]
+            if command in ('traceback', 'tracebacks'):
+                print()
+                print("{0}{1}{2}{3} Latest Exceptions {3}{4}".format(
+                    misc.FB, misc.FI, misc.CC, ('=' * 25),
+                    misc.END
+                    ))
+                print()
+                print(self.latest_exceptions)
+                print()
+                print("{0}{1}{2}{3} Latest Exceptions {3}{4}".format(
+                    misc.FB, misc.FI, misc.CC, ('=' * 25),
+                    misc.END
+                    ))
+                print()
+
+        elif command.lower().startswith(('run', 'exec')):
+            command = command.partition(' ')[2]
+            self.logger.info("Running command `{0}`...".format(
+                command
+                ))
+            try:
+                if command == '':
+                    raise exceptions.InvalidCommandError("Command must not be NoneType!")
+
+                else:
+                    print()
+                    # subprocess.call(command)  # DEV0004: Use subprocess
+                    os.system(command)
+                    print()
+
+            except(PermissionError, OSError):
+                self.latest_exceptions = traceback.format_exc()
+                printer.Printer().print_with_status(str(
+                    error.ErrorClass().ERROR0004('command')), 2)
+
+            except Exception as err:
+                self.latest_exceptions = traceback.format_exc()
+                printer.Printer().print_with_status(str(err), 2)
 
         elif command.lower() in ('restart', 'reboot'):
             self.logger.info("Restarting...")
@@ -419,7 +475,9 @@ will use the default settings.".format(self.name),
             self._proper_exit(0)
 
         else:
-            print(error.ErrorClass().ERROR0003(command))
+            self.latest_exceptions = traceback.format_exc()
+            printer.Printer().print_with_status(str(
+                error.ErrorClass().ERROR0003(command)), 2)
             self.logger.error("Unknown or invalid input recieved: {0}".format(
                 command))
             print("{0} Type '{1}help{0}' for more information.{2}".format(

@@ -66,3 +66,23 @@ class ErrorClass:
         return "{0}Unknown or invalid input recieved{2}: {3}{0}{1}{2}".format(
                 misc.CR, command, misc.END, misc.FB
                 )
+
+    def ERROR0004(self, proc_type='command', name='Archários Framework'):
+        """
+        def ERROR0004():
+            Call this if user attempts to run a command that needs root-level
+            permission/s.
+
+            :param proc_type: Origin of the error.
+            :type str: `command` or `module`
+
+            :param name: Name of the program.
+            :type str:
+        """
+
+        return """Sorry, the {0} you are trying to perform needs root \
+privileges. Please try the following:
+\t~ Please run {1} as root (For Linux)
+\t~ Please Run {1} as Administrator (For Windows)
+\t~ Make sure your smartphone is rooted and {1} has been granted superuser \
+privileges by the su binary. (For Android)""".format(proc_type, name)
