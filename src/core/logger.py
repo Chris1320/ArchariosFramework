@@ -120,7 +120,7 @@ class LoggingObject:
         result = ":{}: [{}] ({}) {}".format(
                 logtype.upper(),
                 str(self.session_id),
-                time.strftime("%b %d %Y"),
+                time.strftime("%H:%M:%S %b %d %Y"),
                 message
                 )
 
@@ -129,7 +129,7 @@ class LoggingObject:
     def get_all_log_datas(self):
         """
         def get_all_log_datas():
-            Return the log data in a form of dict in a list.
+            Return the log data in a form of tuple in a list.
         """
 
         return self.log_datas
