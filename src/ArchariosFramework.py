@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 Archarios Framework :: The Novice's Ethical Hacking Framework
@@ -24,6 +24,7 @@ try:
     import os
     import sys
     import time
+    # import flask  # NOTE: DEV0004: Future web interface ;)
     import atexit
     import signal
     import readline
@@ -44,7 +45,6 @@ try:
     from core import asciigraphs
     from core import random_phrases
     from core import html_downloader
-    from core import advancedhttpserver
 
 except ImportError:
     # Prints if error is encountered while importing modules.
@@ -78,7 +78,7 @@ class ArchariosFramework:
         # Program Information
         self.logger.info('Defining program information.')
         self.name = "Archários Framework"
-        self.version = "0.0.0.6"
+        self.version = "0.0.0.7"
         self.codename = "Alpha"
         self.description = "The Novice's Ethical Hacking Framework"
         self.banner = r"""{0}
@@ -160,6 +160,7 @@ class ArchariosFramework:
 
         else:
             pass
+
         self.prompt_lvl3 = "[" + misc.CG + self.filename + misc.END + '@' +\
         misc.CC + "{0}" + misc.END + "] >>> "
 
@@ -209,7 +210,7 @@ userlevel=self.userlevel, logger=self.logger)"""  # To be used with `eval()`.
                 "USAGE: {0} [SWITCHES]".format(self.filename),
                 "",
                 "SWITCHES:",
-                "    Debugging Seitches:",
+                "    Debugging Switches:",
                 "        Switch: -t --test /t /test",
                 "        Desc..: Test for errors and then exit.",
                 "",
@@ -229,6 +230,7 @@ will use the default settings.".format(self.name),
                 "help                  Show this help menu.",
                 "show [OPTION]         Show information about <option>.",
                 "module [OPTION]       Manage modules. (Type `module ?` for info.)",
+                "runpy [COMMAND]       Pass <command> to python shell. ({0}Use AT YOUR OWN RISK{1})".format(misc.FB + misc.CY, misc.END),
                 "run exec [COMMAND]    Pass <command> to the shell.",
                 "restart reboot        Restart {0}.".format(self.name),
                 "quit exit             Exit {0}.".format(self.name)
@@ -380,6 +382,9 @@ will use the default settings.".format(self.name),
             Import <module> using importlib.
         """
 
+        self.logger.info("Importing {0} via importlib...".format(
+            module
+            ))
         try:
             module_object = importlib.import_module('modules.' + module)
 
@@ -388,9 +393,12 @@ will use the default settings.".format(self.name),
             printer.Printer().print_with_status(str(err), 2)
             printer.Printer().print_with_status("Use `show tracebacks` \
 for more info.", 2)
+            self.logger.error("Something wrong happened while importing \
+{0}! Error: `{1}`; Returning None.".format(module, str(err)))
             return None
 
         else:
+            self.logger.info("Imported {0}! Returning object...".format(module))
             return module_object
 
     def _reload_module(self, module):
@@ -399,6 +407,9 @@ for more info.", 2)
             Reload <module> using importlib.
         """
 
+        self.logger.info("Reloading {0} via importlib...".format(
+            module
+            ))
         try:
             module_object = importlib.reload_module('modules.' + module)
 
@@ -407,9 +418,12 @@ for more info.", 2)
             printer.Printer().print_with_status(str(err), 2)
             printer.Printer().print_with_status("Use `show tracebacks` \
 for more info.", 2)
+            self.logger.info("Error while reloading {0}! Error: {1}; \
+Reloading None.".format(module, str(err)))
             return None
 
         else:
+            self.logger.info("Reloaded {0}! Returning new object...".format(module))
             return module_object
 
     def console(self):
@@ -428,7 +442,7 @@ for more info.", 2)
         print("{0}[{1}i{0}] {2}Type '{3}help{2}' for more information.\
                 {4}".format(misc.CGR, misc.CC, misc.CB, misc.CC, misc.END))
         print()
-        self.logger.info("Starting while loop...")
+        self.logger.info("Starting loop in terminal...")
         while True:
             try:
                 self.logger.info("Running {0} with userlevel of {1}.".format(
@@ -470,6 +484,7 @@ for more info.", 2)
                 self._proper_exit(2)
 
             except(EOFError):
+                self.logger.info("CTRL+D Detected; Showing additional options.")
                 print("More Options")
                 print()
                 print("[01] Standby")
@@ -482,23 +497,28 @@ for more info.", 2)
                         ctrl_d_option = int(input(" >>> "))
                         if ctrl_d_option == 1:
                             try:
+                                self.logger.info("Standing by...")
                                 print(cowsay.cowsay("I'm sleeping, but my \
-eyes were open").replace('(oo)', '(==)'))
+eyes were open. Press CTRL+C or CTRL+D when you are ready.").replace('(oo)', '(==)'))
                                 while True:
                                     time.sleep(60)
 
                             except(KeyboardInterrupt, EOFError):
+                                self.logger.info("Going back to work.")
                                 break
 
                         elif ctrl_d_option == 2:
+                            self.logger.critical("Forcing to quit")
                             sys.exit(1024)
 
                         else:
                             printer.Printer().print_with_status(
                                     "Unknown option!", 2)
+                            self.logger.info("Unknown option selected.")
                             continue
 
                     except(KeyboardInterrupt, EOFError):
+                        self.logger.info("^C/^D detected, continuing loop.")
                         continue
 
     def parse_input(self, command='help'):
@@ -512,34 +532,67 @@ eyes were open").replace('(oo)', '(==)'))
             self.logger.info("Looking for matches of `{0}`...".format(
                 command
                 ))
-            if command in ('traceback', 'tracebacks'):
-                self.logger.info("Printing traceback information...")
-                print()
-                print("{0}{1}{2}{3} Latest Exceptions {3}{4}".format(
-                    misc.FB, misc.FI, misc.CC, ('=' * 25),
-                    misc.END
-                    ))
-                print()
-                print(self.latest_exceptions)
-                print()
-                print("{0}{1}{2}{3} Latest Exceptions {3}{4}".format(
-                    misc.FB, misc.FI, misc.CC, ('=' * 25),
-                    misc.END
-                    ))
-                print()
+            try:
+                if command in ('traceback', 'tracebacks'):
+                    self.logger.info("Printing traceback information...")
+                    print()
+                    print("{0}{1}{2}{3} Latest Exceptions {3}{4}".format(
+                        misc.FB, misc.FI, misc.CC, ('=' * 25),
+                        misc.END
+                        ))
+                    print()
+                    print(self.latest_exceptions)
+                    print()
+                    print("{0}{1}{2}{3} Latest Exceptions {3}{4}".format(
+                        misc.FB, misc.FI, misc.CC, ('=' * 25),
+                        misc.END
+                        ))
+                    print()
 
-            else:
-                self.logger.info("`{0}` is an unknown option to `show`.".format(
-                    command
-                    ))
+                elif command in ('log_data', 'log_datas'):
+                    self.logger.info("Printing log data...")
+                    log_data = self.logger.get_all_log_datas()
+                    print()
+                    print("=" * 25, "LOG DATA", "=" * 25)
+                    print()
+                    for log in log_data:
+                        if log[1] == "info":
+                            print(misc.END, log[0])
+
+                        elif log[1] == "warning":
+                            print(misc.CY, log[0])
+
+                        elif log[1] == "error":
+                            print(misc.CR, log[0])
+
+                        elif log[1] == "debug":
+                            print(misc.CGR, log[0])
+
+                        elif log[1] == "critical":
+                            print(misc.FB, misc.CR, log[0])
+
+                        else:
+                            print(misc.FB, misc.CGR, log[0])
+
+                    print()
+                    print("=" * 25, "LOG DATA", "=" * 25)
+                    print()
+
+                else:
+                    self.logger.info("`{0}` is an unknown option to `show`.".format(
+                        command
+                        ))
+                    raise IndexError
+
+            except IndexError:
                 printer.Printer().print_with_status(
                         "Unknown option: {0}".format(command), 2)
-
                 print("""
 USAGE: show [OPTIONS]
 
 OPTIONS:
     traceback tracebacks    Show the latest traceback information.
+    log_data log_datas      Show the log data from the logger module.
 """)
 
         elif command.lower().startswith('module'):
@@ -575,9 +628,12 @@ show_module_info()...")
                             printer.Printer().print_with_status(
                                     str(exception), 2
                                     )
+                            self.logger.error("An error occured while using \
+the module: `{0}`".format(str(exception)))
 
                 elif command[1] in ('generate', 'new'):
-                    print("{0}{1}Create new module...{2}".format(
+                    self.logger.info("Creating new custom module...")
+                    print("{0}{1}Create new custom module...{2}".format(
                         misc.FB, misc.CG, misc.END
                         ))
                     while True:
@@ -586,6 +642,12 @@ show_module_info()...")
                             gen_description = input("Brief Description about \
 the module: ")
                             gen_author = input("Module Author's/Your Name: ")
+                            self.logger.info("Module name is {0} characters; \
+Description is {1} characters; And Author name is {2} characters.".format(
+                                        len(gen_module_name),
+                                        len(gen_description),
+                                        len(gen_author)
+                                        ))
                             if len(gen_module_name) > 20 or len(
                                     gen_module_name) < 1:
                                 printer.Printer().print_with_status(
@@ -613,10 +675,12 @@ characters!", 2
                             printer.Printer().print_with_status(
                                     "Module creation cancelled...", 1
                                     )
+                            self.logger.info("Module creating cancelled.")
                             return None
 
                         gen_filename = gen_module_name.lower().replace(' ',
                                 '_')
+                        self.logger.info("Reading core/module_template.py")
                         try:
                             with open('core/module_template.py',
                                     'r') as fopen:
@@ -628,9 +692,11 @@ characters!", 2
                             printer.Printer().print_with_status(
                                     "Error while reading template!", 2
                                     )
+                            self.logger.critical("Error while reading template!")
                             return None
 
                         else:
+                            self.logger.info("Modifying template...")
                             gen_module_data = gen_module_data.replace(
                                     "<MODULE_NAME>",
                                     gen_module_name).replace(
@@ -642,6 +708,9 @@ characters!", 2
 %d %Y")
                                     )
 
+                            self.logger.info("Writing to {0}...".format(
+                                        "output/" + gen_filename + ".py"
+                                        ))
                             try:
                                 with open(
                                         "output/{0}.py".format(
@@ -653,11 +722,14 @@ characters!", 2
 successfully!".format(gen_filename))
                                 print("Now, edit your module located in \
 output/{0}.py and create your amazing extension module!".format(gen_filename))
+                                self.logger.info("Module created!")
 
                             except(IOError, OSError, PermissionError):
                                 self.latest_exceptions = traceback.format_exc()
                                 printer.Printer().print_with_status(
                                         "Error while writing to file!", 2)
+                                self.logger.error("Error while writing \
+to file!")
                                 return None
 
                             break
@@ -685,6 +757,8 @@ detected from module...", 1)
                             return None
 
                         except Exception as exception:
+                            self.logger.info("An unknown error occured while \
+using module: {0}".format(str(exception)))
                             self.latest_exceptions = traceback.format_exc()
                             printer.Printer().print_with_status(
                                     str(exception), 2)
@@ -704,7 +778,11 @@ detected from module...", 1)
                                     raise exceptions.UnknownUserLevelError("\
 There is a problem obtaining the userlevel.")
 
+                                self.logger.info("User entered: " +
+                                    self.module_command)
+
                                 if self.module_command.lower().startswith("help"):
+                                    self.logger.info("Printing module help.")
                                     print()
                                     print("help                 Show this help \
 menu.")
@@ -740,24 +818,35 @@ options.".format(misc.FB, misc.CR, misc.END))
                                     print()
 
                                 elif self.module_command.lower().startswith("set"):
+                                    self.logger.info("Setting {0} to {1}.".format(mod_com[1], mod_com[2]))
                                     mod_com = self.module_command.split(' ')
-                                    options[mod_com[1]] = mod_com[2]
+                                    value_type = type(options[mod_com[1]])
+                                    try:
+                                        options[mod_com[1]] = value_type(mod_com[2])
+
+                                    except(TypeError, ValueError):
+                                        self.latest_exceptions = traceback.format_exc()
+                                        printer.Printer().print_with_error(
+                                        "Invalid value for key!", 2)
 
                                 elif self.module_command.lower().startswith("show"):
                                     mod_com = self.module_command.split(' ')
                                     if mod_com[1] == 'info':
+                                        self.logger.info("Printing module info.")
                                         eval("module_obj.{0}\
 .show_module_info()".format(self.module_call))
 
                                     elif mod_com[1]  == 'values':
+                                        self.logger.info("Showing current values.")
                                         print(misc.FB + "Current Values:" +
                                                 misc.END)
                                         for key in options:
-                                            print(misc.FB + misc.CR + key +
+                                            print(misc.FB + misc.CR + str(key) +
                                                     misc.END + ": " +
-                                                    options[key])
+                                                    str(options[key]))
 
                                     elif mod_com[1] == 'options':
+                                        self.logger.info("Showing available keys.")
                                         print(misc.FB + "Available Keys:" +
                                                 misc.END)
                                         for key in ohelp:
@@ -767,14 +856,18 @@ options.".format(misc.FB, misc.CR, misc.END))
 
                                 elif self.module_command.lower(
                                         ).startswith(("run", "exec")):
+                                    self.logger.info("Running module...")
                                     eval("module_obj.{0}.run(options)".format(
                                         self.module_call))
 
                                 elif self.module_command.lower().startswith(
                                         "back"):
+                                    self.logger.info("Quitting module...")
                                     return None
 
                                 else:
+                                    self.logger.info("Unknown command: " +
+                                            self.module_command)
                                     printer.Printer().print_with_status(
                                             "Unknown command: `{0}`!".format(
                                                 self.module_command
@@ -782,6 +875,7 @@ options.".format(misc.FB, misc.CR, misc.END))
                                             )
 
                             except(KeyboardInterrupt, EOFError):
+                                self.logger.info("Printing additional options.")
                                 print("More Options")
                                 print()
                                 print("[01] Standby")
@@ -791,15 +885,24 @@ options.".format(misc.FB, misc.CR, misc.END))
                                     try:
                                         moption = int(input(" >>> "))
                                         if moption == 1:
+                                            self.logger.info("Standing by...")
                                             print(cowsay.cowsay("I'm sleeping, \
-but my eyes were open").replace('(oo)', '(==)'))
-                                            while True:
-                                                time.sleep(60)
+                                                    but my eyes were open. Press CTRL+C or CTRL+D when you are ready.").replace('(oo)', '(==)'))
+                                            try:
+                                                while True:
+                                                    time.sleep(60)
+
+                                            except(KeyboardInterrupt, EOFError):
+                                                pass
 
                                         elif moption == 2:
+                                            self.logger.critical("Forcing to \
+quit module...")
                                             return None
 
                                         else:
+                                            self.logger.info("Unknown option: " +
+                                                    str(moption))
                                             printer.Printer().print_with_status(
                                                     "Unknown option!", 2)
                                             continue
@@ -824,6 +927,30 @@ OPTIONS:
     new generate             Generate a new module from template.
 """)
 
+        elif command.lower().startswith("runpy"):
+            command = command.partition(' ')[2]
+            self.logger.info("Running command `{0}`...".format(
+                command))
+            try:
+                if command == '':
+                    raise exceptions.InvalidCommandError("Command must not be NoneType!")
+
+                else:
+                    print()
+                    print(eval(command))
+                    print()
+
+            except(PermissionError, OSError):
+                self.latest_exceptions = traceback.format_exc()
+                printer.Printer().print_with_status(str(
+                    error.ErrorClass().ERROR0004('command')), 2)
+                self.logger.error("User recieved ERROR 0004.")
+
+            except Exception as err:
+                self.latest_exceptions = traceback.format_exc()
+                printer.Printer().print_with_status(str(err), 2)
+                self.logger.error(str(err))
+
         elif command.lower().startswith(('run', 'exec')):
             command = command.partition(' ')[2]
             self.logger.info("Running command `{0}`...".format(
@@ -835,7 +962,7 @@ OPTIONS:
 
                 else:
                     print()
-                    # subprocess.call(command)  # DEV0004: Use subprocess
+                    # subprocess.call(command)  # TODO: DEV0004: Use subprocess
                     os.system(command)
                     print()
 
@@ -843,14 +970,16 @@ OPTIONS:
                 self.latest_exceptions = traceback.format_exc()
                 printer.Printer().print_with_status(str(
                     error.ErrorClass().ERROR0004('command')), 2)
+                self.logger.error("User recieved ERROR 0004.")
 
             except Exception as err:
                 self.latest_exceptions = traceback.format_exc()
                 printer.Printer().print_with_status(str(err), 2)
+                self.logger.error(str(err))
 
         elif command.lower() in ('restart', 'reboot'):
             self.logger.info("Restarting...")
-            asciigraphs.ASCIIGraphs().animated_loading_screen(5,
+            asciigraphs.ASCIIGraphs().animated_loading_screen(6,
                     "Restarting {0}...".format(self.name),
                     'swapcase',
                     0.10
@@ -860,9 +989,13 @@ OPTIONS:
             misc.ProgramFunctions().program_restart()
 
         elif command.lower() in ('quit', 'exit'):
+            self.logger.info("Gracefully exiting {0}...".format(self.name))
             print(misc.FB + misc.FI + misc.ProgramFunctions().random_color() +
                     random_phrases.phrases() + misc.END)
             self._proper_exit(0)
+
+        elif command.lower() == "":
+            return None
 
         else:
             self.latest_exceptions = traceback.format_exc()
