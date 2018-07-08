@@ -1,4 +1,4 @@
-# Archários Framework v0.0.0.6 :: The Novice's Ethical Hacking Framework
+# Archários Framework v0.0.0.7 :: The Novice's Ethical Hacking Framework
 ## Copyright (C) 2018 :: Catayao56 <Catayao56@gmail.com>
 [Archarios Framework](https://gitlab.com/Catayao56/ArchariosFramework.git) is an Ethical Hacking Framework.
 It was created on Wednesday, June 27, 2018.
@@ -10,9 +10,16 @@ and is the child of the old toolkit and framework,
 Shadow Suite Toolkit.
 
 ## What's new?
-+ Module commands
-      ~ More module commands are now functional.
-      ~ This is a version with lots of bugs!
++ New command: `runpy`
+      -Run python commands throught the command-line and allows you to `hijack`
+       Archários's code without restarting! (Well, it is not the `main function` of
+       runpy command. It is just for debugging.)
+
++ Minor Bug Fixes
+      -Typo fix
+      -Implemented try/except blocks on some statements.
+
++ More logging verbosity.
 
 + ATTENTION: Contributors needed!
       -I can't do this without contributors or even testers,
