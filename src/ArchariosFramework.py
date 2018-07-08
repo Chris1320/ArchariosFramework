@@ -44,6 +44,7 @@ try:
     from core import asciigraphs
     from core import random_phrases
     from core import html_downloader
+    from core import advancedhttpserver
 
 except ImportError:
     # Prints if error is encountered while importing modules.
@@ -77,7 +78,7 @@ class ArchariosFramework:
         # Program Information
         self.logger.info('Defining program information.')
         self.name = "Archários Framework"
-        self.version = "0.0.0.5"
+        self.version = "0.0.0.6"
         self.codename = "Alpha"
         self.description = "The Novice's Ethical Hacking Framework"
         self.banner = r"""{0}
@@ -159,19 +160,14 @@ class ArchariosFramework:
 
         else:
             pass
-        self.prompt_lvl3 = '[{0}{1}{2}@{3}{4}{2}] >>> '.format(
-                misc.CG, self.filename, misc.END,
-                misc.CC, self.hostname
-                )
-        self.prompt_lvl2 = '[{0}{1}{2}@{3}{4}{2}] $: '.format(
-                misc.CG, self.filename, misc.END,
-                misc.CC, self.hostname
-                )
+        self.prompt_lvl3 = "[" + misc.CG + self.filename + misc.END + '@' +\
+        misc.CC + "{0}" + misc.END + "] >>> "
 
-        self.prompt_lvl1 = '[{0}{1}{2}@{3}{4}{2}] #: '.format(
-                misc.CG, self.filename, misc.END,
-                misc.CC, self.hostname
-                )
+        self.prompt_lvl2 = "[" + misc.CG + self.filename + misc.END + '@' +\
+        misc.CC + "{0}" + misc.END + "] $: "
+
+        self.prompt_lvl1 = "[" + misc.CG + self.filename + misc.END + '@' +\
+        misc.CC + "{0}" + misc.END + "] #: "
 
         self.latest_exceptions = traceback.format_exc()
         self.module_call = """ArchariosFrameworkModule(debug=self.debug, \
@@ -439,13 +435,13 @@ for more info.", 2)
                     self.name, self.userlevel
                     ))
                 if self.userlevel == 3:
-                    self.command = input(self.prompt_lvl3)
+                    self.command = input(self.prompt_lvl3.format(self.hostname))
 
                 elif self.userlevel == 2:
-                    self.command = input(self.prompt_lvl2)
+                    self.command = input(self.prompt_lvl2.format(self.hostname))
 
                 elif self.userlevel == 1:
-                    self.command = input(self.prompt_lvl1)
+                    self.command = input(self.prompt_lvl1.format(self.hostname))
 
                 else:
                     raise exceptions.UnknownUserLevelError("There is a problem obtaining the userlevel.")
@@ -666,6 +662,151 @@ output/{0}.py and create your amazing extension module!".format(gen_filename))
 
                             break
 
+                elif command[1] in ('use', 'run', 'exec'):
+                    self.logger.info("Importing {0} module...".format(
+                        command[2]))
+                    module_obj = self._import_module(command[2])
+                    self.logger.info("Checking if importing succeeded...")
+                    if module_obj is None:
+                        self.logger.error("Importing failed.")
+                        return None
+
+                    else:
+                        self.logger.info("Importing succeeded; Calling \
+prepare()...")
+                        try:
+                            options, ohelp = eval("module_obj.{0}\
+.prepare()".format(self.module_call))
+
+                        except(SystemExit):
+                            self.logger.info("SystemExit detected from module...")
+                            printer.Printer().print_with_status("SystemExit \
+detected from module...", 1)
+                            return None
+
+                        except Exception as exception:
+                            self.latest_exceptions = traceback.format_exc()
+                            printer.Printer().print_with_status(
+                                    str(exception), 2)
+
+                        while True:
+                            try:
+                                if self.userlevel == 3:
+                                    self.module_command = input(self.prompt_lvl3.format(misc.FB + command[2]))
+
+                                elif self.userlevel == 2:
+                                    self.module_command = input(self.prompt_lvl2.format(miac.FB + command[2]))
+
+                                elif self.userlevel == 1:
+                                    self.module_command = input(self.prompt_lvl1.format(misc.FB + command[2]))
+
+                                else:
+                                    raise exceptions.UnknownUserLevelError("\
+There is a problem obtaining the userlevel.")
+
+                                if self.module_command.lower().startswith("help"):
+                                    print()
+                                    print("help                 Show this help \
+menu.")
+                                    print("set [KEY] [VALUE]    Set the value \
+for <key>.")
+                                    print("show [OPTION]        Show <option> \
+to the screen.")
+                                    print("run exec             Start module.")
+                                    print("back                 Quit module \
+and go back to Archários terminal.")
+                                    print()
+                                    print(misc.FB + "Available Keys:" +
+                                            misc.END)
+                                    for key in options:
+                                        try:
+                                            print(misc.FB + misc.CR + key +
+                                                    misc.END + ": " + ohelp[key])
+
+                                        except KeyError:
+                                            print(misc.FB + misc.CR + key +
+                                                    misc.END + ": " +
+                                                    misc.CGR + "None" + misc.END)
+
+                                    print()
+                                    print(misc.FB + "Available Options:" +
+                                            misc.END)
+                                    print("{0}{1}info{2}       Show information \
+about this module.".format(misc.FB, misc.CR, misc.END))
+                                    print("{0}{1}values{2}     Show current \
+values.".format(misc.FB, misc.CR, misc.END))
+                                    print("{0}{1}options{2}    Show available \
+options.".format(misc.FB, misc.CR, misc.END))
+                                    print()
+
+                                elif self.module_command.lower().startswith("set"):
+                                    mod_com = self.module_command.split(' ')
+                                    options[mod_com[1]] = mod_com[2]
+
+                                elif self.module_command.lower().startswith("show"):
+                                    mod_com = self.module_command.split(' ')
+                                    if mod_com[1] == 'info':
+                                        eval("module_obj.{0}\
+.show_module_info()".format(self.module_call))
+
+                                    elif mod_com[1]  == 'values':
+                                        print(misc.FB + "Current Values:" +
+                                                misc.END)
+                                        for key in options:
+                                            print(misc.FB + misc.CR + key +
+                                                    misc.END + ": " +
+                                                    options[key])
+
+                                    elif mod_com[1] == 'options':
+                                        print(misc.FB + "Available Keys:" +
+                                                misc.END)
+                                        for key in ohelp:
+                                            print(misc.FB + misc.CR + key +
+                                                    misc.END + ': ' +
+                                                    ohelp[key])
+
+                                elif self.module_command.lower(
+                                        ).startswith(("run", "exec")):
+                                    eval("module_obj.{0}.run(options)".format(
+                                        self.module_call))
+
+                                elif self.module_command.lower().startswith(
+                                        "back"):
+                                    return None
+
+                                else:
+                                    printer.Printer().print_with_status(
+                                            "Unknown command: `{0}`!".format(
+                                                self.module_command
+                                                ), 2
+                                            )
+
+                            except(KeyboardInterrupt, EOFError):
+                                print("More Options")
+                                print()
+                                print("[01] Standby")
+                                print("[02] Force module to quit")
+                                print()
+                                while True:
+                                    try:
+                                        moption = int(input(" >>> "))
+                                        if moption == 1:
+                                            print(cowsay.cowsay("I'm sleeping, \
+but my eyes were open").replace('(oo)', '(==)'))
+                                            while True:
+                                                time.sleep(60)
+
+                                        elif moption == 2:
+                                            return None
+
+                                        else:
+                                            printer.Printer().print_with_status(
+                                                    "Unknown option!", 2)
+                                            continue
+
+                                    except(KeyboardInterrupt, EOFError):
+                                        break
+
                 else:
                     self.logger.info("No match for {0}... Showing help \
 menu...".format(command[1]))
@@ -678,8 +819,9 @@ menu...".format(command[1]))
 USAGE: module [OPTIONS]
 
 OPTIONS:
-    info [MODULE]   Show information of the specified module.
-    new generate    Generate a new module from template.
+    info [MODULE]            Show information of the specified module.
+    use run exec [MODULE]    Use the specified module.
+    new generate             Generate a new module from template.
 """)
 
         elif command.lower().startswith(('run', 'exec')):

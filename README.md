@@ -1,4 +1,4 @@
-# Archários Framework v0.0.0.5 :: The Novice's Ethical Hacking Framework
+# Archários Framework v0.0.0.6 :: The Novice's Ethical Hacking Framework
 ## Copyright (C) 2018 :: Catayao56 <Catayao56@gmail.com>
 [Archarios Framework](https://gitlab.com/Catayao56/ArchariosFramework.git) is an Ethical Hacking Framework.
 It was created on Wednesday, June 27, 2018.
@@ -11,7 +11,8 @@ Shadow Suite Toolkit.
 
 ## What's new?
 + Module commands
-      ~ `module info` now functional.
+      ~ More module commands are now functional.
+      ~ This is a version with lots of bugs!
 
 + ATTENTION: Contributors needed!
       -I can't do this without contributors or even testers,

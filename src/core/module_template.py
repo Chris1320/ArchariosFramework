@@ -23,6 +23,8 @@ class ArchariosFrameworkModule:
 
     def __init__(self, *args, **kwargs):
         # Module Information
+
+        # NOTE: DEV0004: Modify THIS DICTIONARY ONLY!
         self.module_info = {
                 # Module name
                 "name": "<MODULE_NAME>",
@@ -103,6 +105,7 @@ harassment-free experience.
                  misc.FB + misc.CY)
                 }
 
+        # NOTE: DEV0004: Modify THIS DICTIONARY ONLY!
         # Update history
         self.version_history = {
                     1.0: "Initial update"
@@ -131,6 +134,14 @@ harassment-free experience.
         self.userlevel = kwargs.get('userlevel', 3)
 
     def _parse_module_info(self):
+        """
+        def _parse_module_info():
+            Parse module information for getting attention of user not
+            following the guidelines.
+        """
+
+        # NOTE: DEV0004: Don't modify this method!
+
         mo_in = self.module_info
 
         # Check for variable types.
@@ -244,6 +255,13 @@ harassment-free experience.
             raise ValueError("`status` variable must have the value `stable`, `experimental`, or `unstable` only!")
 
     def show_module_info(self):
+        """
+        def show_module_info():
+            Print module info.
+        """
+
+        # NOTE: DEV0004: Don't modify this method!
+
         result = """
 ==================================================
 {0}{1}Name{2}: {3}
@@ -265,3 +283,35 @@ harassment-free experience.
         self.module_info['created'], self.module_info['last_update'],
         self.module_info['ldesc'])
         print(result)
+
+    def prepare(self):
+        """
+        def prepare():
+            Return options required for run() method.
+        """
+
+        # NOTE: DEV0004: This is the method you will work on!
+
+        # Format: key + default_value
+                # Example: "target": "192.168.0.1"
+        values = {
+                # No values is allowed.
+                }
+
+        # Format: key + info
+                # Example: "target": "The target to test."
+        vhelp = {
+                # No values is allowed.
+                }
+
+        return values, vhelp
+
+    def run(self, values):
+        """
+        def run():
+            Run the module.
+        """
+
+        # NOTE: DEV0004: This is the method you will work on!
+
+        pass
