@@ -78,7 +78,7 @@ class ArchariosFramework:
         # Program Information
         self.logger.info('Defining program information.')
         self.name = "Archários Framework"
-        self.version = "0.0.0.7"
+        self.version = "0.0.0.8"
         self.codename = "Alpha"
         self.description = "The Novice's Ethical Hacking Framework"
         self.banner = r"""{0}
@@ -376,7 +376,7 @@ will use the default settings.".format(self.name),
         ansi.set_title("")
         sys.exit(exit_code)
 
-    def _import_module(self, module):
+    def _import_module(self, module, silent=False):
         """
         def _import_module():
             Import <module> using importlib.
@@ -390,12 +390,13 @@ will use the default settings.".format(self.name),
 
         except Exception as err:
             self.latest_exceptions = traceback.format_exc()
-            printer.Printer().print_with_status(str(err), 2)
-            printer.Printer().print_with_status("Use `show tracebacks` \
+            if silent is False:
+                printer.Printer().print_with_status(str(err), 2)
+                printer.Printer().print_with_status("Use `show tracebacks` \
 for more info.", 2)
-            self.logger.error("Something wrong happened while importing \
+                self.logger.error("Something wrong happened while importing \
 {0}! Error: `{1}`; Returning None.".format(module, str(err)))
-            return None
+                return None
 
         else:
             self.logger.info("Imported {0}! Returning object...".format(module))
@@ -498,8 +499,8 @@ Reloading None.".format(module, str(err)))
                         if ctrl_d_option == 1:
                             try:
                                 self.logger.info("Standing by...")
-                                print(cowsay.cowsay("I'm sleeping, but my \
-eyes were open. Press CTRL+C or CTRL+D when you are ready.").replace('(oo)', '(==)'))
+                                print(cowsay.cowsay("I'm sleeping, Press \
+CTRL+C when you are ready.").replace('(oo)', '(==)'))
                                 while True:
                                     time.sleep(60)
 
@@ -517,7 +518,7 @@ eyes were open. Press CTRL+C or CTRL+D when you are ready.").replace('(oo)', '(=
                             self.logger.info("Unknown option selected.")
                             continue
 
-                    except(KeyboardInterrupt, EOFError):
+                    except(KeyboardInterrupt, EOFError, TypeError, ValueError):
                         self.logger.info("^C/^D detected, continuing loop.")
                         continue
 
@@ -734,6 +735,71 @@ to file!")
 
                             break
 
+                elif command[1] in ("ls", "list"):
+                    self.logger.info("Listing modules/ directory contents...")
+                    paths = os.listdir('modules')
+                    self.logger.info("Contents: " + str(paths))
+                    iterator = 0
+                    for path in paths:
+                        path = 'modules/' + path
+                        if path in ('modules/__init__.py', 'modules/__pycache__'):
+                            continue
+
+                        self.logger.info("Checking if {0} is file.".format(path))
+                        if misc.ProgramFunctions().isfile(path):
+                            self.logger.info("{0} is a file.".format(path))
+                            if path.endswith('.py'):
+                                self.logger.info("{0} is a python module.".format(path))
+                                try:
+                                    path = path.replace(os.sep, '.')
+                                    self.logger.debug(path)
+                                    path = path[::-1]
+                                    self.logger.debug(path)
+                                    path = path.partition('.')[2]
+                                    self.logger.debug(path)
+                                    path = path[::-1]
+                                    self.logger.debug(path)
+                                    path = path.partition('.')[2]
+                                    self.logger.debug(path)
+                                    self.logger.info("Importing {0}...".format(path))
+                                    module_obj = self._import_module(path, True)
+                                    iterator += 1
+                                    if module_obj is None:
+                                        self.logger.info("Failed to import {0}!".format(path))
+                                        print("[{0}] ".format(str(iterator)) + misc.FI + misc.CGR + misc.FB + path + " :: ERROR WHILE FETCHING INFO" + misc.END)
+
+                                    else:
+                                        self.logger.info("{0} imported! Now determining module status.".format(path))
+                                        try:
+                                            module_stats = eval("module_obj.{0}\
+.module_info".format(self.module_call))
+                                            if module_stats['status'].lower() == 'stable':
+                                                self.logger.info("{0} is stable.".format(path))
+                                                print("[{0}] ".format(str(iterator)) + misc.FI + misc.CG + path + " :: " + module_stats['bdesc'] + misc.END)
+
+                                            elif module_stats['status'].lower() == 'experimental':
+                                                self.logger.info("{0} is experimental.".format(path))
+                                                print("[{0}] ".format(str(iterator)) + misc.FI + misc.CY + path + " :: " + module_stats['bdesc'] + misc.END)
+
+                                            elif module_stats['status'].lower() == 'unstable':
+                                                self.logger.info("{0} is unstable.".format(path))
+                                                print("[{0}] ".format(str(iterator)) + misc.FI + misc.CR + path + " :: " + module_stats['bdesc'] + misc.END)
+
+                                            else:
+                                                self.logger.warning("{0} has unknown status!".format(path))
+                                                print("[{0}] ".format(str(iterator)) + misc.FI + misc.CGR + path + " :: " + module_stats['bdesc'] + misc.END)
+
+                                        except Exception as err:
+                                            self.logger.error("error while determining {0} status: {1}".format(path, str(err)))
+                                            print("[{0}] ".format(str(iterator)) + misc.FI + misc.CGR + misc.FB + path + " :: ERROR WHILE FETCHING INFO: " + str(err) + misc.END)
+
+                                except Exception as err:
+                                    self.logger.error("error while determining {0} status!".format(path))
+                                    print("[{0}] ".format(str(iterator)) + misc.FI + misc.CGR + misc.FB + path + " :: ERROR WHILE FETCHING INFO: " + str(err) + misc.END)
+
+                        elif misc.ProgramFunctions().isfolder(path):
+                            self.logger.info("{0} is a directory.".format(path))
+
                 elif command[1] in ('use', 'run', 'exec'):
                     self.logger.info("Importing {0} module...".format(
                         command[2]))
@@ -818,16 +884,29 @@ options.".format(misc.FB, misc.CR, misc.END))
                                     print()
 
                                 elif self.module_command.lower().startswith("set"):
-                                    self.logger.info("Setting {0} to {1}.".format(mod_com[1], mod_com[2]))
-                                    mod_com = self.module_command.split(' ')
-                                    value_type = type(options[mod_com[1]])
+                                    mod_comm = self.module_command.partition(' ')[2]
+                                    mod_com = mod_comm.partition(' ')
+                                    self.logger.info("Partitioned command: " +
+                                            str(mod_com))
+                                    self.logger.info("Setting {0} to {1}.".format(mod_com[0], mod_com[2]))
                                     try:
-                                        options[mod_com[1]] = value_type(mod_com[2])
+                                        value_type = type(options[mod_com[0]])
+
+                                    except KeyError:
+                                        self.latest_exceptions = traceback.format_exc()
+                                        printer.Printer().print_with_status(
+                                                "Invalid key!", 2
+                                                )
+                                        continue
+
+                                    try:
+                                        options[mod_com[0]] = value_type(mod_com[2])
 
                                     except(TypeError, ValueError):
                                         self.latest_exceptions = traceback.format_exc()
-                                        printer.Printer().print_with_error(
+                                        printer.Printer().print_with_status(
                                         "Invalid value for key!", 2)
+                                        continue
 
                                 elif self.module_command.lower().startswith("show"):
                                     mod_com = self.module_command.split(' ')
@@ -849,10 +928,17 @@ options.".format(misc.FB, misc.CR, misc.END))
                                         self.logger.info("Showing available keys.")
                                         print(misc.FB + "Available Keys:" +
                                                 misc.END)
-                                        for key in ohelp:
-                                            print(misc.FB + misc.CR + key +
-                                                    misc.END + ': ' +
-                                                    ohelp[key])
+                                        for key in options:
+                                            try:
+                                                print(misc.FB + misc.CR + key +
+                                                        misc.END + ': ' +
+                                                        ohelp[key])
+
+                                            except KeyError:
+                                                print(misc.FB + misc.CR + key +
+                                                        misc.END + ": " +
+                                                        misc.CGR + "None" +
+                                                        misc.END)
 
                                 elif self.module_command.lower(
                                         ).startswith(("run", "exec")):
@@ -881,13 +967,15 @@ options.".format(misc.FB, misc.CR, misc.END))
                                 print("[01] Standby")
                                 print("[02] Force module to quit")
                                 print()
+                                print("[99] Back to module")
+                                print()
                                 while True:
                                     try:
                                         moption = int(input(" >>> "))
                                         if moption == 1:
                                             self.logger.info("Standing by...")
-                                            print(cowsay.cowsay("I'm sleeping, \
-                                                    but my eyes were open. Press CTRL+C or CTRL+D when you are ready.").replace('(oo)', '(==)'))
+                                            print(cowsay.cowsay("I'm sleeping. \
+Press CTRL+C when you are ready.").replace('(oo)', '(==)'))
                                             try:
                                                 while True:
                                                     time.sleep(60)
@@ -900,6 +988,9 @@ options.".format(misc.FB, misc.CR, misc.END))
 quit module...")
                                             return None
 
+                                        elif moption == 99:
+                                            break
+
                                         else:
                                             self.logger.info("Unknown option: " +
                                                     str(moption))
@@ -907,7 +998,7 @@ quit module...")
                                                     "Unknown option!", 2)
                                             continue
 
-                                    except(KeyboardInterrupt, EOFError):
+                                    except(KeyboardInterrupt, EOFError, TypeError, ValueError):
                                         break
 
                 else:
@@ -922,6 +1013,7 @@ menu...".format(command[1]))
 USAGE: module [OPTIONS]
 
 OPTIONS:
+    ls list                  Show available modules.
     info [MODULE]            Show information of the specified module.
     use run exec [MODULE]    Use the specified module.
     new generate             Generate a new module from template.

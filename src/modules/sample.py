@@ -324,3 +324,6 @@ harassment-free experience.
             print("You are now logged in!")
             print("Target: ", values['target'])
             print("Your favorite number: ", values['number'])
+
+        else:
+            print(values)
