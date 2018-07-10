@@ -1,0 +1,16 @@
+<head>
+    <title>{{title}}</title>
+</head>
+<body>
+    <h1>{{title}}</h1>
+    <h2>v{{version}} ({{codename}})</h2>
+    </br>
+    <ul>
+        {% for file in files %}
+        <li>{{file}}
+        {% endfor %}
+    </ul>
+    </br>
+    <p>{{copyright}}</p>
+    <form action=/ method=GET><input type=submit value="Back to homepage"></form>
+</body>

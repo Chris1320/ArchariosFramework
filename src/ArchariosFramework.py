@@ -24,13 +24,16 @@ try:
     import os
     import sys
     import time
-    # import flask  # NOTE: DEV0004: Future web interface ;)
     import atexit
     import signal
     import readline
     import importlib
     import traceback
     import subprocess
+    import multitasking
+
+    from flask import request as flask_request
+    from flask import Flask, render_template
 
     # Import core libraries
     from core import ansi
@@ -56,6 +59,108 @@ except ImportError:
     sys.exit(1)
 
 
+# ++++++++++++++++++++ WEB INTERFACE ++++++++++++++++++++ #
+
+# Initialize flask framework for web interface.
+APP = Flask(__name__)
+
+@multitasking.task
+def web_run(port, debug):
+    """
+    def web_run():
+        Run the server.
+    """
+
+    if type(port) is tuple or type(port) is list:
+        for prt in port:
+            try:
+                # APP.run('0.0.0.0', prt, debug)
+                APP.run('0.0.0.0', prt) # TODO: DEV0001: ValueError: signal only works in main thread (when both -w and -d is present)
+
+            except PermissionError:
+                erred = True
+                continue
+
+            else:
+                erred = False
+                break
+
+        if erred is True:
+            printer.Printer().print_with_status("Cannot bind to {0}:{1}!\
+".format('0.0.0.0', prt), 2)
+            ArchariosFramework(API=True)._proper_exit(256)
+
+        del erred
+
+    else:
+        try:
+            # APP.run('0.0.0.0', prt, debug)
+            APP.run('0.0.0.0', prt) # TODO: DEV0001: ValueError: signal only works in main thread (when both -w and -d is present)
+
+        except PermissionError:
+            printer.Printer().print_with_status("Cannot bind to {0}:{1}!\
+".format('0.0.0.0', prt), 2)
+            ArchariosFramework(API=True)._proper_exit(256)
+
+
+@APP.route("/", methods=['POST', 'GET'])
+def web_main():
+    """
+    def web_main():
+        Main or Home page of the web interface.
+    """
+
+    return render_template('index.html', title=ArchariosFramework(API=True).name,
+            version=ArchariosFramework(API=True).version,
+            codename=ArchariosFramework(API=True).codename,
+            copyright=misc.ProgramFunctions().COPYRIGHT)
+
+
+@APP.route("/outputs.html", methods=['GET'])
+def web_outputs():
+    """
+    def web_outputs():
+        Show files in the output/ directory.
+    """
+
+    return render_template('outputs.html', files=os.listdir('output/'),
+            title=ArchariosFramework(API=True).name,
+            version=ArchariosFramework(API=True).version,
+            codename=ArchariosFramework(API=True).codename,
+            copyright=misc.ProgramFunctions().COPYRIGHT)
+
+
+@APP.route("/terminal.html", methods=['GET', 'POST'])
+def web_terminal():
+    """
+    def web_terminal():
+        Enter commands via the web terminal.
+    """
+
+    return render_template('terminal.html', title=ArchariosFramework(API=True).name,
+            version=ArchariosFramework(API=True).version,
+            codename=ArchariosFramework(API=True).codename,
+            copyright=misc.ProgramFunctions().COPYRIGHT)
+
+
+@APP.route("/parser.html", methods=['POST'])
+def web_parser():
+    """
+    def web_parse():
+        Parse command entered from web_terminal() function/page.
+    """
+
+    result = ArchariosFramework(API=True).parse_input(str(flask_request.form['command']))
+    return render_template('parser.html', title=ArchariosFramework(API=True).name,
+            version=ArchariosFramework(API=True).version,
+            codename=ArchariosFramework(API=True).codename,
+            copyright=misc.ProgramFunctions().COPYRIGHT,
+            result=result)
+
+
+# ++++++++++++++++++++ WEB INTERFACE ++++++++++++++++++++ #
+
+
 class ArchariosFramework:
     """
     class ArchariosFramework():
@@ -68,6 +173,9 @@ class ArchariosFramework:
             Initialization method for ArchariosFramework() class.
         """
 
+        # Check if called as an API or not.
+        self.from_API = bool(kwargs.get('API', False))
+
         # Create and start logging object
         self.logger = logger.LoggingObject(
                 name='ArchariosFramework',
@@ -78,7 +186,7 @@ class ArchariosFramework:
         # Program Information
         self.logger.info('Defining program information.')
         self.name = "Archários Framework"
-        self.version = "0.0.0.8"
+        self.version = "0.0.0.9"
         self.codename = "Alpha"
         self.description = "The Novice's Ethical Hacking Framework"
         self.banner = r"""{0}
@@ -133,6 +241,11 @@ class ArchariosFramework:
             self.logger.info("Debug is True, showing logs...")
             self.logger.enable_logging()
             self.logger.info("Debugging started.")
+
+        self.logger.info("Checking if web interface is True...")
+        self.web = kwargs.get('web', False)
+        if self.web is True:
+            web_run((80, 8000, 8080, 5000), self.debug)
 
         # Environment Information
         self.logger.info("Getting environment information.")
@@ -220,6 +333,9 @@ userlevel=self.userlevel, logger=self.logger)"""  # To be used with `eval()`.
                 "    Miscellaneous Switches:",
                 "        Switch: -h --help -? /h /help /?",
                 "        Desc..: Show this help menu.",
+                "",
+                "        Switch: -w --web /w /web",
+                "        Desc..: Start {0}'s web interface.".format(self.name),
                 "",
                 "NOTE: Running {0} without any arguments \
 will use the default settings.".format(self.name),
@@ -374,7 +490,11 @@ will use the default settings.".format(self.name),
                 str(exit_code)))
 
         ansi.set_title("")
-        sys.exit(exit_code)
+        try:
+            sys.exit(exit_code)
+
+        except SystemExit:
+            os._exit(exit_code)
 
     def _import_module(self, module, silent=False):
         """
@@ -434,6 +554,7 @@ Reloading None.".format(module, str(err)))
         """
 
         self.logger.info("Starting interactive terminal...")
+        time.sleep(1)
         print('\n' * 5)
         print(self.banner)
         print()
@@ -522,11 +643,20 @@ CTRL+C when you are ready.").replace('(oo)', '(==)'))
                         self.logger.info("^C/^D detected, continuing loop.")
                         continue
 
-    def parse_input(self, command='help'):
+    def parse_input(self, command='help', API_mode=False):
+        """
+        def parse_input():
+            Parse user input.
+        """
+
         self.logger.info("Command recieved: `{0}`".format(command))
         if command.lower() in ('help', '?'):
             self.logger.info("Printing help menu.")
-            print(self.help())
+            if self.from_API is not True:
+                print(self.help())
+
+            else:
+                return self.help()
 
         elif command.lower().startswith('show'):
             command = command.lower().partition(' ')[2]
@@ -536,50 +666,64 @@ CTRL+C when you are ready.").replace('(oo)', '(==)'))
             try:
                 if command in ('traceback', 'tracebacks'):
                     self.logger.info("Printing traceback information...")
-                    print()
-                    print("{0}{1}{2}{3} Latest Exceptions {3}{4}".format(
-                        misc.FB, misc.FI, misc.CC, ('=' * 25),
-                        misc.END
-                        ))
-                    print()
-                    print(self.latest_exceptions)
-                    print()
-                    print("{0}{1}{2}{3} Latest Exceptions {3}{4}".format(
-                        misc.FB, misc.FI, misc.CC, ('=' * 25),
-                        misc.END
-                        ))
-                    print()
+                    if self.from_API is not True:
+                        print()
+                        print("{0}{1}{2}{3} Latest Exceptions {3}{4}".format(
+                            misc.FB, misc.FI, misc.CC, ('=' * 25),
+                            misc.END
+                            ))
+                        print()
+                        print(self.latest_exceptions)
+                        print()
+                        print("{0}{1}{2}{3} Latest Exceptions {3}{4}".format(
+                            misc.FB, misc.FI, misc.CC, ('=' * 25),
+                            misc.END
+                            ))
+                        print()
+
+                    else:
+                        return"""
+{0}{1}{2}{3} Latest Exceptions {3}{4}
+
+{5}
+
+{0}{1}{2}{3} Latest Exceptions {3}{4}
+""".format(misc.FB, misc.FI, misc.CC, ('=' * 25), misc.END, self.latest_exceptions)
 
                 elif command in ('log_data', 'log_datas'):
                     self.logger.info("Printing log data...")
                     log_data = self.logger.get_all_log_datas()
-                    print()
-                    print("=" * 25, "LOG DATA", "=" * 25)
-                    print()
+                    result = ""
+                    result += ("\n" + ("=" * 25) + "LOG DATA" + ("=" * 25) + "\n\n")
                     for log in log_data:
                         if log[1] == "info":
-                            print(misc.END, log[0])
+                            result += (misc.END + log[0] + '\n')
 
                         elif log[1] == "warning":
-                            print(misc.CY, log[0])
+                            result += (misc.CY + log[0] + '\n')
 
                         elif log[1] == "error":
-                            print(misc.CR, log[0])
+                            result += (misc.CR + log[0] + '\n')
 
                         elif log[1] == "debug":
-                            print(misc.CGR, log[0])
+                            result += (misc.CGR + log[0] + '\n')
 
                         elif log[1] == "critical":
-                            print(misc.FB, misc.CR, log[0])
+                            result += (misc.FB + misc.CR + log[0] + '\n')
 
                         else:
-                            print(misc.FB, misc.CGR, log[0])
+                            result += (misc.FB + misc.CGR + log[0] + '\n')
 
-                    print()
-                    print("=" * 25, "LOG DATA", "=" * 25)
-                    print()
+                    result += ("\n" + ("=" * 25) + "LOG DATA" + ("=" * 25) + "\n\n")
+
+                    if self.from_API is not True:
+                        print(result)
+
+                    else:
+                        return result
 
                 else:
+                    # DEV0003: Continue this! web interface compatibility!
                     self.logger.info("`{0}` is an unknown option to `show`.".format(
                         command
                         ))
@@ -1104,6 +1248,7 @@ OPTIONS:
 if __name__ == '__main__':
     oconfig_file = None
     odebug = None
+    oweb = None
 
     _iterator = 1  # Skip the filename.
     while _iterator < len(sys.argv):
@@ -1136,6 +1281,9 @@ the traceback on `data/tracebacks.log` and/or inform us about what is it\
         elif arg.lower() in ('-d', '--debug', '/d', '/debug'):
             odebug = True
 
+        elif arg.lower() in ('-w', '--web',  '/w', '/web'):
+            oweb = True
+
         else:
             print(ArchariosFramework().banner)
             print()
@@ -1148,5 +1296,6 @@ the traceback on `data/tracebacks.log` and/or inform us about what is it\
 
     ArchariosFramework(
             config_file=oconfig_file,
-            debug=odebug
+            debug=odebug,
+            web=oweb
             ).console()
