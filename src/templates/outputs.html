@@ -1,15 +1,19 @@
 <head>
     <title>{{title}}</title>
 </head>
-<body>
+<body bgcolor="#000000" text="#FF9900" link="#0099FF">
     <h1>{{title}}</h1>
     <h2>v{{version}} ({{codename}})</h2>
     </br>
     <ul>
         {% for file in files %}
-        <li>{{file}}
+        <li>{{file}}</li>
         {% endfor %}
     </ul>
+    </br>
+    <form action=output_viewer.html method=post>
+        View file contents: <input type=string name=filename> <input type=submit name=Go!>
+    </form>
     </br>
     <p>{{copyright}}</p>
     <form action=/ method=GET><input type=submit value="Back to homepage"></form>
