@@ -25,6 +25,7 @@ try:
     import sys
     import time
     import atexit
+    import random
     import signal
     import readline
     import importlib
@@ -34,6 +35,8 @@ try:
 
     from flask import request as flask_request
     from flask import Flask, render_template
+    from flask import session, redirect, url_for
+    from flask import escape  # abort as flask_abort    For  fatal errors
 
     # Import core libraries
     from core import ansi
@@ -63,6 +66,12 @@ except ImportError:
 
 # Initialize flask framework for web interface.
 APP = Flask(__name__)
+APP.secret_key = random._urandom(2048)  # Generate a random key.
+web_logger = logger.LoggingObject(
+        name="ArchariosFrameworkWeb",
+        logfile="data/web_logfile.log"
+        )
+
 
 @multitasking.task
 def web_run(port, debug):
@@ -75,7 +84,8 @@ def web_run(port, debug):
         for prt in port:
             try:
                 # APP.run('0.0.0.0', prt, debug)
-                APP.run('0.0.0.0', prt) # TODO: DEV0001: ValueError: signal only works in main thread (when both -w and -d is present)
+                APP.run('0.0.0.0', prt)
+                # TODO: DEV0001: ValueError: signal only works in main thread (when both -w and -d is present)
 
             except PermissionError:
                 erred = True
@@ -95,12 +105,23 @@ def web_run(port, debug):
     else:
         try:
             # APP.run('0.0.0.0', prt, debug)
-            APP.run('0.0.0.0', prt) # TODO: DEV0001: ValueError: signal only works in main thread (when both -w and -d is present)
+            APP.run('0.0.0.0', prt)
+            # TODO: DEV0001: ValueError: signal only works in main thread (when both -w and -d is present)
 
         except PermissionError:
             printer.Printer().print_with_status("Cannot bind to {0}:{1}!\
 ".format('0.0.0.0', prt), 2)
             ArchariosFramework(API=True)._proper_exit(256)
+
+
+@APP.route("/index.html", methods=['POST', 'GET'])
+def web_redirect_to_main():
+    """
+    def web_redirect_to_main():
+        Redirect to main.
+    """
+
+    return redirect(url_for('web_main'))
 
 
 @APP.route("/", methods=['POST', 'GET'])
@@ -110,10 +131,64 @@ def web_main():
         Main or Home page of the web interface.
     """
 
-    return render_template('index.html', title=ArchariosFramework(API=True).name,
+    web_logger.info(session)
+
+    if 'username' in session and 'password' in session:
+        return render_template('index.html',
+            title=ArchariosFramework(API=True).name,
             version=ArchariosFramework(API=True).version,
             codename=ArchariosFramework(API=True).codename,
             copyright=misc.ProgramFunctions().COPYRIGHT)
+
+    else:
+        return render_template('login.html',
+            title=ArchariosFramework(API=True).name,
+            version=ArchariosFramework(API=True).version,
+            codename=ArchariosFramework(API=True).codename,
+            copyright=misc.ProgramFunctions().COPYRIGHT)
+
+
+@APP.route("/login.py", methods=['GET', 'POST'])
+def web_parse_login(username='archarios', password='archarios'):
+    """
+    def web_parse_login():
+        Check if login credentials is valid.
+    """
+
+    if flask_request.method != 'POST':
+        return redirect(url_for('web_main'))
+
+    if flask_request.form['username'] == username and \
+            flask_request.form['password'] == password:
+        session['username'] = flask_request.form['username']
+        session['password'] = flask_request.form['password']
+
+        return render_template('index.html',
+            title=ArchariosFramework(API=True).name,
+            version=ArchariosFramework(API=True).version,
+            codename=ArchariosFramework(API=True).codename,
+            copyright=misc.ProgramFunctions().COPYRIGHT)
+
+    else:
+        return render_template('error.html',
+                error_desc="Invalid Username/Password",
+                title=ArchariosFramework(API=True).name,
+                version=ArchariosFramework(API=True).version,
+                codename=ArchariosFramework(API=True).codename,
+                copyright=misc.ProgramFunctions().COPYRIGHT)
+
+
+@APP.route("/logout.py", methods=['GET', 'POST'])
+def web_logout():
+    """
+    def web_logout():
+        Logs out the user.
+    """
+
+    session.pop('username', None)
+    session.pop('password', None)
+
+    return redirect(url_for('web_main'))
 
 
 @APP.route("/outputs.html", methods=['GET'])
@@ -123,17 +198,30 @@ def web_outputs():
         Show files in the output/ directory.
     """
 
-    return render_template('outputs.html', files=os.listdir('output/'),
+    if 'username' in session and 'password' in session:
+        return render_template('outputs.html', files=os.listdir('output/'),
             title=ArchariosFramework(API=True).name,
             version=ArchariosFramework(API=True).version,
             codename=ArchariosFramework(API=True).codename,
             copyright=misc.ProgramFunctions().COPYRIGHT)
 
+    else:
+        return redirect(url_for('web_main'))
+
+
 @APP.route("/output_viewer.html", methods=['POST'])
 def print_data():
+    if 'username' not in session and 'password' not in session:
+        return redirect(url_for('web_main'))
+
     filename = flask_request.form['filename']
-    if filename == '' or filename == None:
-        abort(410)
+    if filename == '' or filename is None:
+        return render_template('error.html',
+                error_desc="No input recieved",
+                title=ArchariosFramework(API=True).name,
+                version=ArchariosFramework(API=True).version,
+                codename=ArchariosFramework(API=True).codename,
+                copyright=misc.ProgramFunctions().COPYRIGHT)
 
     else:
         try:
@@ -181,10 +269,15 @@ def web_terminal():
         Enter commands via the web terminal.
     """
 
-    return render_template('terminal.html', title=ArchariosFramework(API=True).name,
+    if 'username' in session and 'password' in session:
+        return render_template('terminal.html',
+            title=ArchariosFramework(API=True).name,
             version=ArchariosFramework(API=True).version,
             codename=ArchariosFramework(API=True).codename,
             copyright=misc.ProgramFunctions().COPYRIGHT)
+
+    else:
+        return redirect(url_for('web_main'))
 
 
 @APP.route("/parser.html", methods=['POST'])
@@ -194,12 +287,16 @@ def web_parser():
         Parse command entered from web_terminal() function/page.
     """
 
-    result = ArchariosFramework(API=True).parse_input(str(flask_request.form['command']))
-    return render_template('parser.html', title=ArchariosFramework(API=True).name,
+    if 'username' in session and 'password' in session:
+        result = ArchariosFramework(API=True).parse_input(str(flask_request.form['command']))
+        return render_template('parser.html', title=ArchariosFramework(API=True).name,
             version=ArchariosFramework(API=True).version,
             codename=ArchariosFramework(API=True).codename,
             copyright=misc.ProgramFunctions().COPYRIGHT,
             result=result)
+
+    else:
+        return redirect(url_for('web_main'))
 
 
 # ++++++++++++++++++++ WEB INTERFACE ++++++++++++++++++++ #
@@ -230,7 +327,7 @@ class ArchariosFramework:
         # Program Information
         self.logger.info('Defining program information.')
         self.name = "Archários Framework"
-        self.version = "0.0.1.0"
+        self.version = "0.0.1.1"
         self.codename = "Beta"
         self.description = "The Novice's Ethical Hacking Framework"
         self.banner = r"""{0}
