@@ -25,6 +25,7 @@ try:
     import sys
     import time
     import atexit
+    import random
     import signal
     import readline
     import importlib
@@ -34,6 +35,9 @@ try:
 
     from flask import request as flask_request
     from flask import Flask, render_template
+    from flask import session, redirect, url_for
+    from flask import escape, make_response
+    # from flask import abort as flask_abort    For fatal errors
 
     # Import core libraries
     from core import ansi
@@ -63,6 +67,12 @@ except ImportError:
 
 # Initialize flask framework for web interface.
 APP = Flask(__name__)
+APP.secret_key = random._urandom(2048)  # Generate a random key.
+web_logger = logger.LoggingObject(
+        name="ArchariosFrameworkWeb",
+        logfile="data/web_logfile.log"
+        )
+
 
 @multitasking.task
 def web_run(port, debug):
@@ -75,7 +85,7 @@ def web_run(port, debug):
         for prt in port:
             try:
                 # APP.run('0.0.0.0', prt, debug)
-                APP.run('0.0.0.0', prt) # TODO: DEV0001: ValueError: signal only works in main thread (when both -w and -d is present)
+                APP.run('0.0.0.0', prt)
 
             except PermissionError:
                 erred = True
@@ -95,12 +105,22 @@ def web_run(port, debug):
     else:
         try:
             # APP.run('0.0.0.0', prt, debug)
-            APP.run('0.0.0.0', prt) # TODO: DEV0001: ValueError: signal only works in main thread (when both -w and -d is present)
+            APP.run('0.0.0.0', prt)
 
         except PermissionError:
             printer.Printer().print_with_status("Cannot bind to {0}:{1}!\
 ".format('0.0.0.0', prt), 2)
             ArchariosFramework(API=True)._proper_exit(256)
+
+
+@APP.route("/index.html", methods=['POST', 'GET'])
+def web_redirect_to_main():
+    """
+    def web_redirect_to_main():
+        Redirect to main.
+    """
+
+    return redirect(url_for('web_main'))
 
 
 @APP.route("/", methods=['POST', 'GET'])
@@ -110,10 +130,63 @@ def web_main():
         Main or Home page of the web interface.
     """
 
-    return render_template('index.html', title=ArchariosFramework(API=True).name,
+    web_logger.info(session, '\t', request)
+
+    if 'username' in session and 'password' in session:
+        return render_template('index.html',
+            title=ArchariosFramework(API=True).name,
             version=ArchariosFramework(API=True).version,
             codename=ArchariosFramework(API=True).codename,
             copyright=misc.ProgramFunctions().COPYRIGHT)
+
+    else:
+        return render_template('login.html',
+            title=ArchariosFramework(API=True).name,
+            version=ArchariosFramework(API=True).version,
+            codename=ArchariosFramework(API=True).codename,
+            copyright=misc.ProgramFunctions().COPYRIGHT)
+
+
+@APP.route("/login.py", methods=['GET', 'POST'])
+def web_parse_login(username='archarios', password='archarios'):
+    """
+    def web_parse_login():
+        Check if login credentials is valid.
+    """
+
+    if flask_request.method != 'POST':
+        return redirect(url_for('web_main'))
+
+    if flask_request.form['username'] == username and \
+            flask_request.form['password'] == password:
+        result = make_response(redirect(url_for('web_main')))
+        result.set_cookie('username', flask_request.form['username'])
+        result.set_cookie('password', flask_request.form['password'])
+        session['username'] = flask_request.form['username']
+        session['password'] = flask_request.form['password']
+
+        return result
+
+    else:
+        return render_template('error.html',
+                error_desc="Invalid Username/Password",
+                title=ArchariosFramework(API=True).name,
+                version=ArchariosFramework(API=True).version,
+                codename=ArchariosFramework(API=True).codename,
+                copyright=misc.ProgramFunctions().COPYRIGHT)
+
+
+@APP.route("/logout.py", methods=['GET', 'POST'])
+def web_logout():
+    """
+    def web_logout():
+        Logs out the user.
+    """
+
+    session.pop('username', None)
+    session.pop('password', None)
+
+    return redirect(url_for('web_main'))
 
 
 @APP.route("/outputs.html", methods=['GET'])
@@ -123,11 +196,71 @@ def web_outputs():
         Show files in the output/ directory.
     """
 
-    return render_template('outputs.html', files=os.listdir('output/'),
+    if 'username' in session and 'password' in session:
+        return render_template('outputs.html', files=os.listdir('output/'),
             title=ArchariosFramework(API=True).name,
             version=ArchariosFramework(API=True).version,
             codename=ArchariosFramework(API=True).codename,
             copyright=misc.ProgramFunctions().COPYRIGHT)
+
+    else:
+        return redirect(url_for('web_main'))
+
+
+@APP.route("/output_viewer.html", methods=['GET', 'POST'])
+def print_data():
+    if flask_request.method != "POST":
+        return redirect(url_for('web_main'))
+
+    if 'username' not in session and 'password' not in session:
+        return redirect(url_for('web_main'))
+
+    filename = flask_request.form['filename']
+    if filename == '' or filename is None:
+        return render_template('error.html',
+                error_desc="No input recieved",
+                title=ArchariosFramework(API=True).name,
+                version=ArchariosFramework(API=True).version,
+                codename=ArchariosFramework(API=True).codename,
+                copyright=misc.ProgramFunctions().COPYRIGHT)
+
+    else:
+        try:
+            with open('output/{0}'.format(filename), 'r') as fopen:
+                data = fopen.readlines()
+                return render_template('print_content.html',
+                        data=data,
+                        title=ArchariosFramework(API=True).name,
+                        version=ArchariosFramework(API=True).version,
+                        codename=ArchariosFramework(API=True).codename,
+                        copyright=misc.ProgramFunctions().COPYRIGHT)
+
+        except UnicodeDecodeError:
+            try:
+                with open('output/{0}'.format(filename), 'rb') as fopen:
+                    data = fopen.readlines()
+                    return render_template('print_content.html',
+                        data=data,
+                        title=ArchariosFramework(API=True).name,
+                        version=ArchariosFramework(API=True).version,
+                        codename=ArchariosFramework(API=True).codename,
+                        copyright=misc.ProgramFunctions().COPYRIGHT)
+
+            except UnicodeDecodeError as error_msg:
+                return render_template('error.html',
+                        error_desc=error_msg,
+                        title=ArchariosFramework(API=True).name,
+                        version=ArchariosFramework(API=True).version,
+                        codename=ArchariosFramework(API=True).codename,
+                        copyright=misc.ProgramFunctions().COPYRIGHT)
+
+        except Exception as err_msg:
+            return render_template('error.html',
+                    error_desc=err_msg,
+                    title=ArchariosFramework(API=True).name,
+                    version=ArchariosFramework(API=True).version,
+                    codename=ArchariosFramework(API=True).codename,
+                    copyright=misc.ProgramFunctions().COPYRIGHT)
 
 
 @APP.route("/terminal.html", methods=['GET', 'POST'])
@@ -137,25 +270,37 @@ def web_terminal():
         Enter commands via the web terminal.
     """
 
-    return render_template('terminal.html', title=ArchariosFramework(API=True).name,
+    if 'username' in session and 'password' in session:
+        return render_template('terminal.html',
+            title=ArchariosFramework(API=True).name,
             version=ArchariosFramework(API=True).version,
             codename=ArchariosFramework(API=True).codename,
             copyright=misc.ProgramFunctions().COPYRIGHT)
 
+    else:
+        return redirect(url_for('web_main'))
 
-@APP.route("/parser.html", methods=['POST'])
+
+@APP.route("/parser.html", methods=['GET', 'POST'])
 def web_parser():
     """
     def web_parse():
         Parse command entered from web_terminal() function/page.
     """
 
-    result = ArchariosFramework(API=True).parse_input(str(flask_request.form['command']))
-    return render_template('parser.html', title=ArchariosFramework(API=True).name,
+    if flask_request.method != 'POST':
+        return redirect(url_for('web_main'))
+
+    if 'username' in session and 'password' in session:
+        result = ArchariosFramework(API=True).parse_input(str(flask_request.form['command']))
+        return render_template('parser.html', title=ArchariosFramework(API=True).name,
             version=ArchariosFramework(API=True).version,
             codename=ArchariosFramework(API=True).codename,
             copyright=misc.ProgramFunctions().COPYRIGHT,
             result=result)
+
+    else:
+        return redirect(url_for('web_main'))
 
 
 # ++++++++++++++++++++ WEB INTERFACE ++++++++++++++++++++ #
@@ -186,8 +331,8 @@ class ArchariosFramework:
         # Program Information
         self.logger.info('Defining program information.')
         self.name = "Archários Framework"
-        self.version = "0.0.0.9"
-        self.codename = "Alpha"
+        self.version = "0.0.1.2"
+        self.codename = "Beta"
         self.description = "The Novice's Ethical Hacking Framework"
         self.banner = r"""{0}
    _          _     {3}/\/|{0}     _            ___                                  _
@@ -643,7 +788,7 @@ CTRL+C when you are ready.").replace('(oo)', '(==)'))
                         self.logger.info("^C/^D detected, continuing loop.")
                         continue
 
-    def parse_input(self, command='help', API_mode=False):
+    def parse_input(self, command='help'):
         """
         def parse_input():
             Parse user input.
@@ -656,7 +801,7 @@ CTRL+C when you are ready.").replace('(oo)', '(==)'))
                 print(self.help())
 
             else:
-                return self.help()
+                return self.help('list')
 
         elif command.lower().startswith('show'):
             command = command.lower().partition(' ')[2]
@@ -682,48 +827,78 @@ CTRL+C when you are ready.").replace('(oo)', '(==)'))
                         print()
 
                     else:
-                        return"""
-{0}{1}{2}{3} Latest Exceptions {3}{4}
-
-{5}
-
-{0}{1}{2}{3} Latest Exceptions {3}{4}
-""".format(misc.FB, misc.FI, misc.CC, ('=' * 25), misc.END, self.latest_exceptions)
+                        return["{0} Latest Exceptions {0}".format(('=' * 15)),
+                        "",
+                        self.latest_exceptions,
+                        "",
+                        "{0} Latest Exceptions {0}".format(('=' * 15))]
 
                 elif command in ('log_data', 'log_datas'):
                     self.logger.info("Printing log data...")
                     log_data = self.logger.get_all_log_datas()
                     result = ""
-                    result += ("\n" + ("=" * 25) + "LOG DATA" + ("=" * 25) + "\n\n")
+                    if self.from_API is not True:
+                        result += ("\n" + ("=" * 25) + "LOG DATA" + ("=" * 25) + "\n\n")
+
+                    else:
+                        result += ("\n" + ("=" * 15) + "LOG DATA" + ("=" * 15) + "\n\n")
+
                     for log in log_data:
                         if log[1] == "info":
-                            result += (misc.END + log[0] + '\n')
+                            if self.from_API is not True:
+                                result += (misc.END + log[0] + '\n')
+
+                            else:
+                                result += (log[0] + '\n')
 
                         elif log[1] == "warning":
-                            result += (misc.CY + log[0] + '\n')
+                            if self.from_API is not True:
+                                result += (misc.CY + log[0] + '\n')
+
+                            else:
+                                result += (log[0] + '\n')
 
                         elif log[1] == "error":
-                            result += (misc.CR + log[0] + '\n')
+                            if self.from_API is not True:
+                                result += (misc.CR + log[0] + '\n')
+
+                            else:
+                                result += (log[0] + '\n')
 
                         elif log[1] == "debug":
-                            result += (misc.CGR + log[0] + '\n')
+                            if self.from_API is not True:
+                                result += (misc.CGR + log[0] + '\n')
+
+                            else:
+                                result += (log[0] + '\n')
 
                         elif log[1] == "critical":
-                            result += (misc.FB + misc.CR + log[0] + '\n')
+                            if self.from_API is not True:
+                                result += (misc.FB + misc.CR + log[0] + '\n')
+
+                            else:
+                                rrsult += (log[0] + '\n')
 
                         else:
-                            result += (misc.FB + misc.CGR + log[0] + '\n')
+                            if self.from_API is not True:
+                                result += (misc.FB + misc.CGR + log[0] + '\n')
 
-                    result += ("\n" + ("=" * 25) + "LOG DATA" + ("=" * 25) + "\n\n")
+                            else:
+                                result += (log[0] + '\n')
+
+                    if self.from_API is not True:
+                        result += ("\n" + ("=" * 25) + "LOG DATA" + ("=" * 25) + "\n\n")
+
+                    else:
+                        result += ("\n" + ("=" * 15) + "LOG DATA" + ("=" * 15) + "\n\n")
 
                     if self.from_API is not True:
                         print(result)
 
                     else:
-                        return result
+                        return result.split('\n')
 
                 else:
-                    # DEV0003: Continue this! web interface compatibility!
                     self.logger.info("`{0}` is an unknown option to `show`.".format(
                         command
                         ))
@@ -732,7 +907,8 @@ CTRL+C when you are ready.").replace('(oo)', '(==)'))
             except IndexError:
                 printer.Printer().print_with_status(
                         "Unknown option: {0}".format(command), 2)
-                print("""
+                if self.from_API is not True:
+                    print("""
 USAGE: show [OPTIONS]
 
 OPTIONS:
@@ -740,7 +916,16 @@ OPTIONS:
     log_data log_datas      Show the log data from the logger module.
 """)
 
+                else:
+                    return ["", "USAGE: show [OPTIONS]",
+                            "", "OPTIONS:",
+                            "    traceback tracebacks    Show the latest traceback information.",
+                            "    log_data log_datas      Show the log data from the logger module.",
+                            ""]
+
         elif command.lower().startswith('module'):
+            # TODO: DEV0003: Continue API support here!
+            # if self.from_API is not True:
             try:
                 command = command.split(' ')
                 self.logger.info("Looking for matches of `{0}`...".format(
@@ -979,7 +1164,7 @@ using module: {0}".format(str(exception)))
                                     self.module_command = input(self.prompt_lvl3.format(misc.FB + command[2]))
 
                                 elif self.userlevel == 2:
-                                    self.module_command = input(self.prompt_lvl2.format(miac.FB + command[2]))
+                                    self.module_command = input(self.prompt_lvl2.format(misc.FB + command[2]))
 
                                 elif self.userlevel == 1:
                                     self.module_command = input(self.prompt_lvl1.format(misc.FB + command[2]))
