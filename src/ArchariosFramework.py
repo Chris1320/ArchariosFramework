@@ -160,6 +160,7 @@ def web_parse_login(username='archarios', password='archarios'):
 
     if flask_request.form['username'] == username and \
             flask_request.form['password'] == password:
+        flask_request.
         session['username'] = flask_request.form['username']
         session['password'] = flask_request.form['password']
 
@@ -209,8 +210,11 @@ def web_outputs():
         return redirect(url_for('web_main'))
 
 
-@APP.route("/output_viewer.html", methods=['POST'])
+@APP.route("/output_viewer.html", methods=['GET', 'POST'])
 def print_data():
+    if flask_request.method != "POST":
+        return redirect(url_for('web_main'))
+
     if 'username' not in session and 'password' not in session:
         return redirect(url_for('web_main'))
 
@@ -280,12 +284,15 @@ def web_terminal():
         return redirect(url_for('web_main'))
 
 
-@APP.route("/parser.html", methods=['POST'])
+@APP.route("/parser.html", methods=['GET', 'POST'])
 def web_parser():
     """
     def web_parse():
         Parse command entered from web_terminal() function/page.
     """
+
+    if flask_request.method != 'POST':
+        return redirect(url_for('web_main'))
 
     if 'username' in session and 'password' in session:
         result = ArchariosFramework(API=True).parse_input(str(flask_request.form['command']))
@@ -327,7 +334,7 @@ class ArchariosFramework:
         # Program Information
         self.logger.info('Defining program information.')
         self.name = "Archários Framework"
-        self.version = "0.0.1.1"
+        self.version = "0.0.1.2"
         self.codename = "Beta"
         self.description = "The Novice's Ethical Hacking Framework"
         self.banner = r"""{0}
