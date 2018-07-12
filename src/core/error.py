@@ -86,3 +86,16 @@ privileges. Please try the following:
 \t~ Please Run {1} as Administrator (For Windows)
 \t~ Make sure your smartphone is rooted and {1} has been granted superuser \
 privileges by the su binary. (For Android)""".format(proc_type, name)
+
+    def ERROR0005(self, proc_type='command'):
+        """
+        def ERROR0005():
+            Call this if command doesn't yet support API.
+
+            :param proc_type: Origin of the error.
+            :type str: `command` or `module`
+        """
+
+        return """Sorry! This {0} does not have any API support as of now.
+Please contact the developer or create a merge request that has the fix for
+your problem. Thank you""".format(proc_type)

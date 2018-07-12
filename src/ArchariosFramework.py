@@ -130,7 +130,7 @@ def web_main():
         Main or Home page of the web interface.
     """
 
-    web_logger.info(session, '\t', request)
+    web_logger.info(str(session) + '\t' + str(flask_request))
 
     if 'username' in session and 'password' in session:
         return render_template('index.html',
@@ -331,7 +331,7 @@ class ArchariosFramework:
         # Program Information
         self.logger.info('Defining program information.')
         self.name = "Archários Framework"
-        self.version = "0.0.1.2"
+        self.version = "0.0.1.3"
         self.codename = "Beta"
         self.description = "The Novice's Ethical Hacking Framework"
         self.banner = r"""{0}
@@ -924,8 +924,7 @@ OPTIONS:
                             ""]
 
         elif command.lower().startswith('module'):
-            # TODO: DEV0003: Continue API support here!
-            # if self.from_API is not True:
+            # TODO: DEV0001: API support here!
             try:
                 command = command.split(' ')
                 self.logger.info("Looking for matches of `{0}`...".format(
@@ -963,112 +962,119 @@ the module: `{0}`".format(str(exception)))
 
                 elif command[1] in ('generate', 'new'):
                     self.logger.info("Creating new custom module...")
-                    print("{0}{1}Create new custom module...{2}".format(
-                        misc.FB, misc.CG, misc.END
-                        ))
-                    while True:
-                        try:
-                            gen_module_name = input("Module name: ")
-                            gen_description = input("Brief Description about \
-the module: ")
-                            gen_author = input("Module Author's/Your Name: ")
-                            self.logger.info("Module name is {0} characters; \
-Description is {1} characters; And Author name is {2} characters.".format(
-                                        len(gen_module_name),
-                                        len(gen_description),
-                                        len(gen_author)
-                                        ))
-                            if len(gen_module_name) > 20 or len(
-                                    gen_module_name) < 1:
-                                printer.Printer().print_with_status(
-                                        "Module name must be 1-20 characters!",
-                                        2
-                                        )
-                                continue
+                    if self.from_API is not True:
+                        print("{0}{1}Create new custom module...{2}".format(
+                            misc.FB, misc.CG, misc.END
+                            ))
 
-                            if len(gen_description) > 100 or len(
-                                    gen_description) < 1:
-                                printer.Printer().print_with_status(
-                                        "Module's brief description must \
-be 1-100 characters!", 2
-                                        )
-                                continue
-
-                            if len(gen_author) < 1 or len(gen_author) > 50:
-                                printer.Printer().print_with_status(
-                                        "`author` variable must be 1-50 \
-characters!", 2
-                                        )
-                                continue
-
-                        except(KeyboardInterrupt, EOFError):
-                            printer.Printer().print_with_status(
-                                    "Module creation cancelled...", 1
-                                    )
-                            self.logger.info("Module creating cancelled.")
-                            return None
-
-                        gen_filename = gen_module_name.lower().replace(' ',
-                                '_')
-                        self.logger.info("Reading core/module_template.py")
-                        try:
-                            with open('core/module_template.py',
-                                    'r') as fopen:
-                                gen_module_data = fopen.read()
-
-                        except(IOError, FileNotFoundError, OSError, \
-                                PermissionError):
-                            self.latest_exceptions = traceback.format_exc()
-                            printer.Printer().print_with_status(
-                                    "Error while reading template!", 2
-                                    )
-                            self.logger.critical("Error while reading template!")
-                            return None
-
-                        else:
-                            self.logger.info("Modifying template...")
-                            gen_module_data = gen_module_data.replace(
-                                    "<MODULE_NAME>",
-                                    gen_module_name).replace(
-                                    "<BRIEF_DESCRIPTION>", gen_description
-                                    ).replace(
-                                    "<MODULE_AUTHOR>", gen_author
-                                    ).replace(
-                                    "<DATE_CREATED>", time.strftime("%b. \
-%d %Y")
-                                    )
-
-                            self.logger.info("Writing to {0}...".format(
-                                        "output/" + gen_filename + ".py"
-                                        ))
+                        while True:
                             try:
-                                with open(
-                                        "output/{0}.py".format(
-                                        gen_filename), 'a') as fopen:
-                                            fopen.write(gen_module_data)
+                                gen_module_name = input("Module name: ")
+                                gen_description = input("Brief Description about \
+the module: ")
+                                gen_author = input("Module Author's/Your Name: ")
+                                self.logger.info("Module name is {0} characters; \
+Description is {1} characters; And Author name is {2} characters.".format(
+                                            len(gen_module_name),
+                                            len(gen_description),
+                                            len(gen_author)
+                                            ))
+                                if len(gen_module_name) > 20 or len(
+                                        gen_module_name) < 1:
+                                    printer.Printer().print_with_status(
+                                            "Module name must be 1-20 characters!",
+                                            2
+                                            )
+                                    continue
 
-                                printer.Printer().print_with_status(
-                                        "{0}.py module created \
-successfully!".format(gen_filename))
-                                print("Now, edit your module located in \
-output/{0}.py and create your amazing extension module!".format(gen_filename))
-                                self.logger.info("Module created!")
+                                if len(gen_description) > 100 or len(
+                                        gen_description) < 1:
+                                    printer.Printer().print_with_status(
+                                            "Module's brief description must \
+be 1-100 characters!", 2
+                                            )
+                                    continue
 
-                            except(IOError, OSError, PermissionError):
-                                self.latest_exceptions = traceback.format_exc()
+                                if len(gen_author) < 1 or len(gen_author) > 50:
+                                    printer.Printer().print_with_status(
+                                            "`author` variable must be 1-50 \
+characters!", 2
+                                            )
+                                    continue
+
+                            except(KeyboardInterrupt, EOFError):
                                 printer.Printer().print_with_status(
-                                        "Error while writing to file!", 2)
-                                self.logger.error("Error while writing \
-to file!")
+                                        "Module creation cancelled...", 1
+                                        )
+                                self.logger.info("Module creating cancelled.")
                                 return None
 
-                            break
+                            gen_filename = gen_module_name.lower().replace(' ',
+                                    '_')
+                            self.logger.info("Reading core/module_template.py")
+                            try:
+                                with open('core/module_template.py',
+                                        'r') as fopen:
+                                    gen_module_data = fopen.read()
+
+                            except(IOError, FileNotFoundError, OSError, \
+                                    PermissionError):
+                                self.latest_exceptions = traceback.format_exc()
+                                printer.Printer().print_with_status(
+                                        "Error while reading template!", 2
+                                        )
+                                self.logger.critical("Error while reading template!")
+                                return None
+
+                            else:
+                                self.logger.info("Modifying template...")
+                                gen_module_data = gen_module_data.replace(
+                                        "<MODULE_NAME>",
+                                        gen_module_name).replace(
+                                        "<BRIEF_DESCRIPTION>", gen_description
+                                        ).replace(
+                                        "<MODULE_AUTHOR>", gen_author
+                                        ).replace(
+                                        "<DATE_CREATED>", time.strftime("%b. \
+%d %Y")
+                                        )
+
+                                self.logger.info("Writing to {0}...".format(
+                                            "output/" + gen_filename + ".py"
+                                            ))
+                                try:
+                                    with open(
+                                            "output/{0}.py".format(
+                                            gen_filename), 'a') as fopen:
+                                                fopen.write(gen_module_data)
+
+                                    printer.Printer().print_with_status(
+                                            "{0}.py module created \
+successfully!".format(gen_filename))
+                                    print("Now, edit your module located in \
+output/{0}.py and create your amazing extension module!".format(gen_filename))
+                                    self.logger.info("Module created!")
+
+                                except(IOError, OSError, PermissionError):
+                                    self.latest_exceptions = traceback.format_exc()
+                                    printer.Printer().print_with_status(
+                                            "Error while writing to file!", 2)
+                                    self.logger.error("Error while writing \
+to file!")
+                                    return None
+
+                                break
+
+                    else:
+                        result = error.ErrorClass().ERROR0005().split('\n')
+                        return result
 
                 elif command[1] in ("ls", "list"):
                     self.logger.info("Listing modules/ directory contents...")
                     paths = os.listdir('modules')
                     self.logger.info("Contents: " + str(paths))
                     iterator = 0
+                    result = ""
                     for path in paths:
                         path = 'modules/' + path
                         if path in ('modules/__init__.py', 'modules/__pycache__'):
@@ -1093,9 +1099,10 @@ to file!")
                                     self.logger.info("Importing {0}...".format(path))
                                     module_obj = self._import_module(path, True)
                                     iterator += 1
+                                    # TODO: DEV0001: Remove all colors for API!
                                     if module_obj is None:
                                         self.logger.info("Failed to import {0}!".format(path))
-                                        print("[{0}] ".format(str(iterator)) + misc.FI + misc.CGR + misc.FB + path + " :: ERROR WHILE FETCHING INFO" + misc.END)
+                                        result += ("[{0}] ".format(str(iterator)) + misc.FI + misc.CGR + misc.FB + path + " :: ERROR WHILE FETCHING INFO" + misc.END + '\n')
 
                                     else:
                                         self.logger.info("{0} imported! Now determining module status.".format(path))
@@ -1104,30 +1111,37 @@ to file!")
 .module_info".format(self.module_call))
                                             if module_stats['status'].lower() == 'stable':
                                                 self.logger.info("{0} is stable.".format(path))
-                                                print("[{0}] ".format(str(iterator)) + misc.FI + misc.CG + path + " :: " + module_stats['bdesc'] + misc.END)
+                                                result += ("[{0}] ".format(str(iterator)) + misc.FI + misc.CG + path + " :: " + module_stats['bdesc'] + misc.END + '\n')
 
                                             elif module_stats['status'].lower() == 'experimental':
                                                 self.logger.info("{0} is experimental.".format(path))
-                                                print("[{0}] ".format(str(iterator)) + misc.FI + misc.CY + path + " :: " + module_stats['bdesc'] + misc.END)
+                                                result += ("[{0}] ".format(str(iterator)) + misc.FI + misc.CY + path + " :: " + module_stats['bdesc'] + misc.END + '\n')
 
                                             elif module_stats['status'].lower() == 'unstable':
                                                 self.logger.info("{0} is unstable.".format(path))
-                                                print("[{0}] ".format(str(iterator)) + misc.FI + misc.CR + path + " :: " + module_stats['bdesc'] + misc.END)
+                                                result += ("[{0}] ".format(str(iterator)) + misc.FI + misc.CR + path + " :: " + module_stats['bdesc'] + misc.END + '\n')
 
                                             else:
                                                 self.logger.warning("{0} has unknown status!".format(path))
-                                                print("[{0}] ".format(str(iterator)) + misc.FI + misc.CGR + path + " :: " + module_stats['bdesc'] + misc.END)
+                                                result += ("[{0}] ".format(str(iterator)) + misc.FI + misc.CGR + path + " :: " + module_stats['bdesc'] + misc.END +  '\n')
 
                                         except Exception as err:
                                             self.logger.error("error while determining {0} status: {1}".format(path, str(err)))
-                                            print("[{0}] ".format(str(iterator)) + misc.FI + misc.CGR + misc.FB + path + " :: ERROR WHILE FETCHING INFO: " + str(err) + misc.END)
+                                            result += ("[{0}] ".format(str(iterator)) + misc.FI + misc.CGR + misc.FB + path + " :: ERROR WHILE FETCHING INFO: " + str(err) + misc.END + '\n')
 
                                 except Exception as err:
                                     self.logger.error("error while determining {0} status!".format(path))
-                                    print("[{0}] ".format(str(iterator)) + misc.FI + misc.CGR + misc.FB + path + " :: ERROR WHILE FETCHING INFO: " + str(err) + misc.END)
+                                    result += ("[{0}] ".format(str(iterator)) + misc.FI + misc.CGR + misc.FB + path + " :: ERROR WHILE FETCHING INFO: " + str(err) + misc.END + '\n')
 
                         elif misc.ProgramFunctions().isfolder(path):
                             self.logger.info("{0} is a directory.".format(path))
+
+                    if self.from_API is not True:
+                        print(result)
+
+                    else:
+                        result = result.split('\n')
+                        return result
 
                 elif command[1] in ('use', 'run', 'exec'):
                     self.logger.info("Importing {0} module...".format(
