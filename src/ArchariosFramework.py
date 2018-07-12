@@ -36,7 +36,8 @@ try:
     from flask import request as flask_request
     from flask import Flask, render_template
     from flask import session, redirect, url_for
-    from flask import escape  # abort as flask_abort    For  fatal errors
+    from flask import escape, make_response
+    # from flask import abort as flask_abort    For fatal errors
 
     # Import core libraries
     from core import ansi
@@ -85,7 +86,6 @@ def web_run(port, debug):
             try:
                 # APP.run('0.0.0.0', prt, debug)
                 APP.run('0.0.0.0', prt)
-                # TODO: DEV0001: ValueError: signal only works in main thread (when both -w and -d is present)
 
             except PermissionError:
                 erred = True
@@ -106,7 +106,6 @@ def web_run(port, debug):
         try:
             # APP.run('0.0.0.0', prt, debug)
             APP.run('0.0.0.0', prt)
-            # TODO: DEV0001: ValueError: signal only works in main thread (when both -w and -d is present)
 
         except PermissionError:
             printer.Printer().print_with_status("Cannot bind to {0}:{1}!\
@@ -131,7 +130,7 @@ def web_main():
         Main or Home page of the web interface.
     """
 
-    web_logger.info(session)
+    web_logger.info(session, '\t', request)
 
     if 'username' in session and 'password' in session:
         return render_template('index.html',
@@ -160,15 +159,13 @@ def web_parse_login(username='archarios', password='archarios'):
 
     if flask_request.form['username'] == username and \
             flask_request.form['password'] == password:
-        flask_request.
+        result = make_response(redirect(url_for('web_main')))
+        result.set_cookie('username', flask_request.form['username'])
+        result.set_cookie('password', flask_request.form['password'])
         session['username'] = flask_request.form['username']
         session['password'] = flask_request.form['password']
 
-        return render_template('index.html',
-            title=ArchariosFramework(API=True).name,
-            version=ArchariosFramework(API=True).version,
-            codename=ArchariosFramework(API=True).codename,
-            copyright=misc.ProgramFunctions().COPYRIGHT)
+        return result
 
     else:
         return render_template('error.html',
