@@ -133,7 +133,10 @@ def web_main():
 
     web_logger.info(str(session) + '\t' + str(flask_request))
 
-    if web_login(request.get_cookie['username'], request.get_cookie['password']):
+    # FIXME: DEV0001: Need to fix login system. Use login module.
+    #if web_login(flask_request.get_cookie['username'],
+    #        flask_request.get_cookie['password']):
+    if True:
         return render_template('index.html',
             title=ArchariosFramework(API=True).name,
             version=ArchariosFramework(API=True).version,
@@ -147,13 +150,6 @@ def web_main():
             codename=ArchariosFramework(API=True).codename,
             copyright=misc.ProgramFunctions().COPYRIGHT)
 
-
-def web_login(username="", password=""):
-    """
-    def web_login():
-        Login using the login module.
-    """
-    a
 
 @APP.route("/login.py", methods=['GET', 'POST'])
 def web_parse_login(username="", password=""):
@@ -487,7 +483,8 @@ userlevel=self.userlevel, logger=self.logger)"""  # To be used with `eval()`.
                 "        Desc..: Show this help menu.",
                 "",
                 "        Switch: -w --web /w /web",
-                "        Desc..: Start {0}'s web interface.".format(self.name),
+                # TODO: DEV0004: Remove WIP when finished developing web interface.
+                "        Desc..: (WIP) Start {0}'s web interface.".format(self.name),
                 "",
                 "NOTE: Running {0} without any arguments \
 will use the default settings.".format(self.name),
