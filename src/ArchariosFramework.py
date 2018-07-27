@@ -33,6 +33,7 @@ try:
     import subprocess
     import multitasking
 
+    # Import third-party library to host web-interface.
     from flask import request as flask_request
     from flask import Flask, render_template
     from flask import session, redirect, url_for
@@ -53,9 +54,9 @@ try:
     from core import random_phrases
     from core import html_downloader
 
-except ImportError:
+except ImportError as i:
     # Prints if error is encountered while importing modules.
-    print("Import Error!")
+    print("Error: " + str(i))
     print()
     print("==================== TRACEBACK ====================")
     traceback.print_exc()
@@ -132,7 +133,7 @@ def web_main():
 
     web_logger.info(str(session) + '\t' + str(flask_request))
 
-    if 'username' in session and 'password' in session:
+    if web_login(request.get_cookie['username'], request.get_cookie['password']):
         return render_template('index.html',
             title=ArchariosFramework(API=True).name,
             version=ArchariosFramework(API=True).version,
@@ -147,8 +148,15 @@ def web_main():
             copyright=misc.ProgramFunctions().COPYRIGHT)
 
 
+def web_login(username="", password=""):
+    """
+    def web_login():
+        Login using the login module.
+    """
+    a
+
 @APP.route("/login.py", methods=['GET', 'POST'])
-def web_parse_login(username='archarios', password='archarios'):
+def web_parse_login(username="", password=""):
     """
     def web_parse_login():
         Check if login credentials is valid.
@@ -157,13 +165,12 @@ def web_parse_login(username='archarios', password='archarios'):
     if flask_request.method != 'POST':
         return redirect(url_for('web_main'))
 
-    if flask_request.form['username'] == username and \
-            flask_request.form['password'] == password:
+    if login.login(flask_request.form['username'], flask_request.form['password']):
         result = make_response(redirect(url_for('web_main')))
         result.set_cookie('username', flask_request.form['username'])
         result.set_cookie('password', flask_request.form['password'])
-        session['username'] = flask_request.form['username']
-        session['password'] = flask_request.form['password']
+        #session['username'] = flask_request.form['username']
+        #session['password'] = flask_request.form['password']
 
         return result
 
