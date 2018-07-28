@@ -62,7 +62,7 @@ This document is used as a list of TO-DOs and other plans.
     - [ ] Dtctv (Server/Client File Repository for Investigating cyber attacks.)
 
 + [ ] 13.Social Engineering Tools
-    - [ ] Weemen (Port of Weeman)
+    - [ ] DarkFish (HTTP server for phishing)
 
 + [ ] 14.System Services
     - [ ] Deception (HTTP, FTP, SMTP, Telnet, SSH, and SNMP honeypot)
@@ -70,6 +70,6 @@ This document is used as a list of TO-DOs and other plans.
     - [ ] SimpleIM_Server (Chat server that uses raw sockets and actual IP for connection)
 
 + [ ] 15.Others
-    - [ ] Ipify (Know your external IP Address)
-    - [ ] MapSCII (ASCII Map via Telnet)
+    - [X] Ipify (Know your external IP Address)
+    - [X] MapSCII (ASCII Map via Telnet)
     - [ ] SimpleIM (SimpleIM client)

@@ -9,8 +9,7 @@ from core import exceptions
 
 # Put all needed dependencies here!
 try:
-    # import something_here
-    pass
+    import subprocess
 
 except BaseException as err:
     print("While importing dependency modules, an error occured: {0}".format(str(err)))
@@ -45,77 +44,31 @@ class ArchariosFrameworkModule:
         # NOTE: DEV0004: Modify THIS DICTIONARY ONLY!
         self.module_info = {
                 # Module name
-                "name": "<MODULE_NAME>",
+                "name": "MapSCII",
                 # Module brief description
-                "bdesc": "<BRIEF_DESCRIPTION>",
+                "bdesc": "An ASCII world map from `mapscii.me` using telnet.",
                 # Module version
                 "version": 1.0,
                 # Module author
-                "author": "<MODULE_AUTHOR>",
+                "author": "Catayao56",
                 # Module status
                 "status": "Stable",
                 # Date created (Please follow the format)
-                "created": "<DATE_CREATED>",
+                "created": "Jul. 28 2018",
                 # Latest update (Please follow the format)
-                "last_update": "<DATE_CREATED>",
+                "last_update": "Jul. 28 2018",
                 # Long description
                 "ldesc": """\
-<t>This module is meantly built for Archários Framework.<end>
+<t>MapSCII -- An ASCII world map from `mapscii.me` using telnet.<end>
 
-This module can be a template for contributors if they
-want to create their own module.
+<h>What is MapSCII?<end>
 
-When creating a new module, <u>please read CONTRIBUTING.md<end>
-for guidelines on creating a module, and
-<u>CODE_OF_CONDUCT.md<end> for rules regarding to a
-harassment-free experience.
+    <u>MapSCII<end> is a <n>telnet service<end> that allows the connected telnet clients
+    to <n>view the world map<end> <b>in a form of ASCII<end>.
 
-<h>Formatting tutorial<end>:
-    <n>NOTE<end>: <u>This applies to long descriptions (ldesc variable).<end>
-
-    To highlight the title, use the `< t >` expression
-    (without the spaces between `<` and `t`, `t` and `>`.)
-
-    Example:
-             <t>This is a title.<end>
-
-    To highlight a subtitle, use the `< h >` expression
-    (without the spaces between `<` and `h`, `h` and `>`.)
-
-    Example:
-             <h>This is a subtitle.<end>
-
-    To format strings, use the following:
-        `< u >` to underline text,
-        `< i >` to italicize text, and
-        `< b >` to bold text.
-
-        (without the spaces!)
-
-    Example:
-             <u>Underlined<end>
-             <i>Italicized<end>
-             <b>Bold<end>
-
-    To place a note, use the `< n >` expression
-    (without the spaces between `<` and `n`, `n` and `>`.)
-
-    Example:
-             <n>This is a Note. Follow the guidelines when creating a module!<end>
-
-    Remember to put `< end >` expression after the characters you
-    want to be modified.
-
-    Example:
-             <t>This is a title,<end> and this is not.
-             <h>This is a subtitle,<end> and this is not.
-             <u>This is underlined,<end> and this is not.
-             <i>This is italic,<end> and this is not.
-             <b>This is bold,<end> and this is not.
-             <n>This is a note,<end> and this is not.
-
-             <t>F<end> <h>A<end> <u>N<end> <i>C<end> <b>Y<end> <n>!<end>
-
+    This module is helpful to <u>visually locate targets<end> around the world.
+    It is not its primary function, but you can look at the world map and set notes
+    where their servers are, what is their physical network, and more.
              """.replace('<t>', misc.FB + misc.FU + misc.FI).replace(
                  '<end>', misc.END).replace('<u>', misc.FU).replace(
                  '<i>', misc.FI).replace('<b>', misc.FB).replace(
@@ -332,5 +285,18 @@ harassment-free experience.
         """
 
         # NOTE: DEV0004: This is the method you will work on!
+        try:
+            # print(subprocess.getstatusoutput('which telnet')) # DEV0005
+            if subprocess.getstatusoutput('which telnet')[0] == 0:
+                if subprocess.call(['telnet', 'mapscii.me']) == 0:
+                    return 0
 
-        return 0
+                else:
+                    return 2
+
+            else:
+                print("No telnet client was detected.")
+                return 1
+
+        except BaseException:
+            return random.randint(2, 999)

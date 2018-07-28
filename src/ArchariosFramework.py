@@ -1256,45 +1256,63 @@ options.".format(misc.FB, misc.CR, misc.END))
                                         continue
 
                                 elif self.module_command.lower().startswith("show"):
-                                    mod_com = self.module_command.split(' ')
-                                    if mod_com[1] == 'info':
-                                        self.logger.info("Printing module info.")
+                                    try:
+                                        mod_com = self.module_command.split(' ')
+                                        if mod_com[1] == 'info':
+                                            self.logger.info("Printing module info.")
+                                            eval("module_obj.{0}\
+.show_module_info()".format(self.module_call))
+
+                                        elif mod_com[1]  == 'values':
+                                            self.logger.info("Showing current values.")
+                                            print(misc.FB + "Current Values:" +
+                                                    misc.END)
+                                            for key in options:
+                                                print(misc.FB + misc.CR + str(key) +
+                                                        misc.END + ": " +
+                                                    str(options[key]))
+
+                                        elif mod_com[1] == 'options':
+                                            self.logger.info("Showing available keys.")
+                                            print(misc.FB + "Available Keys:" +
+                                                    misc.END)
+                                            for key in options:
+                                                try:
+                                                    print(misc.FB + misc.CR + key +
+                                                            misc.END + ': ' +
+                                                            ohelp[key])
+
+                                                except KeyError:
+                                                    print(misc.FB + misc.CR + key +
+                                                            misc.END + ": " +
+                                                            misc.CGR + "None" +
+                                                            misc.END)
+
+                                    except IndexError:
                                         eval("module_obj.{0}\
 .show_module_info()".format(self.module_call))
 
-                                    elif mod_com[1]  == 'values':
-                                        self.logger.info("Showing current values.")
-                                        print(misc.FB + "Current Values:" +
-                                                misc.END)
-                                        for key in options:
-                                            print(misc.FB + misc.CR + str(key) +
-                                                    misc.END + ": " +
-                                                    str(options[key]))
-
-                                    elif mod_com[1] == 'options':
-                                        self.logger.info("Showing available keys.")
-                                        print(misc.FB + "Available Keys:" +
-                                                misc.END)
-                                        for key in options:
-                                            try:
-                                                print(misc.FB + misc.CR + key +
-                                                        misc.END + ': ' +
-                                                        ohelp[key])
-
-                                            except KeyError:
-                                                print(misc.FB + misc.CR + key +
-                                                        misc.END + ": " +
-                                                        misc.CGR + "None" +
-                                                        misc.END)
-
                                 elif self.module_command.lower(
-                                        ).startswith(("run", "exec")):
+                                    ).startswith(("run", "exec")):
                                     self.logger.info("Running module...")
-                                    eval("module_obj.{0}.run(options)".format(
-                                        self.module_call))
+                                    return_code = eval("module_obj.{0}.run(\
+options)".format(self.module_call))
+                                    try:
+                                        return_code = int(return_code)
+
+                                    except(ValueError, TypeError):
+                                        print(misc.CR + \
+                                            error.ErrorClass().ERROR0007() + misc.END)
+
+                                    else:
+                                        if return_code == 0:
+                                            print(misc.CG + "Module successfully finished!" + misc.END)
+
+                                        else:
+                                            print(misc.CR + "Module exited with error code {0}!".format(str(return_code)) + misc.END)
 
                                 elif self.module_command.lower().startswith(
-                                        "back"):
+                                    "back"):
                                     self.logger.info("Quitting module...")
                                     return None
 

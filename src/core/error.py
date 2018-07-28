@@ -99,3 +99,21 @@ privileges by the su binary. (For Android)""".format(proc_type, name)
         return """Sorry! This {0} does not have any API support as of now.
 Please contact the developer or create a merge request that has the fix for
 your problem. Thank you""".format(proc_type)
+
+    def ERROR0006(self):
+        """
+        def ERROR0006():
+            Call this if there is a problem with the internet connection.
+        """
+
+        return "There is a problem connecting to the internet!"
+
+    def ERROR0007(self):
+        """
+        def ERROR0007():
+            Call this if module's run() method doesn't return an integer.
+        """
+
+        return """Module doesn't return an integer!
+If you are the developer, please put a return token at the end of all
+possible exit points of the code. If not, please contact the developer."""
