@@ -5,4 +5,5 @@ test:
         - ls
         - cd src
         - pwd
+        - pip3 install multitasking flask
         - python3 ArchariosFramework.py --test
