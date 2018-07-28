@@ -7,17 +7,7 @@ from core import error
 from core import logger
 from core import exceptions
 
-# Put all needed dependencies here!
-try:
-    # import something_here
-    pass
-
-except BaseException as err:
-    print("While importing dependency modules, an error occured: {0}".format(str(err)))
-    importerror = True
-
-else:
-    importerror = False
+import requests
 
 """
 Template for creating a module for Archários Framework.
@@ -34,87 +24,28 @@ class ArchariosFrameworkModule:
     """
 
     def __init__(self, *args, **kwargs):
-        if importerror is not False:
-            return 8
-
-        else:
-            pass
-
         # Module Information
 
         # NOTE: DEV0004: Modify THIS DICTIONARY ONLY!
         self.module_info = {
                 # Module name
-                "name": "<MODULE_NAME>",
+                "name": "Ipify",
                 # Module brief description
-                "bdesc": "<BRIEF_DESCRIPTION>",
+                "bdesc": "Show your current external IP address using ipify.org's API.",
                 # Module version
                 "version": 1.0,
                 # Module author
-                "author": "<MODULE_AUTHOR>",
+                "author": "Catayao56",
                 # Module status
                 "status": "Stable",
                 # Date created (Please follow the format)
-                "created": "<DATE_CREATED>",
+                "created": "Jul. 28 2018",
                 # Latest update (Please follow the format)
-                "last_update": "<DATE_CREATED>",
+                "last_update": "Jul. 28 2018",
                 # Long description
                 "ldesc": """\
-<t>This module is meantly built for Archários Framework.<end>
+<t>Ipify :: Show your current external IP address using ipify.org's API.<end>
 
-This module can be a template for contributors if they
-want to create their own module.
-
-When creating a new module, <u>please read CONTRIBUTING.md<end>
-for guidelines on creating a module, and
-<u>CODE_OF_CONDUCT.md<end> for rules regarding to a
-harassment-free experience.
-
-<h>Formatting tutorial<end>:
-    <n>NOTE<end>: <u>This applies to long descriptions (ldesc variable).<end>
-
-    To highlight the title, use the `< t >` expression
-    (without the spaces between `<` and `t`, `t` and `>`.)
-
-    Example:
-             <t>This is a title.<end>
-
-    To highlight a subtitle, use the `< h >` expression
-    (without the spaces between `<` and `h`, `h` and `>`.)
-
-    Example:
-             <h>This is a subtitle.<end>
-
-    To format strings, use the following:
-        `< u >` to underline text,
-        `< i >` to italicize text, and
-        `< b >` to bold text.
-
-        (without the spaces!)
-
-    Example:
-             <u>Underlined<end>
-             <i>Italicized<end>
-             <b>Bold<end>
-
-    To place a note, use the `< n >` expression
-    (without the spaces between `<` and `n`, `n` and `>`.)
-
-    Example:
-             <n>This is a Note. Follow the guidelines when creating a module!<end>
-
-    Remember to put `< end >` expression after the characters you
-    want to be modified.
-
-    Example:
-             <t>This is a title,<end> and this is not.
-             <h>This is a subtitle,<end> and this is not.
-             <u>This is underlined,<end> and this is not.
-             <i>This is italic,<end> and this is not.
-             <b>This is bold,<end> and this is not.
-             <n>This is a note,<end> and this is not.
-
-             <t>F<end> <h>A<end> <u>N<end> <i>C<end> <b>Y<end> <n>!<end>
 
              """.replace('<t>', misc.FB + misc.FU + misc.FI).replace(
                  '<end>', misc.END).replace('<u>', misc.FU).replace(
@@ -331,6 +262,17 @@ harassment-free experience.
             Run the module.
         """
 
-        # NOTE: DEV0004: This is the method you will work on!
+        try:
+            ip = requests.get('https://api.ipify.org/').text
 
-        return 0
+        except(ConnectionError, requests.exceptions.ConnectionError):
+            print(error.ErrorClass().ERROR0006())
+            return 6
+
+        except Exception as error_msg:
+            print("[E] {0}".format(str(error_msg)))
+            return 999
+
+        else:
+            print("Your public IP Address is '" + str(ip) + "'.")
+            return 0

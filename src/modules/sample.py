@@ -31,7 +31,7 @@ class ArchariosFrameworkModule:
                 # Module brief description
                 "bdesc": "A sample module for Archários Framework.",
                 # Module version
-                "version": 1.0,
+                "version": 1.1,
                 # Module author
                 "author": "Catayao56",
                 # Module status
@@ -108,7 +108,8 @@ harassment-free experience.
         # NOTE: DEV0004: Modify THIS DICTIONARY ONLY!
         # Update history
         self.version_history = {
-                    1.0: "Initial update"
+                    1.0: "Initial update",
+                    1.1: "Module update for return codes."
                     }
 
         self._parse_module_info()
@@ -324,6 +325,8 @@ harassment-free experience.
             print("You are now logged in!")
             print("Target: ", values['target'])
             print("Your favorite number: ", values['number'])
+            return 0
 
         else:
             print(values)
+            return random.randint(1, 1024)
