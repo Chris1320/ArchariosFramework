@@ -20,7 +20,8 @@ This document is used as a list of TO-DOs and other plans.
 
 ## Framework Modules
 + [ ] 1.Reconnaissance Tools
-    - [X] _On Hold_ ReconMe (Web Reconnaissance Tool)
+    - [ ] _In Development_ ReconMe (Web Reconnaissance Tool)
+        * [ ] More stable CMS detection.
     - [ ] _On Hold_ WhatsYourName (Get host by a number of ways)
     - [ ] _On Hold_ IPCalc (IP Calculator)
 

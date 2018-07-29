@@ -334,7 +334,7 @@ class ArchariosFramework:
         # Program Information
         self.logger.info('Defining program information.')
         self.name = "Archários Framework"
-        self.version = "0.0.1.3"
+        self.version = "0.0.1.4"
         self.codename = "Beta"
         self.description = "The Novice's Ethical Hacking Framework"
         self.banner = r"""{0}
@@ -656,6 +656,9 @@ will use the default settings.".format(self.name),
             ))
         try:
             module_object = importlib.import_module('modules.' + module)
+
+        except(ImportError, ModuleNotFoundError):
+            printer.Printer().print_with_status("Cannot find `{0}` module! Please make sure it is installed and properly configured.".format(module), 2)
 
         except Exception as err:
             self.latest_exceptions = traceback.format_exc()
@@ -1228,6 +1231,7 @@ about this module.".format(misc.FB, misc.CR, misc.END))
 values.".format(misc.FB, misc.CR, misc.END))
                                     print("{0}{1}options{2}    Show available \
 options.".format(misc.FB, misc.CR, misc.END))
+                                    print("{0}{1}tracebacks{2} Show latest exceptions.".format(misc.FB, misc.CR, misc.END))
                                     print()
 
                                 elif self.module_command.lower().startswith("set"):
@@ -1237,7 +1241,23 @@ options.".format(misc.FB, misc.CR, misc.END))
                                             str(mod_com))
                                     self.logger.info("Setting {0} to {1}.".format(mod_com[0], mod_com[2]))
                                     try:
-                                        value_type = type(options[mod_com[0]])
+                                        if type(options[mod_com[0]]) is bool:
+                                            if mod_com[2].lower() in ('true', 'on', '1'):
+                                                options[mod_com[0]] = True
+                                                continue
+
+                                            elif mod_com[2].lower() in ('false', 'off', '0'):
+                                                options[mod_com[0]] = False
+                                                continue
+
+                                            else:
+                                                printer.Printer().print_with_status(
+                                                        "Invalid value for key! Must be True or False, On or Off, 0 or 1.", 2
+                                                        )
+                                                continue
+
+                                        else:
+                                            value_type = type(options[mod_com[0]])
 
                                     except KeyError:
                                         self.latest_exceptions = traceback.format_exc()
@@ -1288,6 +1308,9 @@ options.".format(misc.FB, misc.CR, misc.END))
                                                             misc.CGR + "None" +
                                                             misc.END)
 
+                                        elif mod_com[1] == 'tracebacks':
+                                            self.parse_input("show tracebacks")
+
                                     except IndexError:
                                         eval("module_obj.{0}\
 .show_module_info()".format(self.module_call))
@@ -1295,21 +1318,29 @@ options.".format(misc.FB, misc.CR, misc.END))
                                 elif self.module_command.lower(
                                     ).startswith(("run", "exec")):
                                     self.logger.info("Running module...")
-                                    return_code = eval("module_obj.{0}.run(\
-options)".format(self.module_call))
                                     try:
-                                        return_code = int(return_code)
+                                        return_code = eval("module_obj.{0}.run(\
+options)".format(self.module_call))
+                                        try:
+                                            return_code = int(return_code)
 
-                                    except(ValueError, TypeError):
-                                        print(misc.CR + \
-                                            error.ErrorClass().ERROR0007() + misc.END)
-
-                                    else:
-                                        if return_code == 0:
-                                            print(misc.CG + "Module successfully finished!" + misc.END)
+                                        except(ValueError, TypeError):
+                                            print(misc.CR + \
+                                                error.ErrorClass().ERROR0007() + misc.END)
 
                                         else:
-                                            print(misc.CR + "Module exited with error code {0}!".format(str(return_code)) + misc.END)
+                                            if return_code == 0:
+                                                print(misc.CG + "Module successfully finished!" + misc.END)
+
+                                            else:
+                                                print(misc.CR + "Module exited with error code {0}!".format(str(return_code)) + misc.END)
+
+                                    except BaseException as moduleExc:
+                                        self.latest_exceptions = traceback.format_exc()
+                                        printer.Printer(
+                                                ).print_with_status(
+                                                        str(moduleExc) + "\t(run \
+`show tracebacks` for more info.)", 1)
 
                                 elif self.module_command.lower().startswith(
                                     "back"):
@@ -1389,6 +1420,14 @@ OPTIONS:
             self.logger.info("Running command `{0}`...".format(
                 command))
             try:
+                dangers = ('sys.exit', 'os.exit', 'proper_exit')
+                for danger in dangers:
+                    if danger in command:
+                        raise exceptions.CommandNotAllowedError("Sorry! The command you are trying to execute is not allowed by the program.")
+
+                    else:
+                        pass
+
                 if command == '':
                     raise exceptions.InvalidCommandError("Command must not be NoneType!")
 

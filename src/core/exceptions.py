@@ -58,3 +58,11 @@ class NameTooLongError(Exception):
     """
 
     pass
+
+class CommandNotAllowedError(Exception):
+    """
+    class CommandNotAllowedError():
+        An exception class.
+    """
+
+    pass
