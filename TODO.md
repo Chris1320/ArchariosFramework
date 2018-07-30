@@ -11,17 +11,23 @@ This document is used as a list of TO-DOs and other plans.
   |
   ``X`` if the feature is done.
 
+## General
++ [ ] _On Hold_ More logging verbosity.
++ [ ] _On Hold_ Module logging.
+
 ## Web Interface
 + [ ] _On Hold_ Need to fix login system. Use login module.
 + [ ] _On Hold_ API support continuation. (Escape characters, return outputs, etc.)
 
 ## Framework Commands
 + [ ] _On Hold_ Use subprocess on ``run`` command because os.system() is deprecated.
++ [ ] _On Hold_ Built-In Notepad.
++ [ ] _On Hold_ Module Manager (Included in `module` command.)
 
 ## Framework Modules
 + [ ] 1.Reconnaissance Tools
     - [ ] _In Development_ ReconMe (Web Reconnaissance Tool)
-        * [ ] More stable CMS detection.
+        * [X] More stable CMS detection.
     - [ ] _On Hold_ WhatsYourName (Get host by a number of ways)
     - [ ] _On Hold_ IPCalc (IP Calculator)
 

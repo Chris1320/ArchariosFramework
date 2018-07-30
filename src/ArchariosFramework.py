@@ -334,7 +334,7 @@ class ArchariosFramework:
         # Program Information
         self.logger.info('Defining program information.')
         self.name = "Archários Framework"
-        self.version = "0.0.1.4"
+        self.version = "0.0.1.5"
         self.codename = "Beta"
         self.description = "The Novice's Ethical Hacking Framework"
         self.banner = r"""{0}
@@ -497,6 +497,7 @@ will use the default settings.".format(self.name),
                 "module [OPTION]       Manage modules. (Type `module ?` for info.)",
                 "runpy [COMMAND]       Pass <command> to python shell. ({0}Use AT YOUR OWN RISK{1})".format(misc.FB + misc.CY, misc.END),
                 "run exec [COMMAND]    Pass <command> to the shell.",
+                "clear cls clr         Clear the current contents of the screen.",
                 "restart reboot        Restart {0}.".format(self.name),
                 "quit exit             Exit {0}.".format(self.name)
                 ]
@@ -684,7 +685,8 @@ for more info.", 2)
             module
             ))
         try:
-            module_object = importlib.reload_module('modules.' + module)
+            module_obj = self._import_module(module)
+            module_object = importlib.reload(module_obj)
 
         except Exception as err:
             self.latest_exceptions = traceback.format_exc()
@@ -1308,7 +1310,8 @@ options.".format(misc.FB, misc.CR, misc.END))
                                                             misc.CGR + "None" +
                                                             misc.END)
 
-                                        elif mod_com[1] == 'tracebacks':
+                                        elif mod_com[1].lower(
+                                                ) in ('tracebacks', 'traceback'):
                                             self.parse_input("show tracebacks")
 
                                     except IndexError:
@@ -1397,6 +1400,16 @@ quit module...")
                                     except(KeyboardInterrupt, EOFError, TypeError, ValueError):
                                         break
 
+                elif command[1] in ('reload', 'restart', 'reboot'):
+                    try:
+                        printer.Printer().print_with_status(
+                                "Restarting {0}...".format(command[2]), 0)
+                        self._reload_module(command[2])
+
+                    except Exception as reload_error:
+                        self.latest_exceptions = traceback.format_exc()
+                        printer.Printer().print_with_status(str(reload_error), 2)
+
                 else:
                     self.logger.info("No match for {0}... Showing help \
 menu...".format(command[1]))
@@ -1413,6 +1426,7 @@ OPTIONS:
     info [MODULE]            Show information of the specified module.
     use run exec [MODULE]    Use the specified module.
     new generate             Generate a new module from template.
+    reload [MODULE]          Reload the specified module.
 """)
 
         elif command.lower().startswith("runpy"):
@@ -1472,6 +1486,10 @@ OPTIONS:
                 self.latest_exceptions = traceback.format_exc()
                 printer.Printer().print_with_status(str(err), 2)
                 self.logger.error(str(err))
+
+        elif command.lower() in ('clear', 'cls', 'clr'):
+            self.logger.info("Clearing the screen")
+            misc.ProgramFunctions().clrscrn()
 
         elif command.lower() in ('restart', 'reboot'):
             self.logger.info("Restarting...")
