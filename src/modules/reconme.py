@@ -10,6 +10,7 @@ from core import exceptions
 # Put all needed dependencies here!
 try:
     import whois
+    import socket
     import requests
 
     from core import printer
@@ -609,6 +610,27 @@ api.hackertarget.com/geoip/?q={0}".format(target_site)).text
             print("[i] geoip is false, now skipping...")
             geoip_result = None
 
+        # Step 10: Grab banners.
+        if values['grab_banners'] is True:
+            print("[i] Grabbing banners from {0}...".format(target_site))
+            ports2grab_banners = [21, 22, 25, 80, 110]
+            banners = []
+            for port in ports2grab_banners:
+                try:
+                    connection = socket.socket()
+                    connection.connect((target_site, port))
+                    banners.append({str(port): str(connection.recv(1024))})
+
+                except(ConnectionError, ConnectionResetError):
+                    printer.Printer().print_with_status(error.ErrorCodes().ERROR0006())
+
+                except Exception as error:
+                    printer.Printer().print_with_status(str(error), 2)
+
+        else:
+            print("[i] grab_banners is false, now skipping...")
+            banners = []
+
         # Step __: Print the results.
         print(misc.FB + misc.CC + \
                 "Results for `{0}`:".format(values['target']) + misc.END)
@@ -683,5 +705,9 @@ Archarios Framework\n\n" + robots_data)
         else:
             pass
 
+        print()
+        print(misc.CG + "Banners:" + misc.END)
+        for banner in banners:
+            print("Port + Banner Data: {0}  ----  {1}".format(banner, banners[banner]))
         print()
         return 0
