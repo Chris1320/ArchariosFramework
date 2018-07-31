@@ -120,7 +120,6 @@ class LoggingObject:
             :param message: Log message
         """
 
-        message = message.encode('utf-8')
         result = ":{}: [{}] ({}) {}".format(
                 logtype.upper(),
                 str(self.session_id),
