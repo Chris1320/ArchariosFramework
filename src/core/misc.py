@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Coding=UTF-8
+#coding=utf-8
 
 """
 Archarios Framework :: The Novice's Ethical Hacking Framework
