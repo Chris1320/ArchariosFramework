@@ -52,7 +52,7 @@ class ArchariosFrameworkModule:
                 # Module brief description
                 "bdesc": "A suite of tools for information gathering.",
                 # Module version
-                "version": 1.2,
+                "version": 1.3,
                 # Module author
                 "author": "Catayao56",
                 # Module status
@@ -97,7 +97,8 @@ about a website or a network.
         self.version_history = {
                     1.0: "Initial update",
                     1.1: "Added more features. Added get_cms and cloudflare_resolve switches.",
-                    1.2: "Added more features. Added get_robots and whois switches."
+                    1.2: "Added more features. Added get_robots and whois switches.",
+                    1.3: "Fixed bugs and added geolocation."
                     }
 
         self._parse_module_info()
