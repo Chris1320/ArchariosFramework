@@ -585,12 +585,28 @@ for subdomains...'.format(sub, sub + '.' + target_site), iterator,
             whois_result = None
 
         # Step 9: Get geolocation from IP.
-        # TODO: DEV0001: Do this!
         if values['geoip'] is True:
             print("[i] Getting geolocation of {0}.".format(values['target']))
+            try:
+                geoip_results = requests.get("https://\
+api.hackertarget.com/geoip/?q={0}".format(target_site)).text
+                geoip_results = geoip_results.split('\n')
+
+            except Exception as geoiperror:
+                printer.Printer().print_with_status(str(geoiperror), 2)
+                geoip_results = None
+
+            else:
+                geoip_result = {}
+                for res in geoip_results:
+                    res = res.partition(': ')
+                    geoip_result[res[0].lower()] = res[2]
+
+                # print(geoip_result, type(geoip_result)) # DEV0005
 
         else:
             print("[i] geoip is false, now skipping...")
+            geoip_result = None
 
         # Step __: Print the results.
         print(misc.FB + misc.CC + \
@@ -619,7 +635,7 @@ for subdomains...'.format(sub, sub + '.' + target_site), iterator,
 
         print()
         if whois_result is None:
-            print(misc.CR + "Whois Information: Error fetching data" + misc.END)
+            pass
 
         else:
             print(misc.CG + "Whois Information:" + misc.END)
@@ -655,8 +671,16 @@ Archarios Framework\n\n" + robots_data)
         else:
             pass
 
-        # TODO: DEV0001: Do this!
-        # print(misc.CG + "Geolocation:" + misc.END)
-        # print(misc.CY + "Longitude:" + misc.END)
+        if values['geoip'] is True:
+            print(misc.CG + "Whois Information:" + misc.END)
+            print(misc.CY + "\tCountry:" + misc.END, geoip_result['country'])
+            print(misc.CY + "\tState:" + misc.END, geoip_result['state'])
+            print(misc.CY + "\tCity:" + misc.END, geoip_result['city'])
+            print(misc.CY + "\tLatitude:" + misc.END, geoip_result['latitude'])
+            print(misc.CY + "\tLongitude:" + misc.END, geoip_result['longitude'])
+
+        else:
+            pass
+
         print()
         return 0
