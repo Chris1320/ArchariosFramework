@@ -78,11 +78,9 @@ Shadow Suite Toolkit.
     + Termux Development Team: Termux Android Emulator
 
 ## Requirements
-+ Tested Operating Systems are Kali, Mint, Ubuntu, Termux Terminal Emulator for Android, and Cygwin Terminal Emulator for Windows
++ Tested Operating Systems are Kali, Mint, Ubuntu, and Termux Terminal Emulator for Android.
 	
-+ Not yet tested for Windows Operating Systems...
-
-+ Worked on your operating system but not listed here? Please contact us and we'll be happy to include it here!
++ Not yet tested for Windows Operating Systems... And sorry, we are not planning to suppport Windows OS.
 
 + Internet Connection. (for performing remote attacks and/or updating)
 + Python Interpreter version 3.
