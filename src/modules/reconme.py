@@ -46,14 +46,13 @@ class ArchariosFrameworkModule:
 
         # Module Information
 
-        # NOTE: DEV0004: Modify THIS DICTIONARY ONLY!
         self.module_info = {
                 # Module name
                 "name": "ReconMe",
                 # Module brief description
                 "bdesc": "A suite of tools for information gathering.",
                 # Module version
-                "version": 1.1,
+                "version": 1.2,
                 # Module author
                 "author": "Catayao56",
                 # Module status
@@ -61,13 +60,32 @@ class ArchariosFrameworkModule:
                 # Date created (Please follow the format)
                 "created": "Jul. 28 2018",
                 # Latest update (Please follow the format)
-                "last_update": "Jul. 28 2018",
+                "last_update": "Jul. 31 2018",
                 # Long description
                 "ldesc": """\
 <t>ReconMe :: A suite of tools for information gathering<end>
 
 ReconMe is a tool included in Archários Framework to gather information
 about a website or a network.
+
+<h>Features:<end>
+    - Custom timeout for every connection.
+    - We provided a <n>FREE<end> <b>API key<end> to be used. <n>Please don't abuse it<end>.
+    - Custom user agent string.
+    - Get the site title.
+    - Get the IP address of the web server.
+    - Get the CMS information.
+    - Try to resolve IP from subdomains if IP is hidden by CloudFlare.
+    - Get robots.txt file from target.
+    - Gather whois information of the target.
+    - Gather geolocation information of the target.
+    - Grab banners of the target.
+    - Perform DNS lookup.
+    - Perform subnet calculation.
+    - Search for subdomains.
+    - Perform a reverse IP lookup.
+    - `Harvest` more information from trusted sources.
+
 """.replace('<t>', misc.FB + misc.FU + misc.FI).replace(
                  '<end>', misc.END).replace('<u>', misc.FU).replace(
                  '<i>', misc.FI).replace('<b>', misc.FB).replace(
@@ -75,10 +93,11 @@ about a website or a network.
                  misc.FB + misc.CY)
                 }
 
-        # NOTE: DEV0004: Modify THIS DICTIONARY ONLY!
         # Update history
         self.version_history = {
-                    1.0: "Initial update"
+                    1.0: "Initial update",
+                    1.1: "Added more features. Added get_cms and cloudflare_resolve switches.",
+                    1.2: "Added more features. Added get_robots and whois switches."
                     }
 
         self._parse_module_info()
@@ -109,8 +128,6 @@ about a website or a network.
             Parse module information for getting attention of user not
             following the guidelines.
         """
-
-        # NOTE: DEV0004: Don't modify this method!
 
         mo_in = self.module_info
 
@@ -230,8 +247,6 @@ about a website or a network.
             Print module info.
         """
 
-        # NOTE: DEV0004: Don't modify this method!
-
         result = """
 ==================================================
 {0}{1}Name{2}: {3}
@@ -259,9 +274,6 @@ about a website or a network.
         def prepare():
             Return options required for run() method.
         """
-
-        # NOTE: DEV0004: This is the method you will work on!
-        # NOTE: DEV0004: Modify those dictionaries only!
 
         # Format: key + default_value
                 # Example: "target": "192.168.0.1"
@@ -333,6 +345,9 @@ please don't abuse this public API key. Change this if you have another API.",
                 requests.ConnectionError):
             printer.Printer().print_with_status(error.ErrorClass().ERROR0006(), 2)
             print("[?] Maybe {0} is not a web server?".format(values['target']))
+            # FIXME: DEV0001: What if target is not a web server?
+            # print("[i] Trying to contact via DNS...")
+            # gethost.byname(values['target'].partition('://')[2].partition('/')[0])
             return 1
 
         except Exception as err:
@@ -565,6 +580,18 @@ for subdomains...'.format(sub, sub + '.' + target_site), iterator,
                 printer.Printer().print_with_status(str(whoiserror), 2)
                 whois_result = None
 
+        else:
+            print("[i] whois is false, now skipping...")
+            whois_result = None
+
+        # Step 9: Get geolocation from IP.
+        # TODO: DEV0001: Do this!
+        if values['geoip'] is True:
+            print("[i] Getting geolocation of {0}.".format(values['target']))
+
+        else:
+            print("[i] geoip is false, now skipping...")
+
         # Step __: Print the results.
         print(misc.FB + misc.CC + \
                 "Results for `{0}`:".format(values['target']) + misc.END)
@@ -628,5 +655,8 @@ Archarios Framework\n\n" + robots_data)
         else:
             pass
 
+        # TODO: DEV0001: Do this!
+        # print(misc.CG + "Geolocation:" + misc.END)
+        # print(misc.CY + "Longitude:" + misc.END)
         print()
         return 0
