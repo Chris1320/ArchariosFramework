@@ -48,7 +48,7 @@ class ArchariosFrameworkModule:
                 # Module brief description
                 "bdesc": "An ASCII world map from `mapscii.me` using telnet.",
                 # Module version
-                "version": 1.0,
+                "version": 1.1,
                 # Module author
                 "author": "Catayao56",
                 # Module status
@@ -79,7 +79,8 @@ class ArchariosFrameworkModule:
         # NOTE: DEV0004: Modify THIS DICTIONARY ONLY!
         # Update history
         self.version_history = {
-                    1.0: "Initial update"
+                    1.0: "Initial update",
+                    1.1: "Added version history when `module info mapscii` is entered."
                     }
 
         self._parse_module_info()
@@ -247,13 +248,22 @@ class ArchariosFrameworkModule:
 {0}{1}Description{2}:
 
 {10}
-==================================================""".format(
+""".format(
         misc.FB, misc.CR, misc.END, self.module_info['name'],
         self.module_info['version'], self.module_info['author'],
         self.module_info['bdesc'], self.module_info['status'],
         self.module_info['created'], self.module_info['last_update'],
         self.module_info['ldesc'])
+
+        ver_hist = """
+{0}{1}Version History{2}:""".format(misc.FB, misc.CR, misc.END)
+
+        for version in self.version_history:
+            ver_hist += "\n{0}: {1}".format(version, self.version_history[version])
+
         print(result)
+        print(ver_hist)
+        print('\n==================================================')
 
     def prepare(self):
         """

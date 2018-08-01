@@ -10,8 +10,9 @@ from core import exceptions
 
 # Put all needed dependencies here!
 try:
-    # import something_here
-    pass
+    from core import gethost
+    from core import printer
+    from core import asciigraphs
 
 except BaseException as err:
     print("While importing dependency modules, an error occured: {0}".format(str(err)))
@@ -46,82 +47,34 @@ class ArchariosFrameworkModule:
         # NOTE: DEV0004: Modify THIS DICTIONARY ONLY!
         self.module_info = {
                 # Module name
-                "name": "<MODULE_NAME>",
+                "name": "WhatsYourName",
                 # Module brief description
-                "bdesc": "<BRIEF_DESCRIPTION>",
+                "bdesc": "Get host by a number of ways.",
                 # Module version
                 "version": 1.0,
                 # Module author
-                "author": "<MODULE_AUTHOR>",
+                "author": "Catayao56",
                 # Module status
                 "status": "Stable",
                 # Date created (Please follow the format)
-                "created": "<DATE_CREATED>",
+                "created": "Aug. 01 2018",
                 # Latest update (Please follow the format)
-                "last_update": "<DATE_CREATED>",
+                "last_update": "Aug. 01 2018",
                 # Long description
                 "ldesc": """\
-<t>This module is meantly built for Archários Framework.<end>
+<t>WhatsYourName -- Get host by a number of ways.<end>
 
-This module can be a template for contributors if they
-want to create their own module.
+WhatsYourName gets the host by a number of ways. The methods are listed below:
 
-When creating a new module, <u>please read CONTRIBUTING.md<end>
-for guidelines on creating a module, and
-<u>CODE_OF_CONDUCT.md<end> for rules regarding to a
-harassment-free experience.
+    + Get host's IP from DNS. (`default` method)
+    + Get IP address from subdomains. (`subdomain` method.)
+    + Get IP address from whois registrars. (`whois` method.) (<n>Work In Progress<end>)
 
-<h>Formatting tutorial<end>:
-    <n>NOTE<end>: <u>This applies to long descriptions (ldesc variable).<end>
+If you know any methods, feel free to create a merge request or contact me on
+e-mail of facebook to do it.
 
-    To highlight the title, use the `< t >` expression
-    (without the spaces between `<` and `t`, `t` and `>`.)
-
-    Example:
-             <t>This is a title.<end>
-
-    To highlight a subtitle, use the `< h >` expression
-    (without the spaces between `<` and `h`, `h` and `>`.)
-
-    Example:
-             <h>This is a subtitle.<end>
-
-    To format strings, use the following:
-        `< u >` to underline text,
-        `< i >` to italicize text, and
-        `< b >` to bold text.
-
-        (without the spaces!)
-
-    Example:
-             <u>Underlined<end>
-             <i>Italicized<end>
-             <b>Bold<end>
-
-    To place a note, use the `< n >` expression
-    (without the spaces between `<` and `n`, `n` and `>`.)
-
-    Example:
-             <n>This is a Note. Follow the guidelines when creating a module!<end>
-
-    Remember to put `< end >` expression after the characters you
-    want to be modified.
-
-    Example:
-             <t>This is a title,<end> and this is not.
-             <h>This is a subtitle,<end> and this is not.
-             <u>This is underlined,<end> and this is not.
-             <i>This is italic,<end> and this is not.
-             <b>This is bold,<end> and this is not.
-             <n>This is a note,<end> and this is not.
-
-             <t>F<end> <h>A<end> <u>N<end> <i>C<end> <b>Y<end> <n>!<end>
-
-<h>Module Template Version History<end>
-    1.0: Initial Release.
-    1.1: Added version history on show_module_info() method.
-
-             """.replace('<t>', misc.FB + misc.FU + misc.FI).replace(
+-Catayao56
+""".replace('<t>', misc.FB + misc.FU + misc.FI).replace(
                  '<end>', misc.END).replace('<u>', misc.FU).replace(
                  '<i>', misc.FI).replace('<b>', misc.FB).replace(
                  '<h>', misc.FB + misc.FI).replace('<n>',
@@ -306,11 +259,12 @@ harassment-free experience.
         self.module_info['created'], self.module_info['last_update'],
         self.module_info['ldesc'])
 
-ver_hist = """
+        ver_hist = """
 {0}{1}Version History{2}:
 """.format(misc.FB, misc.CR, misc.END)
+
         for version in self.version_history:
-            ver_hist += "\n\t{0}: {1}".format(version, self.version_history[version])
+            ver_hist += '\n{0}: {1}'.format(version, self.version_history[version])
 
         print(result)
         print(ver_hist)
@@ -328,13 +282,15 @@ ver_hist = """
         # Format: key + default_value
                 # Example: "target": "192.168.0.1"
         values = {
-                # This can be none, it is allowed.
+                "target": "localhost",
+                "method": "default"
                 }
 
         # Format: key + info
                 # Example: "target": "The target to test."
         vhelp = {
-                # This can be none, it is allowed.
+                "target": "Target host. Must be a domain name.",
+                "method": "Method to use. `show help` for more info."
                 }
 
         return values, vhelp
@@ -345,6 +301,97 @@ ver_hist = """
             Run the module.
         """
 
-        # NOTE: DEV0004: This is the method you will work on!
+        if '://' in values['target']:
+            values['target'] = values['target'].partition('://')[2]
+            values['target'] = values['target'].partition('/')[0]
 
-        return 0
+        if values['method'].lower() == 'default':
+            try:
+                ip = gethost.byname(values['target'])
+                error = ['Errno', 'Error', 'Err', 'errno', 'error', 'err',
+                        'ERRNO', 'ERROR', 'ERR']
+                for err in error:
+                    if err in ip:
+                        printer.Printer().print_with_status(
+                                "An error occured: " + str(ip), 2)
+                        return 2
+
+                    else:
+                        continue
+
+                print(misc.CG + misc.FB + "IP Address of `{0}` is `{1}`.".format(values['target'], ip))
+                return 0
+
+            except(KeyboardInterrupt, EOFError):
+                print(error.ErrorCodes().ERROR0002())
+                return 1
+
+        elif values['method'].lower() == 'subdomain':
+            try:
+                subdomains = ('www', 'mail', 'mail2', 'webmail',
+                        'email', 'direct-connect-mail', 'direct',
+                        'direct-connect', 'cpanel', 'phpmyadmin',
+                        'ftp', 'forum', 'blog', 'm', 'dev',
+                        'record', 'ssl', 'dns', 'help', 'ns',
+                        'ns1', 'ns2', 'ns3', 'ns4', 'irc', 'server',
+                        'status', 'portal', 'beta', 'admin',
+                        'alpha', 'imap', 'smtp', 'test', 'mx', 'mx0',
+                        'remote', 'mx1', 'mailserver', 'server', 'mx2',
+                        'mail1', 'redbusprimarydns', 'redbussecondarydns',
+                        'vpn', 'mx7', 'secure', 'shop', 'cloud', 'mx01',
+                        'api', 'dns1', 'dns2', 'host', 'app', 'support',
+                        'ww1', 'mailin1', 'mailin2', 'pop', 'bbs', 'web',
+                        'r.1', 'r.2', 'r.3', 'owa')
+
+                result_default_ip = gethost.byname(values['target'])
+                print("\t[i] Default IP Address: {0}".format(result_default_ip))
+
+            except Exception as err:
+                printer.Printer().print_with_status(str(err), 2)
+                return 3
+
+            try:
+                hosts_discovery = {}
+                iterator = 0
+                for sub in subdomains:
+                    iterator += 1
+                    asciigraphs.ASCIIGraphs().progress_bar_manual('Checking \
+for subdomains...', iterator, len(subdomains), 20)
+                    subhost = sub + '.' + values['target']
+                    try:
+                        result_subhost_ip = gethost.byname(subhost)
+                        errors = ['Errno', 'Error', 'error', 'errno']
+                        for error in errors:
+                            if error in str(result_subhost_ip):
+                                please_continue = True
+                                break
+
+                            else:
+                                please_continue = False
+                                continue
+
+                        if please_continue is True:
+                            please_continue = False
+                            continue
+
+                        if result_subhost_ip != result_default_ip:
+                            hosts_discovery[subhost] = \
+                                    misc.CG + str(result_subhost_ip) + misc.END
+
+                        else:
+                            hosts_discovery[subhost] = \
+                                    misc.CY + str(result_subhost_ip) + misc.END
+
+                    except Exception as err:
+                        printer.Printer().print_with_status(str(err), 2)
+                        continue
+
+                print("{0}Results{1}:".format(misc.FB + misc.CR, misc.END))
+                for result in hosts_discovery:
+                    print("\t{0}: {1}".format(result, hosts_discovery[result]))
+
+                return 0
+
+            except Exception as erred:
+                printer.Printer().print_with_status(str(erred), 2)
+                return 4

@@ -53,7 +53,7 @@ class ArchariosFrameworkModule:
                 # Module brief description
                 "bdesc": "A suite of tools for information gathering.",
                 # Module version
-                "version": 1.3,
+                "version": 1.4,
                 # Module author
                 "author": "Catayao56",
                 # Module status
@@ -99,7 +99,8 @@ about a website or a network.
                     1.0: "Initial update",
                     1.1: "Added more features. Added get_cms and cloudflare_resolve switches.",
                     1.2: "Added more features. Added get_robots and whois switches.",
-                    1.3: "Fixed bugs and added geolocation."
+                    1.3: "Fixed bugs and added geolocation.",
+                    1.4: "Added version history when `module info reconme` is entered."
                     }
 
         self._parse_module_info()
@@ -263,13 +264,23 @@ about a website or a network.
 {0}{1}Description{2}:
 
 {10}
-==================================================""".format(
+""".format(
         misc.FB, misc.CR, misc.END, self.module_info['name'],
         self.module_info['version'], self.module_info['author'],
         self.module_info['bdesc'], self.module_info['status'],
         self.module_info['created'], self.module_info['last_update'],
         self.module_info['ldesc'])
+
+        ver_hist = """
+{0}{1}Version History{2}:
+""".format(misc.FB, misc.CR, misc.END)
+
+        for version in self.version_history:
+            ver_hist += '\n{0}: {1}'.format(version, self.version_history[version])
+
         print(result)
+        print(ver_hist)
+        print('\n==================================================')
 
     def prepare(self):
         """
@@ -508,8 +519,7 @@ please don't abuse this public API key. Change this if you have another API.",
                 for sub in subdomains:
                     iterator += 1
                     asciigraphs.ASCIIGraphs().progress_bar_manual('Checking \
-for subdomains...'.format(sub, sub + '.' + target_site), iterator,
-                    len(subdomains), 20)
+for subdomains...', iterator, len(subdomains), 20)
                     subhost = sub + '.' + target_site
                     try:
                         result_subhost_ip = gethost.byname(subhost)
@@ -611,15 +621,21 @@ api.hackertarget.com/geoip/?q={0}".format(target_site)).text
             geoip_result = None
 
         # Step 10: Grab banners.
+        # DEV0003: Continue this!
+        """
         if values['grab_banners'] is True:
             print("[i] Grabbing banners from {0}...".format(target_site))
+            iterator = 1
             ports2grab_banners = [21, 22, 25, 80, 110]
-            banners = []
+            banners = {}
             for port in ports2grab_banners:
                 try:
+                    asciigraphs.ASCIIGraphs().progress_bar_manual('Grabbing banners...', iterator, len(ports2grab_banners), 20)
                     connection = socket.socket()
                     connection.connect((target_site, port))
-                    banners.append({str(port): str(connection.recv(1024))})
+                    connection.send(b'CONNECT')
+                    banners[str(port)] = str(connection.recv(1024))
+                    connection.close()
 
                 except(ConnectionError, ConnectionResetError):
                     printer.Printer().print_with_status(error.ErrorCodes().ERROR0006())
@@ -627,11 +643,14 @@ api.hackertarget.com/geoip/?q={0}".format(target_site)).text
                 except Exception as error:
                     printer.Printer().print_with_status(str(error), 2)
 
+                iterator += 1
+
         else:
             print("[i] grab_banners is false, now skipping...")
-            banners = []
+            banners = {}
+        """
 
-        # Step __: Print the results.
+        # Step 16: Print the results.
         print(misc.FB + misc.CC + \
                 "Results for `{0}`:".format(values['target']) + misc.END)
         print()
