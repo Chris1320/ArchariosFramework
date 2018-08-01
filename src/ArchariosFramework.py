@@ -334,7 +334,8 @@ class ArchariosFramework:
 
         # Program Information
         self.logger.info('Defining program information.')
-        self.name = "Archários Framework"
+        # self.name = "Archários Framework"
+        self.name = "Archarios Framework"
         self.version = "0.0.1.6"
         self.codename = "Beta"
         self.description = "The Novice's Ethical Hacking Framework"
@@ -1211,7 +1212,7 @@ for <key>.")
 to the screen.")
                                     print("run exec             Start module.")
                                     print("back                 Quit module \
-and go back to Archários terminal.")
+and go back to Archarios terminal.")
                                     print()
                                     print(misc.FB + "Available Keys:" +
                                             misc.END)

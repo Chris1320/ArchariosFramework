@@ -201,7 +201,6 @@ class LoggingObject:
             :param message: Log message.
         """
 
-        message = message.encode('utf-8')
         message = self._format(message, 'info')
         self.log_datas.append((message, 'info'))
         self.log_data = (message, 'info')
@@ -216,7 +215,6 @@ class LoggingObject:
             :param message: Log message.
         """
 
-        message = message.encode('utf-8')
         message = self._format(message, 'warning')
         self.log_datas.append((message, 'warning'))
         self.log_data = (message, 'warning')
@@ -231,7 +229,6 @@ class LoggingObject:
             :param message: Log message.
         """
 
-        message = message.encode('utf-8')
         message = self._format(message, 'error')
         self.log_datas.append((message, 'error'))
         self.log_data = (message, 'error')
@@ -246,7 +243,6 @@ class LoggingObject:
             :param message: Log message.
         """
 
-        message = message.encode('utf-8')
         message = self._format(message, 'debug')
         self.log_datas.append((message, 'debug'))
         self.log_data = (message, 'debug')
@@ -261,7 +257,6 @@ class LoggingObject:
             :param message: Log message.
         """
 
-        message = message.encode('utf-8')
         message = self._format(message, 'critical')
         self.log_datas.append((message, 'critical'))
         self.log_data = (message, 'critical')

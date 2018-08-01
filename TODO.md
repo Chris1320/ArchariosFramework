@@ -2,7 +2,7 @@
 ##Information
 This document is used as a list of TO-DOs and other plans.
 
- [X] _IN PROGRESS_ Implement the login panel.
+ [X] _IN DEVELOPMENT_ Implement the login panel.
   ^       ^                 ^
   |       |                 |
   |       |        Description of the plan.

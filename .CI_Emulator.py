@@ -105,7 +105,7 @@ class testEnvLinux:
         if self.newenv:
             if not os.path.exists(self.py36):
                 print(self.CGR, "[i] Creating Environment...", self.END)
-                gso('virtualenv --python=python3.6 ' + self.py36)
+                os.mkdir(self.py36)
 
             else:
                 print(self.CGR, "[i] Reusing Previous\

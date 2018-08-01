@@ -44,9 +44,9 @@ class TestingClass:
         """
 
         self.core_modules = os.listdir('core')
+        self.third_party_modules = os.listdir('modules')
 
         self.name = str(name)
-        self.faulty_modules = {}
 
     def main(self):
         """
@@ -58,6 +58,15 @@ class TestingClass:
         for module in self.core_modules:
             test_result = self.test("core/" + module)
             # print(test_result, test_results)
+            if test_result is not None:
+                test_results += test_result
+                continue
+
+            else:
+                continue
+
+        for module in self.third_party_modules:
+            test_result = self.test("modules/" + module)
             if test_result is not None:
                 test_results += test_result
                 continue

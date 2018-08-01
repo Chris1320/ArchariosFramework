@@ -63,8 +63,8 @@ class ASCIIGraphs():
             if per > 100:
                 per = 100
 
-            sys.stdout.write("\r{0} [{1}] {2}%".format(description.encode('utf-8'),
-                hashes.encode('utf-8') + spaces.encode('utf-8'), per.encode('utf-8')))
+            sys.stdout.write("\r{0} [{1}] {2}%".format(description,
+                hashes + spaces, per))
             sys.stdout.flush()
             if int(100 - round(percent * 100)) >= 100:
                 print('\r')
@@ -109,8 +109,8 @@ class ASCIIGraphs():
         percent = float(iteration_counter) / total_items
         hashes = '#' * int(round(percent * progress_bar_length))
         spaces = ' ' * (progress_bar_length - len(hashes))
-        sys.stdout.write("\r{0} [{1}] {2}%".format(description.encode('utf-8'),
-            hashes.encode('utf-8') + spaces.encode('utf-8'), int(round(percent * 100))))
+        sys.stdout.write("\r{0} [{1}] {2}%".format(description,
+            hashes + spaces, int(round(percent * 100))))
         sys.stdout.flush()
         if total_items == iteration_counter:
             print("\r")
@@ -141,8 +141,8 @@ class ASCIIGraphs():
             splashes = ['-', '\\', '|', '/']
             iterator = 0
             while time.time() < length:
-                sys.stdout.write("\r{0} {1}".format(description.encode('utf-8'),
-                    splashes[iterator].encode('utf-8')))
+                sys.stdout.write("\r{0} {1}".format(description,
+                    splashes[iterator]))
                 sys.stdout.flush()
                 iterator += 1
                 if iterator > 3 or iterator < 0:
@@ -150,7 +150,7 @@ class ASCIIGraphs():
 
                 time.sleep(delay)
 
-            sys.stdout.write('\r{0}{1}'.format(description.encode('utf-8'), '  '))
+            sys.stdout.write('\r{0}{1}'.format(description, '  '))
             sys.stdout.flush()
             print('\r')
 

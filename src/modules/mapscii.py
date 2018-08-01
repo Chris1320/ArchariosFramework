@@ -23,7 +23,8 @@ Template for creating a module for Archários Framework.
 """
 
 # Put all objects here that needs to be tested.
-objects = ["ArchariosFrameworkModule"]
+objects = ["ArchariosFrameworkModule", "ArchariosFrameworkModule.__init__",
+        "ArchariosFrameworkModule.prepare", "ArchariosFrameworkModule.run"]
 
 
 class ArchariosFrameworkModule:
