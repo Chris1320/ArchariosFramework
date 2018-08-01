@@ -306,7 +306,7 @@ harassment-free experience.
         self.module_info['created'], self.module_info['last_update'],
         self.module_info['ldesc'])
 
-ver_hist = """
+        ver_hist = """
 {0}{1}Version History{2}:
 """.format(misc.FB, misc.CR, misc.END)
         for version in self.version_history:
