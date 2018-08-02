@@ -5,5 +5,5 @@ test:
         - ls
         - cd src
         - pwd
-        - pip3 install multitasking flask reqests whois
+        - pip3 install --upgrade multitasking flask reqests whois
         - python3 ArchariosFramework.py --test
