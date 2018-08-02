@@ -52,7 +52,7 @@ class ArchariosFrameworkModule:
                 # Module brief description
                 "bdesc": "Get host by a number of ways.",
                 # Module version
-                "version": 1.0,
+                "version": 1.1,
                 # Module author
                 "author": "Catayao56",
                 # Module status
@@ -69,7 +69,6 @@ WhatsYourName gets the host by a number of ways. The methods are listed below:
 
     + Get host's IP from DNS. (`default` method)
     + Get IP address from subdomains. (`subdomain` method.)
-    + Get IP address from whois registrars. (`whois` method.) (<n>Work In Progress<end>)
 
 If you know any methods, feel free to create a merge request or contact me on
 e-mail of facebook to do it.
@@ -85,7 +84,8 @@ e-mail of facebook to do it.
         # NOTE: DEV0004: Modify THIS DICTIONARY ONLY!
         # Update history
         self.version_history = {
-                    1.0: "Initial update"
+                    1.0: "Initial update",
+                    1.1: "Tried to do whois, but failed."
                     }
 
         self._parse_module_info()
@@ -396,3 +396,7 @@ for subdomains...', iterator, len(subdomains), 20)
             except Exception as erred:
                 printer.Printer().print_with_status(str(erred), 2)
                 return 4
+
+        else:
+            printer.Printer().print_with_status("Unknown method!", 2)
+            return 0
