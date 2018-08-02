@@ -34,8 +34,8 @@ This document is used as a list of TO-DOs and other plans.
         * [X] Continue to geolocation feature.
         * [ ] Fix grab_banners.
 
-    - [X] _In Development_ WhatsYourName (Get host by a number of ways)
-        * [ ] Whois method.
+    - [X] _Finished_ WhatsYourName (Get host by a number of ways)
+        * [X] Whois method.
     - [ ] _On Hold_ IPCalc (IP Calculator)
 
 + 2.Scanning Tools
@@ -69,7 +69,7 @@ This document is used as a list of TO-DOs and other plans.
     - [ ] SuggestMeExploit (Exploit Suggesting Tool using various sources.)
 
 + 9.Post-Exploitation Tools
-    - [ ] BRAT (Basic Remote Administration Tool)
+    - [ ] ArchaRAT (Remote Administration Tool)
 
 + 12.Reporting Tools
     - [ ] Panalyze (Password Analyzer)
