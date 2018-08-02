@@ -16,21 +16,21 @@ Shadow Suite Toolkit.
 + Updated ReconMe module.
 
 + ATTENTION: Contributors needed!
-      -I can't do this without contributors or even testers,
+     * I can't do this without contributors or even testers,
        please help me!
-          ~ Co-Developers
-    	  ~ Testers (Windows and Linux systems)
-	      ~ End-users (Seriously)
+          + Co-Developers
+    	  + Testers (Windows and Linux systems)
+	      + End-users (Seriously)
 
 ## Full Feature List
 + Open Source
-      -Archários is protected by the GNU General Public License, means
+     * Archários is protected by the GNU General Public License, means
        that you can freely download, modify, and distribute the software.
        Just give "creds" to us and the developers that made the awesome
        tools.
 
 + Create Custom Modules from template
-      -Do you know Python? Do you know how to code in Python? Do you want
+     * Do you know Python? Do you know how to code in Python? Do you want
        to create your own module that can penetration test a Class A network
        in just three seconds? (exagerrated) Archários Framework provides
        a module template to help you start creating your custom module. It also
@@ -38,17 +38,17 @@ Shadow Suite Toolkit.
        the integration of Archários Framework and your custom module.
 
 + Pre-installed modules
-      -It's okay if you don't know how to program. Archários Framework has an
+     * It's okay if you don't know how to program. Archários Framework has an
        arsenal! It provides you tools written in different languages. Python,
        Ruby, Perl, PHP, and many more!
 
 + Services
-      -Its too bad if you need to open multiple instances of Archários Framework
+     * Its too bad if you need to open multiple instances of Archários Framework
        just to do other tasks... So services just've come! Start those services
        such as servers, background hash crackers, and many more!
 
 + Secrets
-      -We know this is not really necessary, But its fun to look at the code to
+     * We know this is not really necessary, But its fun to look at the code to
        see Archários Framework secrets!
 
 ## License and Copying
@@ -85,8 +85,8 @@ Shadow Suite Toolkit.
 + Internet Connection. (for performing remote attacks and/or updating)
 + Python Interpreter version 3.
 + Dependencies
-	-Dependencies can be installed automatically in the program. (Needs Internet Connection)
-	-To manually install, type "sudo python3 core/update.py" and "bash instdeps.bash".
+	* Dependencies can be installed automatically in the program. (Needs Internet Connection)
+	* To manually install, type "sudo python3 core/update.py" and "bash instdeps.bash".
 
 
 ## Installing & Running
