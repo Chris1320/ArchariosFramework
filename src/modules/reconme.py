@@ -12,6 +12,7 @@ try:
     import whois
     import socket
     import requests
+    import subprocess
 
     from core import printer
     from core import gethost
@@ -54,7 +55,7 @@ class ArchariosFrameworkModule:
                 # Module brief description
                 "bdesc": "A suite of tools for information gathering.",
                 # Module version
-                "version": 1.4,
+                "version": 1.7,
                 # Module author
                 "author": "Catayao56",
                 # Module status
@@ -101,7 +102,10 @@ about a website or a network.
                     1.1: "Added more features. Added get_cms and cloudflare_resolve switches.",
                     1.2: "Added more features. Added get_robots and whois switches.",
                     1.3: "Fixed bugs and added geolocation.",
-                    1.4: "Added version history when `module info reconme` is entered."
+                    1.4: "Added version history when `module info reconme` is entered.",
+                    1.5: "Added grab_banners and dns_lookup features.",
+                    1.6: "Added subdomain scanner.",
+                    1.7: "Added Reverse IP lookup feature."
                     }
 
         self._parse_module_info()
@@ -323,14 +327,14 @@ please don't abuse this public API key. Change this if you have another API.",
                 "get_site_title": "Get the site title.",
                 "get_ip_address": "Get the external IP address of the target.",
                 "get_cms": "Get the CMS information of the website.",
-                "cloudflare_resolve": "Try to resolve IP from subdomains.",
+                "cloudflare_resolve": "Try to resolve IP from subdomains. (Small version of subdomain)",
                 "get_robots": "get robots.txt file from target.",
                 "whois": "Gather whois information via hackertarget.com API.",
                 "geoip": "Gather geolocation information via hackertarget.com API.",
-                "grab_banners": "Grab banners.",
+                "grab_banners": "Grab banners using Nmap (Requires Nmap installed)",
                 "dns_lookup": "Perform DNS lookup using hackertarget.com API.",
                 "subnet_calc": "Perform subnet calculation using hackertarget.com API.",
-                "subdomain": "Search for subdomains.",
+                "subdomain": "Search for subdomains. (Wider than cloudflare_resolve)",
                 "reverse_ip_lookup": "Perform a reverse IP lookup using yougetsignal.com API.",
                 "harvester": "`Harvest` more information from trusted sources."
                 }
@@ -622,34 +626,92 @@ api.hackertarget.com/geoip/?q={0}".format(target_site)).text
             geoip_result = None
 
         # Step 10: Grab banners.
-        # DEV0003: Continue this!
-        """
         if values['grab_banners'] is True:
-            print("[i] Grabbing banners from {0}...".format(target_site))
-            iterator = 1
-            ports2grab_banners = [21, 22, 25, 80, 110]
-            banners = {}
-            for port in ports2grab_banners:
-                try:
-                    asciigraphs.ASCIIGraphs().progress_bar_manual('Grabbing banners...', iterator, len(ports2grab_banners), 20)
-                    connection = socket.socket()
-                    connection.connect((target_site, port))
-                    connection.send(b'CONNECT')
-                    banners[str(port)] = str(connection.recv(1024))
-                    connection.close()
+            print("[i] Grabbing banners... This may take a while.")
+            try:
+                result_grabbanners = subprocess.getstatusoutput("nmap \
+-sV -p21,22,25,80,110 --script=banner {0}".format(target_site))
+                if result_grabbanners[0] == 0:
+                    pass
 
-                except(ConnectionError, ConnectionResetError):
-                    printer.Printer().print_with_status(error.ErrorCodes().ERROR0006())
+                else:
+                    printer.Printer().print_with_status("Please install `nmap` first before using the `grab_banners` feature.", 1)
+                    result_grabbanners = [999, ""]
 
-                except Exception as error:
-                    printer.Printer().print_with_status(str(error), 2)
-
-                iterator += 1
+            except Exception as error:
+                printer.Printer().print_with_status(str(error), 2)
+                result_grabbanners = "An error occured."
 
         else:
             print("[i] grab_banners is false, now skipping...")
-            banners = {}
-        """
+            result_grabbanners = [999, ""]
+
+        # Step 11: DNS Lookup.
+        if values['dns_lookup'] is True:
+            print("[i] Performing DNS Lookup")
+            try:
+                result_dnslookup = requests.get("https://api.hackertarget.com/dnslookup/?q={0}".format(target_site)).text
+
+            except Exception as dnslerr:
+                printer.Printer().print_with_status(str(dnslerr), 2)
+                result_dnslookup = "An error occured."
+
+        else:
+            print("[i] dns_lookup is false, now skipping...")
+            result_dnslookup = ""
+
+        # Step 12: Subnet Calculation
+        if values['subnet_calc'] is True:
+            print("[i] Performing Subnet calculation/lookup...")
+            try:
+                result_subnetcalc = requests.get("https://api.hackertarget.com/subnetcalc/?q={0}".format(target_site)).text
+
+            except Exception as ec:
+                printer.Printer().print_with_status(str(ec), 2)
+                result_subnetcalc = "An error occured."
+
+        else:
+            print("[i] subnet_calc is false, now skipping...")
+            result_subnetcalc = ""
+
+        # Step 13: Search for subdomains
+        if values['subdomain'] is True:
+            print("[i] Searching for subdomains... This may take a while.")
+            try:
+                with open("data/subdomains.lst", 'r') as fopen:
+                    subs = fopen.readlines()
+
+                iterate = 0
+                result_subdomain = []
+                for sub in subs:
+                    iterate += 1
+                    asciigraphs.ASCIIGraphs().progress_bar_manual("Searching for subdomains...", iterate, len(subs), 20)
+                    sub = sub.replace('\n', '')
+                    subres = gethost.byname(sub + '.' + target_site)
+                    result_subdomain.append("{0}: {1}".format(sub + '.' + target_site, subres))
+
+            except Exception as erred:
+                printer.Printer().print_with_status(str(erred), 2)
+                result_subdomain = []
+
+        else:
+            print("[i] subdomain is false, now skipping...")
+            result_subdomain = []
+
+        # Step 14: Perform Reverse IP Lookup
+        if values['reverse_ip_lookup'] is True:
+            print("[i] Performing reverse IP lookup...")
+            try:
+                result_reverseIP = requests.get("https://api.hackertarget.\
+com/reverseiplookup/?q={0}".format(target_site)).text
+
+            except Exception as revIPerr:
+                printer.Printer().print_with_status(str(revIPerr), 2)
+                result_reverseIP = "An error occured."
+
+        else:
+            print("[i] reverse_ip_lookup is false, now skipping...")
+            result_reverseIP = ""
 
         # Step 16: Print the results.
         print(misc.FB + misc.CC + \
@@ -698,7 +760,7 @@ api.hackertarget.com/geoip/?q={0}".format(target_site)).text
                 else:
                     filename = target_site
 
-                with open('output/{0}_robots.txt'.format(filename), 'w') as fopen:
+                with open('output/{0}_robots.txt'.format(filename), 'a') as fopen:
                     fopen.write("# Produced by ReconMe, a module from \
 Archarios Framework\n\n" + robots_data)
 
@@ -727,7 +789,37 @@ Archarios Framework\n\n" + robots_data)
 
         print()
         print(misc.CG + "Banners:" + misc.END)
-        for banner in banners:
-            print("Port + Banner Data: {0}  ----  {1}".format(banner, banners[banner]))
+        print(result_grabbanners[1])
+        print()
+        print(misc.CG + "DNS Lookup Result:" + misc.END)
+        print(result_dnslookup)
+        print()
+        print(misc.CG + "Subnet Calculation/Lookup Result:" + misc.END)
+        print(result_subnetcalc)
+        print()
+        if values['subdomain'] is True:
+            if misc.ProgramFunctions().path_exists('output/{0}_subdomains.txt'.format(target_site)):
+                filename = target_site + '-1'
+
+            else:
+                filename = target_site
+
+            try:
+                with open('output/{0}_subdomains.txt'.format(filename), 'a') as fopen:
+                    for sub in result_subdomain:
+                        fopen.write(sub + '\n')
+
+            except Exception as error:
+                print(misc.CR + "Failed to save subdomains to `output/{0}_subdomains.txt`.".format(filename))
+
+            else:
+                print(misc.CG + "Subdomains.txt file saved to `output/{0}_subdomains.txt`.".format(filename))
+
+        else:
+            pass
+
+        print()
+        print(misc.CG + "Reverse IP Lookup Result:" + misc.END)
+        print(result_reverseIP)
         print()
         return 0
