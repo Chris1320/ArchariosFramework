@@ -150,6 +150,47 @@ def wnotes_add():
     except(FileNotFoundError, IOError, EOFError):
         return render_template("error.html", desc="Cannot write to file!")
 
+@APP.route('/notes/del', methods=['POST'])
+@wlimiter.limit("30 per minute")
+def wnotes_del():
+    note = flask_request.form['note']
+    try:
+        note = int(note)
+
+    except(ValueError, TypeError):
+        return render_template("error.html", desc="Note number must be an integer!!")
+
+    else:
+        try:
+            with open("data/notes.txt", 'r') as fread:
+                data = fread.readlines()
+
+        except(FileNotFoundError, IOError, EOFError):
+            return render_template("error.html", desc="Cannot read file!")
+
+        else:
+            i = 0
+            try:
+                os.remove('data/notes.txt')
+
+            except Exception as removerr:
+                return render_template("error.html", desc=str(removerr))
+
+            for notes in data:
+                i += 1
+                if i == note:
+                    continue
+
+                else:
+                    try:
+                        with open("data/notes.txt", 'a') as fwrite:
+                            fwrite.write(notes)
+
+                    except(IOError, EOFError):
+                        return render_template("error.html", desc="Cannot write to file!")
+
+            return redirect(url_for("wnotes"))
+
 def wread_notes():
     try:
         with open("data/notes.txt", 'r') as fopen:
