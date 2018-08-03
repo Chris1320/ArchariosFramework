@@ -14,14 +14,16 @@ This document is used as a list of TO-DOs and other plans.
 ## General
 + [ ] _On Hold_ More logging verbosity.
 + [ ] _On Hold_ Module logging.
-+ [ ] _In Development_ Remove encodings on logger.py and asciigraphs.py
++ [X] _Finished_ Remove encodings on logger.py and asciigraphs.py
 
 ## Web Interface
-+ [ ] _On Hold_ Need to fix login system. Use login module.
++ [ ] _On Hold_ Need to fix login system
 + [ ] _On Hold_ API support continuation. (Escape characters, return outputs, etc.)
-+ [ ] _In Development_ Online Notepad
-+ [ ] _On Hold_ File Repository
-+ [ ] _On Hold_ Progress Tracker
++ [X] _Finished_ Online Notepad
++ [ ] _In Development_ File Repository
+    + [ ] Online Viewer/Editor
+
++ [ ] _In Development_ Progress Tracker
 
 ## Framework Commands
 + [ ] _On Hold_ Use subprocess on ``run`` command because os.system() is deprecated.

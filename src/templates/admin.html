@@ -17,8 +17,14 @@
 
     </head>
     <body bgcolor="#FFFFF0">
-        <h1>Uh Oh...</h1>
-        <h2>{{ desc }}</h2>
+        <h1>Administration Panel</h1>
+        <div>
+            <h2>Execute Commands</h2>
+            <form action="/admin/execute.py" method="POST">
+                <h4>Command: </h4><input type="text" name="command"></br>
+                <input type="submit" name="Execute Command!">
+            </form>
+        </div>
         </br>
         <a href="/">Back to homepage</a>
     </body>
