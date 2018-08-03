@@ -19,6 +19,9 @@ This document is used as a list of TO-DOs and other plans.
 ## Web Interface
 + [ ] _On Hold_ Need to fix login system. Use login module.
 + [ ] _On Hold_ API support continuation. (Escape characters, return outputs, etc.)
++ [ ] _In Development_ Online Notepad
++ [ ] _On Hold_ File Repository
++ [ ] _On Hold_ Progress Tracker
 
 ## Framework Commands
 + [ ] _On Hold_ Use subprocess on ``run`` command because os.system() is deprecated.

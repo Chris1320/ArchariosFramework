@@ -40,7 +40,7 @@ try:
     from flask import session, redirect, url_for
     from flask import escape, make_response
     # from flask import abort as flask_abort    For fatal errors
-    # from flask_admin import Admin
+    from flask_admin import Admin
     from flask_limiter import Limiter
     from flask_limiter.util import get_remote_address
 
@@ -120,15 +120,47 @@ def web_run(port, debug):
 
 # +++++ Web pages +++++ #
 
+@APP.route('/index.html', methods=['GET', 'POST'])
+def wmain_redirect():
+    return redirect(url_for('wmain'))
+
 @APP.route('/', methods=['GET', 'POST'])
 @wlimiter.limit("30 per minute")
 def wmain():
-    return render_template("index.html")
+    return render_template("index.html", title="Archarios Framework")
 
-@APP.route('/admin/', methods=['GET', 'POST'])
-@wlimiter.limit("1 per second")
-def wadmin():
-    return render_template("admin.html")
+@APP.route('/notes', methods=['GET', 'POST'])
+@wlimiter.limit("30 per minute")
+def wnotes():
+    return render_template("notes_viewer.html", notes=wread_notes())
+
+@APP.route('/notes/add', methods=['POST'])
+@wlimiter.limit("30 per minute")
+def wnotes_add():
+    note = flask_request.form['note']
+    if note in (None, ""):
+        return render_template("error.html", desc="Cannot add blank note!")
+
+    try:
+        with open("data/notes.txt", 'a') as fopen:
+            fopen.write(note + '\n')
+
+        return redirect(url_for("wnotes"))
+
+    except(FileNotFoundError, IOError, EOFError):
+        return render_template("error.html", desc="Cannot write to file!")
+
+def wread_notes():
+    try:
+        with open("data/notes.txt", 'r') as fopen:
+            notes = fopen.readlines()
+
+    except(FileNotFoundError, IOError, EOFError):
+        return []
+
+    else:
+        return notes
+
 
 # ++++++++++++++++++++ WEB INTERFACE ++++++++++++++++++++ #
 

@@ -17,8 +17,25 @@
 
     </head>
     <body bgcolor="#FFFFF0">
-        <!-- Content here -->
+        <h2>Notes</h2>
+        <ul>
+            {% for note in notes %}
+            <li>{{ note }}</li>
+            {% endfor %}
+        </ul>
         </br>
+        <form action="/notes/add" method="POST">
+            <input type="text" name="note">
+            <input type="submit" value="Add new note">
+        </form>
+        </br>
+        <!-- DEV0003: WIP
+        <form action="/notes/del" method="POST">
+            <input type="text" name="note">
+            <input type="submit" value="Remove existing note">
+        </form>
+        -->
+        </br/>
         <a href="/">Back to homepage</a>
     </body>
 </html>
