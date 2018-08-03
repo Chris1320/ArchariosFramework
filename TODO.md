@@ -14,7 +14,7 @@ This document is used as a list of TO-DOs and other plans.
 ## General
 + [ ] _On Hold_ More logging verbosity.
 + [ ] _On Hold_ Module logging.
-+ [ ] _In Development_ Remove encodings on logger.py and asciigraphs.py
++ [X] _Finished_ Remove encodings on logger.py and asciigraphs.py
 
 ## Web Interface
 + [ ] _On Hold_ Need to fix login system. Use login module.
@@ -32,7 +32,8 @@ This document is used as a list of TO-DOs and other plans.
         * [ ] On step 2, What if target is not a web server? Try to
               contact with alternate method.
         * [X] Continue to geolocation feature.
-        * [ ] Fix grab_banners.
+        * [X] Fix grab_banners.
+        * [ ] `harvest` feature.
 
     - [X] _Finished_ WhatsYourName (Get host by a number of ways)
         * [X] Whois method.
@@ -41,7 +42,7 @@ This document is used as a list of TO-DOs and other plans.
 + 2.Scanning Tools
     - [ ] _On Hold_ ArcháriosScanner
     - [ ] _On Hold_ Sensitive File Detector
-    - [ ] _On Hold_ Sub-Domain Scanner
+    - [ ] _In Development_ Sub-Domain Scanner
     - [ ] _On Hold_ NetScan (Like Nmap)
     - [ ] _On Hold_ SimpleWP (WordPress Scanner and Backup Grabber)
 
