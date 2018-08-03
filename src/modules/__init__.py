@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 """
 Archarios Framework :: The Novice's Ethical Hacking Framework
 Copyright(C) 2018 :: Catayao56 <Catayao56@gmail.com>
