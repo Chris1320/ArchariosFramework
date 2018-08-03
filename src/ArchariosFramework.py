@@ -40,7 +40,7 @@ try:
     from flask import session, redirect, url_for
     from flask import escape, make_response
     # from flask import abort as flask_abort    For fatal errors
-    # from flask_admin import Admin
+    from flask_admin import Admin
     from flask_limiter import Limiter
     from flask_limiter.util import get_remote_address
 
@@ -120,15 +120,141 @@ def web_run(port, debug):
 
 # +++++ Web pages +++++ #
 
+@APP.route('/index.html', methods=['GET', 'POST'])
+def wmain_redirect():
+    return redirect(url_for('wmain'))
+
 @APP.route('/', methods=['GET', 'POST'])
 @wlimiter.limit("30 per minute")
 def wmain():
-    return render_template("index.html")
+    return render_template("index.html", title="Archarios Framework")
 
-@APP.route('/admin/', methods=['GET', 'POST'])
-@wlimiter.limit("1 per second")
+@APP.route('/notes', methods=['GET', 'POST'])
+@wlimiter.limit("30 per minute")
+def wnotes():
+    return render_template("notes_viewer.html", notes=wread_notes())
+
+@APP.route('/notes/add', methods=['POST'])
+@wlimiter.limit("30 per minute")
+def wnotes_add():
+    note = flask_request.form['note']
+    if note in (None, ""):
+        return render_template("error.html", desc="Cannot add blank note!")
+
+    try:
+        with open("data/notes.txt", 'a') as fopen:
+            fopen.write(note + '\n')
+
+        return redirect(url_for("wnotes"))
+
+    except(FileNotFoundError, IOError, EOFError):
+        return render_template("error.html", desc="Cannot write to file!")
+
+@APP.route('/notes/del', methods=['POST'])
+@wlimiter.limit("30 per minute")
+def wnotes_del():
+    note = flask_request.form['note']
+    try:
+        note = int(note)
+
+    except(ValueError, TypeError):
+        return render_template("error.html", desc="Note number must be an integer!!")
+
+    else:
+        try:
+            with open("data/notes.txt", 'r') as fread:
+                data = fread.readlines()
+
+        except(FileNotFoundError, IOError, EOFError):
+            return render_template("error.html", desc="Cannot read file!")
+
+        else:
+            i = 0
+            try:
+                os.remove('data/notes.txt')
+
+            except Exception as removerr:
+                return render_template("error.html", desc=str(removerr))
+
+            for notes in data:
+                i += 1
+                if i == note:
+                    continue
+
+                else:
+                    try:
+                        with open("data/notes.txt", 'a') as fwrite:
+                            fwrite.write(notes)
+
+                    except(IOError, EOFError):
+                        return render_template("error.html", desc="Cannot write to file!")
+
+            return redirect(url_for("wnotes"))
+
+def wread_notes():
+    try:
+        with open("data/notes.txt", 'r') as fopen:
+            notes = fopen.readlines()
+
+    except(FileNotFoundError, IOError, EOFError):
+        return []
+
+    else:
+        return notes
+
+@APP.route('/progress', methods=['GET', 'POST'])
+@wlimiter.limit("30 per minute")
+def wprogress():
+    # DEV0004: Please continue this :)
+    # Must show the current test phase, contributors, etc.
+    return render_template("progress.html")
+
+@APP.route('/reports', methods=['GET', 'POST'])
+@wlimiter.limit("15 per minute")
+def wreports():
+    filed = os.listdir('output')
+    files = []
+    for flie in filed:
+        if flie == '.git_include':
+            pass
+
+        else:
+            files.append(flie)
+
+    print("Files:", len(files))
+    if len(files) != 0:
+        return render_template("reports.html", filenames=files)
+
+    else:
+        return render_template("error.html", desc="There's nothing here :(")
+
+@APP.route('/admin', methods=['GET', 'POST'])
+@wlimiter.limit("1800 per hour")
 def wadmin():
-    return render_template("admin.html")
+    return render_template('admin.html')
+
+@APP.route('/admin/execute.py', methods=['POST'])
+@wlimiter.limit("1800 per hour")
+def wadmin_execute():
+    command = flask_request.form['command']
+    if command in (None, ""):
+        return render_template("error.html", desc="Command cannot be none!")
+
+    else:
+        for comm in ('runpy', 'exit', 'quit', 'restart', 'reboot'):
+            if comm in command:
+                return render_template("error.html", desc="Command not supported by API!")
+
+            else:
+                try:
+                    result_command = ArchariosFramework().parse_input(command)
+
+                except BaseException as commBaseExc:
+                    return render_template("error.html", desc=str(commBaseExc))
+
+                else:
+                    return render_template("command_output.html", result=result_command)
+
 
 # ++++++++++++++++++++ WEB INTERFACE ++++++++++++++++++++ #
 
