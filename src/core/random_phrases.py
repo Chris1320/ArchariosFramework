@@ -1,4 +1,4 @@
-#coding=utf-8
+# -*- coding: utf-8 -*-
 
 """
 Archarios Framework :: The Novice's Ethical Hacking Framework

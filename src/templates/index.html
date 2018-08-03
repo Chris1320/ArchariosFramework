@@ -1,22 +1,64 @@
-<head>
-    <title>{{title}}</title>
-</head>
-<body bgcolor="#000000" text="#FF9900" link="#0099FF">
-    <h1>{{title}}</h1>
-    <h2>v{{version}} ({{codename}})</h2>
-    </br>
-    <form action="outputs.html">
-        <input type="submit" value="View Archários Reports">
-    </form>
-    <form action="terminal.html">
-        <input type="submit" value="Enter command remotely using web interface">
-    </form>
-    </br>
-    <form action="logout.py">
-        <input type="submit" value="Logout">
-    </form>
-    </br>
-    <h3>NOTE: This interface may be unstable so use <b>WITH CAUTION</b>!</h3>
-    </br>
-    <p>{{copyright}}</p>
-</body>
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Archarios Framework</title>
+
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="">
+        <meta name="author" content="">
+
+        <link href="/admin/static/bootstrap/bootstrap3/swatch/default/bootstrap.min.css?  v=3.3.5" rel="stylesheet">
+        <link href="/admin/static/bootstrap/bootstrap3/css/bootstrap-theme.min.css?v=3.3. 5" rel="stylesheet">
+        <link href="/admin/static/admin/css/bootstrap3/admin.css?v=1.1.1" rel="stylesheet">
+
+        <style>
+         body {
+             padding-top: 4px;
+         }
+         </style>
+
+    </head>
+    <body>
+        <!-- navbar -->
+        <div class="container">
+            <nav class="navbar navbar-default" role="navigation">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" datatoggle="collapse" data-target="#admin-navbar-collapse">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="/">Archarios Framework</a>
+                </div>
+                <!-- navbar content -->
+                <div class="collapse navbar-collapse" id="admin-navbar-collapse">
+                    <ul class="nav navbar-nav">
+                        <li class="active">
+                            <a href="/">Home</a>
+                        </li>
+                    </ul>
+
+                    <ul class="nav navbar-nav">
+                        <li class="active">
+                            <a href="/admin/">Admin</a>
+                        </li>
+                    </ul>
+                    
+                    <ul class="nav navbar-nav navbar-right">
+                    </ul>
+                </div>
+                <!-- end navbar content -->
+            </nav>
+            <script src="/admin/static/vendor/jquery.min.js?v=2.1.4" type="text/javascript"></script>
+            <script src="/admin/static/bootstrap/bootstrap3/js/bootstrap.min.js?v=3.3.5" type="text/javascript"></script>
+            <script src="/admin/static/vendor/moment.min.js?v=2.9.0" type="text/javascript"></script>
+            <script src="/admin/static/vendor/select2/select2.min.js?v=3.5.2" type="text/javascript"></script>
+            <!-- end navbar -->
+            <h1>Archarios Framework</h1>
+            <h2>Web Interface</h2>
+
+    </body>
+</html>
