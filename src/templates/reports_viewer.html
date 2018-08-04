@@ -17,22 +17,13 @@
 
     </head>
     <body bgcolor="#FFFFF0">
+        <h1>File Viewer</h1>
         <div>
-            <h1>File Repository</h1>
-            <ul>
-                {% for filename in filenames %}
-                <li>
-                    {{ filename }}
-                </li>
-                {% endfor %}
-            </ul>
+            
+            {% for line in data %}
+            <p>{{ line }}</p>
+            {% endfor %}
         </div>
-        </br>
-        <h2>Actions</h2>
-        <form action="reports/viewer.py" method="POST">
-            <input type="text" name="file2view">
-            <input type="submit" value="View the file!">
-        </form>
         </br>
         <a href="/">Back to homepage</a>
     </body>
