@@ -19,7 +19,9 @@
     <body bgcolor="#FFFFF0">
         <h1>Command result:</h1>
         <div>
-            <p>{{ result }}</p>
+            {% for res in result %}
+            <p>{{ res }}</p>
+            {% endfor %}
         </div>
         </br>
         <a href="/admin">Enter new command</a></br>

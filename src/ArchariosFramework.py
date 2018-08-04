@@ -228,6 +228,29 @@ def wreports():
     else:
         return render_template("error.html", desc="There's nothing here :(")
 
+@APP.route("/reports/viewer.py", methods=['GET', 'POST'])
+@wlimiter.limit("15 per minute")
+def wreports_viewer():
+    try:
+        filename = flask_request.form['file2view']
+        with open('output/' + filename, 'r') as fopen:
+            data = fopen.readlines()
+
+        return render_template("reports_viewer.html", data=data)
+
+    except UnicodeDecodeError:
+        try:
+            with open('output/' + filename, 'rb') as fopen:
+                data = fopen.readlines()
+
+            return render_template("reports_viewer.html", data=data)
+
+        except(FileNotFoundError, EOFError, IOError):
+            return render_template("error.html", desc="Error reading file or not found!")
+
+    except(FileNotFoundError, EOFError, IOError):
+        return render_template("error.html", desc="Error reading file or not found!")
+
 @APP.route('/admin', methods=['GET', 'POST'])
 @wlimiter.limit("1800 per hour")
 def wadmin():
@@ -247,7 +270,7 @@ def wadmin_execute():
 
             else:
                 try:
-                    result_command = ArchariosFramework().parse_input(command)
+                    result_command = ArchariosFramework(API=True).parse_input(command)
 
                 except BaseException as commBaseExc:
                     return render_template("error.html", desc=str(commBaseExc))
