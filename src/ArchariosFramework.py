@@ -202,13 +202,6 @@ def wread_notes():
     else:
         return notes
 
-@APP.route('/progress', methods=['GET', 'POST'])
-@wlimiter.limit("30 per minute")
-def wprogress():
-    # DEV0004: Please continue this :)
-    # Must show the current test phase, contributors, etc.
-    return render_template("progress.html")
-
 @APP.route('/reports', methods=['GET', 'POST'])
 @wlimiter.limit("15 per minute")
 def wreports():
@@ -907,7 +900,6 @@ OPTIONS:
                             ""]
 
         elif command.lower().startswith('module'):
-            # TODO: DEV0001: API support here!
             try:
                 command = command.split(' ')
                 self.logger.info("Looking for matches of `{0}`...".format(
