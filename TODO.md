@@ -51,7 +51,7 @@ This document is used as a list of TO-DOs and other plans.
     - [ ] _On Hold_ SimpleWP (WordPress Scanner and Backup Grabber)
 
 + 3.Vulnerability Analysis Tools
-    - [ ] _On Hold_ ArcháriosFlooder (DoS Tool)
+    - [ ] _In Development_ ArcháriosFlooder (DoS Tool)
     - [ ] _On Hold_ WPEnum (WordPress Username Enumerator)
     - [ ] _On Hold_ Cross-Site Scripter (XSS Vulnerability Analysis Tool)
 
