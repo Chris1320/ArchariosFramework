@@ -177,12 +177,12 @@ class TestingClass:
 
         else:
             asciigraphs.ASCIIGraphs().animated_loading_screen(1,
-                "Another bunch of non-ASCII characters... Emojis", 'loading', 0.10)
+                "Another bunch of non-ASCII characters... Emojis!", 'loading', 0.10)
             print()
             try:
                 for emoji in ('☺', '😀', '😁', '😂', '😅', '😇', '😉', '😯', '😐',
                     '😑', '😕', '😠', '😬', '😢'):
-                        printer.Printer().print_and_flush('\r' + char)
+                        printer.Printer().print_and_flush('\r' + emoji)
                         time.sleep(1)
 
             except(UnicodeDecodeError):
