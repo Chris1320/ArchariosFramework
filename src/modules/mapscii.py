@@ -106,6 +106,7 @@ class ArchariosFrameworkModule:
         self.fdescription = kwargs.get('fbanner', None)
         self.fbanner = kwargs.get('fbanner', None)
         self.userlevel = kwargs.get('userlevel', 3)
+        self.from_API = kwargs.get('API', False)
 
     def _parse_module_info(self):
         """
@@ -263,9 +264,14 @@ class ArchariosFrameworkModule:
         for version in self.version_history:
             ver_hist += "\n{0}: {1}".format(version, self.version_history[version])
 
-        print(result)
-        print(ver_hist)
-        print('\n==================================================')
+        if self.from_API is False:
+            print(result)
+            print(ver_hist)
+            print('\n==================================================')
+
+        else:
+            return result + '\n' + ver_hist + \
+                '\n\n=================================================='
 
     def prepare(self):
         """
@@ -299,6 +305,9 @@ class ArchariosFrameworkModule:
         # NOTE: DEV0004: This is the method you will work on!
         try:
             # print(subprocess.getstatusoutput('which telnet')) # DEV0005
+            if self.from_API is True:
+                return((3, error.ErrorClass().ERROR0005()))
+
             if subprocess.getstatusoutput('which telnet')[0] == 0:
                 if subprocess.call(['telnet', 'mapscii.me']) == 0:
                     return 0

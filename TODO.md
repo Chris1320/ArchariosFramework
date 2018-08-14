@@ -19,6 +19,9 @@ This document is used as a list of TO-DOs and other plans.
 ## Web Interface
 + [ ] _On Hold_ Need to fix login system
 + [ ] _On Hold_ API support continuation. (Escape characters, return outputs, etc.)
+    + [ ] _On Hold_ Restricted commands (`restart`, `quit`, etc.) can be ran via
+                    the web interface.
+
 + [X] _Finished_ Online Notepad
 + [ ] _In Development_ File Repository
     + [ ] Online Viewer/Editor
@@ -36,11 +39,13 @@ This document is used as a list of TO-DOs and other plans.
         * [X] More stable CMS detection.
         * [ ] On step 2, What if target is not a web server? Try to
               contact with alternate method.
+              
         * [X] Continue to geolocation feature.
         * [ ] Fix grab_banners.
 
     - [X] _Finished_ WhatsYourName (Get host by a number of ways)
         * [X] Whois method.
+
     - [ ] _On Hold_ IPCalc (IP Calculator)
 
 + 2.Scanning Tools
@@ -52,6 +57,12 @@ This document is used as a list of TO-DOs and other plans.
 
 + 3.Vulnerability Analysis Tools
     - [ ] _In Development_ ArcháriosFlooder (DoS Tool)
+        * [X] Validation of options.
+        * [X] Default Attack
+        * [ ] ARP Attack
+        * [ ] DHCP Attack
+        * [ ] Web Attack
+
     - [ ] _On Hold_ WPEnum (WordPress Username Enumerator)
     - [ ] _On Hold_ Cross-Site Scripter (XSS Vulnerability Analysis Tool)
 
@@ -70,25 +81,25 @@ This document is used as a list of TO-DOs and other plans.
     - [ ] _On Hold_ Bluetooth Predator (Bluetooth Attacks)
 
 + 8.Exploitation Tools
-    - [ ] ShadowSploit
-    - [ ] SuggestMeExploit (Exploit Suggesting Tool using various sources.)
+    - [ ] _On Hold_ ShadowSploit
+    - [ ] _On Hold_ SuggestMeExploit (Exploit Suggesting Tool using various sources.)
 
 + 9.Post-Exploitation Tools
-    - [ ] ArchaRAT (Remote Administration Tool)
+    - [ ] _On Hold_ ArchaRAT (Remote Administration Tool)
 
 + 12.Reporting Tools
-    - [ ] Panalyze (Password Analyzer)
-    - [ ] Dtctv (Server/Client File Repository for Investigating cyber attacks.)
+    - [ ] _On Hold_ Panalyze (Password Analyzer)
+    - [ ] _On Hold_ Dtctv (Server/Client File Repository for Investigating cyber attacks.)
 
 + 13.Social Engineering Tools
-    - [ ] DarkFish (HTTP server for phishing)
+    - [ ] _On Hold_ DarkFish (HTTP server for phishing)
 
 + 14.System Services
-    - [ ] Deception (HTTP, FTP, SMTP, Telnet, SSH, and SNMP honeypot)
-    - [ ] WebExpose
-    - [ ] SimpleIM_Server (Chat server that uses raw sockets and actual IP for connection)
+    - [ ] _On Hold_ Deception (HTTP, FTP, SMTP, Telnet, SSH, and SNMP honeypot)
+    - [ ] _On Hold_ WebExpose
+    - [ ] _On Hold_ SimpleIM_Server (Chat server that uses raw sockets and actual IP for connection)
 
 + 15.Others
-    - [X] Ipify (Know your external IP Address)
-    - [X] MapSCII (ASCII Map via Telnet)
-    - [ ] SimpleIM (SimpleIM client)
+    - [X] _Finished_ Ipify (Know your external IP Address)
+    - [X] _Finished_ MapSCII (ASCII Map via Telnet)
+    - [ ] _On Hold_ SimpleIM (SimpleIM client)

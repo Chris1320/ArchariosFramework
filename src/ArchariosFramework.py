@@ -67,6 +67,9 @@ except ImportError as i:
     print("===================================================")
     sys.exit(1)
 
+else:
+    # Changes the print function into printer.
+    print = printer.Printer().printt
 
 # ++++++++++++++++++++ WEB INTERFACE ++++++++++++++++++++ #
 
@@ -104,7 +107,7 @@ def web_run(port, debug):
         if erred is True:
             printer.Printer().print_with_status("Cannot bind to {0}:{1}!\
 ".format('0.0.0.0', prt), 2)
-            ArchariosFramework(API=True)._proper_exit(256)
+            ArchariosFramework(from_API=True)._proper_exit(256)
 
         del erred
 
@@ -116,7 +119,7 @@ def web_run(port, debug):
         except PermissionError:
             printer.Printer().print_with_status("Cannot bind to {0}:{1}!\
 ".format('0.0.0.0', prt), 2)
-            ArchariosFramework(API=True)._proper_exit(256)
+            ArchariosFramework(from_API=True)._proper_exit(256)
 
 # +++++ Web pages +++++ #
 
@@ -269,7 +272,14 @@ def wadmin_execute():
                     return render_template("error.html", desc=str(commBaseExc))
 
                 else:
-                    return render_template("command_output.html", result=result_command)
+                    # print(result_command) # DEV0005
+                    if type(result_command) not in (str, list, dict, tuple):
+                        result_command = str(result_command)
+                        result_command = result_command.split('\n')
+                        result_command = (9999, result_command)
+
+                    # print(result_command) # DEV0005
+                    return render_template("command_output.html", result=result_command[1])
 
 
 # ++++++++++++++++++++ WEB INTERFACE ++++++++++++++++++++ #
@@ -301,7 +311,7 @@ class ArchariosFramework:
         self.logger.info('Defining program information.')
         # self.name = "Archários Framework"
         self.name = "Archarios Framework"
-        self.version = "0.0.1.8"
+        self.version = "0.0.1.9"
         self.codename = "Beta"
         self.description = "The Novice's Ethical Hacking Framework"
         self.banner = r"""{0}
@@ -402,7 +412,8 @@ class ArchariosFramework:
         self.module_call = """ArchariosFrameworkModule(debug=self.debug, \
 fname=self.name, fversion=self.version, fcodename=self.codename, \
 fdescription=self.description, fbanner=self.banner, \
-userlevel=self.userlevel, logger=self.logger)"""  # To be used with `eval()`.
+userlevel=self.userlevel, logger=self.logger, API=self.from_API)"""
+        # To be used with `eval()`.
 
         # Setup interpreter history
         self.logger.info("Setting up interpreter history...")
@@ -479,7 +490,7 @@ will use the default settings.".format(self.name),
             return result
 
         elif rtype.lower() == "list":
-            result = help_lines
+            result = [0, help_lines]
             self.logger.info("Returning list...")
             return result
 
@@ -803,11 +814,11 @@ CTRL+C when you are ready.").replace('(oo)', '(==)'))
                         print()
 
                     else:
-                        return["{0} Latest Exceptions {0}".format(('=' * 15)),
+                        return [0, ["{0} Latest Exceptions {0}".format(('=' * 5)),
                         "",
                         self.latest_exceptions,
                         "",
-                        "{0} Latest Exceptions {0}".format(('=' * 15))]
+                        "{0} Latest Exceptions {0}".format(('=' * 5))]]
 
                 elif command in ('log_data', 'log_datas'):
                     self.logger.info("Printing log data...")
@@ -817,7 +828,7 @@ CTRL+C when you are ready.").replace('(oo)', '(==)'))
                         result += ("\n" + ("=" * 25) + "LOG DATA" + ("=" * 25) + "\n\n")
 
                     else:
-                        result += ("\n" + ("=" * 15) + "LOG DATA" + ("=" * 15) + "\n\n")
+                        result += ("\n" + ("=" * 5) + "LOG DATA" + ("=" * 5) + "\n\n")
 
                     for log in log_data:
                         if log[1] == "info":
@@ -866,13 +877,13 @@ CTRL+C when you are ready.").replace('(oo)', '(==)'))
                         result += ("\n" + ("=" * 25) + "LOG DATA" + ("=" * 25) + "\n\n")
 
                     else:
-                        result += ("\n" + ("=" * 15) + "LOG DATA" + ("=" * 15) + "\n\n")
+                        result += ("\n" + ("=" * 5) + "LOG DATA" + ("=" * 5) + "\n\n")
 
                     if self.from_API is not True:
                         print(result)
 
                     else:
-                        return result.split('\n')
+                        return [0, result.split('\n')]
 
                 else:
                     self.logger.info("`{0}` is an unknown option to `show`.".format(
@@ -893,11 +904,11 @@ OPTIONS:
 """)
 
                 else:
-                    return ["", "USAGE: show [OPTIONS]",
+                    return [0, ["", "USAGE: show [OPTIONS]",
                             "", "OPTIONS:",
                             "    traceback tracebacks    Show the latest traceback information.",
                             "    log_data log_datas      Show the log data from the logger module.",
-                            ""]
+                            ""]]
 
         elif command.lower().startswith('module'):
             try:
@@ -919,9 +930,15 @@ OPTIONS:
                         self.logger.info("Importing succeeded; Calling \
 show_module_info()...")
                         try:
-                            eval("module_obj.{0}.show_module_info()".format(
-                                self.module_call
-                                ))
+                            if self.from_API is False:
+                                eval("module_obj.{0}.show_module_info()".format(
+                                    self.module_call
+                                    ))
+
+                            else:
+                                return([0, eval("module_obj.{0}.\
+show_module_info()".format(self.module_call)).split('\n')])
+                                # TODO: Continue
 
                         except(SystemExit):
                             self.logger.info("SystemExit detected from module..")
@@ -929,11 +946,16 @@ show_module_info()...")
 
                         except Exception as exception:
                             self.latest_exceptions = traceback.format_exc()
-                            printer.Printer().print_with_status(
-                                    str(exception), 2
-                                    )
                             self.logger.error("An error occured while using \
 the module: `{0}`".format(str(exception)))
+                            if self.from_API is False:
+                                printer.Printer().print_with_status(
+                                    str(exception), 2
+                                    )
+                                return 1
+
+                            else:
+                                return(1, str(exception))
 
                 elif command[1] in ('generate', 'new'):
                     self.logger.info("Creating new custom module...")
@@ -1041,8 +1063,7 @@ to file!")
                                 break
 
                     else:
-                        result = error.ErrorClass().ERROR0005().split('\n')
-                        return result
+                        return(5, error.ErrorClass().ERROR0005().split('\n'))
 
                 elif command[1] in ("ls", "list"):
                     self.logger.info("Listing modules/ directory contents...")
@@ -1074,7 +1095,6 @@ to file!")
                                     self.logger.info("Importing {0}...".format(path))
                                     module_obj = self._import_module(path, True)
                                     iterator += 1
-                                    # TODO: DEV0001: Remove all colors for API!
                                     if module_obj is None:
                                         self.logger.info("Failed to import {0}!".format(path))
                                         result += ("[{0}] ".format(str(iterator)) + misc.FI + misc.CGR + misc.FB + path + " :: ERROR WHILE FETCHING INFO" + misc.END + '\n')
@@ -1117,6 +1137,38 @@ to file!")
                     else:
                         result = result.split('\n')
                         return result
+
+                elif command[1] in ('test',):
+                    self.logger.info("Testing {0} module...".format(command[2]))
+                    module_obj = self._import_module(command[2])
+                    self.logger.info("Checking if importing succeeded...")
+                    if module_obj is None:
+                        printer.Printer().print_with_status("Importing failed.", 2)
+                        self.logger.error("Importing failed.")
+                        return None
+
+                    else:
+                        self.logger.info("Importing succeeded; getting objects list.")
+                        objects = module_obj.objects
+                        i = 0
+                        for obj in objects:
+                            i += 1
+                            asciigraphs.ASCIIGraphs().progress_bar_manual(
+                                    "Testing module...", i, len(objects))
+
+                            try:
+                                eval("module_obj.{0}".format(obj))
+
+                            except BaseException as err:
+                                self.latest_exceptions = traceback.format_exc()
+                                printer.Printer().print_with_status(
+                                        str(err) + " (type `show tracebacks` \
+for more info.)", 2)
+                                time.sleep(1)
+                                break
+
+                            finally:
+                                time.sleep(0.10)
 
                 elif command[1] in ('use', 'run', 'exec'):
                     self.logger.info("Importing {0} module...".format(
@@ -1384,16 +1436,31 @@ menu...".format(command[1]))
                     raise IndexError
 
             except IndexError:
-                print("""
+                if self.from_API is not True:
+                    print("""
 USAGE: module [OPTIONS]
 
 OPTIONS:
     ls list                  Show available modules.
     info [MODULE]            Show information of the specified module.
+    test [MODULE]            Test the specified module.
     use run exec [MODULE]    Use the specified module.
     new generate             Generate a new module from template.
     reload [MODULE]          Reload the specified module.
 """)
+
+                else:
+                    return[0, ["",
+"USAGE: module [OPTIONS]",
+"",
+"OPTIONS:",
+"    ls list                 Show available modules.",
+"    info [MODULE]           Show information of the specified module.",
+"    test [MODULE]           Test the specified module."
+"    use run exec [MODULE]   Use the specified module.",
+"    new generate            Generate a new module from template.",
+"    reload [MODULE]         Reload the specified module.",
+""]]
 
         elif command.lower().startswith("runpy"):
             command = command.partition(' ')[2]

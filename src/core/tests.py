@@ -24,6 +24,8 @@ import os
 import time
 import traceback
 
+from core import error
+from core import printer
 from core import asciigraphs
 from importlib import import_module as imprt
 
@@ -73,6 +75,8 @@ class TestingClass:
 
             else:
                 continue
+
+        self.test_non_ASCII()
 
         return test_results
 
@@ -156,3 +160,34 @@ class TestingClass:
 
         print()
         return self.erred
+
+    def test_non_ASCII(self):
+        asciigraphs.ASCIIGraphs().animated_loading_screen(1,
+                "Testing non-ASCII characters...", 'loading', 0.10)
+        print()
+        try:
+            for char in ('é', 'ú', 'í', 'ó', 'π', 'á', 'đ', '₣', '£', 'ž', 'ç',
+                'ñ', 'μ'):
+                    printer.Printer().print_and_flush('\r' + char)
+                    time.sleep(1)
+
+        except(UnicodeDecodeError):
+            print(error.ErrorClass().ERROR0008())
+            return 1
+
+        else:
+            asciigraphs.ASCIIGraphs().animated_loading_screen(1,
+                "Another bunch of non-ASCII characters... Emojis", 'loading', 0.10)
+            print()
+            try:
+                for emoji in ('☺', '😀', '😁', '😂', '😅', '😇', '😉', '😯', '😐',
+                    '😑', '😕', '😠', '😬', '😢'):
+                        printer.Printer().print_and_flush('\r' + char)
+                        time.sleep(1)
+
+            except(UnicodeDecodeError):
+                print(error.ErrorClass().ERROR0008())
+                return 1
+
+            else:
+                return 0
