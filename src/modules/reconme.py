@@ -130,6 +130,7 @@ about a website or a network.
         self.fdescription = kwargs.get('fbanner', None)
         self.fbanner = kwargs.get('fbanner', None)
         self.userlevel = kwargs.get('userlevel', 3)
+        self.from_API = kwargs.get('API', False)
 
     def _parse_module_info(self):
         """
@@ -284,9 +285,14 @@ about a website or a network.
         for version in self.version_history:
             ver_hist += '\n{0}: {1}'.format(version, self.version_history[version])
 
-        print(result)
-        print(ver_hist)
-        print('\n==================================================')
+        if self.from_API is False:
+            print(result)
+            print(ver_hist)
+            print('\n==================================================')
+
+        else:
+            return result + '\n' + ver_hist + \
+                '\n\n=================================================='
 
     def prepare(self):
         """
@@ -347,6 +353,9 @@ please don't abuse this public API key. Change this if you have another API.",
         def run():
             Run the module.
         """
+
+        if self.from_API is True:
+            return((7, "Cannot use ReconMe when called from API."))
 
         global error
 

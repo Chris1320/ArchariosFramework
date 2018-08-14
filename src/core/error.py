@@ -119,3 +119,11 @@ your problem. Thank you""".format(proc_type)
         return """Module doesn't return an integer!
 If you are the developer, please put a return token at the end of all
 possible exit points of the code. If not, please contact the developer."""
+
+    def ERROR0008(self):
+        """
+        def ERROR0008():
+            Call this module if machine doesn't handle non-ASCII characters.
+        """
+
+        return """Your system does not properly handle non-ASCII characters."""

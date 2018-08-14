@@ -81,3 +81,33 @@ class Printer:
         sys.stdout.write(obj)
         sys.stdout.flush()
         return None
+
+    def printt(self, obj="", mode=0, temp_objs=[]):
+        """
+        def print():
+            Print <obj> in a number of ways.
+
+            :param obj: Object to print.
+            :type str:
+
+            :param mode: How <obj> will be treated.
+            :type int:
+                0 = Normal print using print function.
+                1 = Append <obj> to temporary list.
+                2 = Reset the temporary list.
+        """
+
+        if mode == 0:
+            print(obj)
+            return temp_objs
+
+        elif mode == 1:
+            temp_objs.append(obj)
+            return temp_objs
+
+        elif mode == 2:
+            temp_objs = []
+            return temp_objs
+
+        else:
+            raise exceptions.InvalidParameterError("Mode must be between 0 ~ 2!")

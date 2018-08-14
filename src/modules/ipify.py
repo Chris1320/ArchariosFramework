@@ -7,6 +7,7 @@ from core import misc
 from core import error
 from core import logger
 from core import exceptions
+from core import printer
 
 import requests
 
@@ -82,6 +83,7 @@ class ArchariosFrameworkModule:
         self.fdescription = kwargs.get('fbanner', None)
         self.fbanner = kwargs.get('fbanner', None)
         self.userlevel = kwargs.get('userlevel', 3)
+        self.from_API = kwargs.get('API', False)
 
     def _parse_module_info(self):
         """
@@ -239,9 +241,14 @@ class ArchariosFrameworkModule:
         for version in self.version_history:
             ver_hist += "\n{0}: {1}".format(version, self.version_history[version])
 
-        print(result)
-        print(ver_hist)
-        print('\n==================================================')
+        if self.from_API is True:
+            return(result + '\n' + ver_hist + \
+'\n\n==================================================')
+
+        else:
+            print(result)
+            print(ver_hist)
+            print('\n==================================================')
 
     def prepare(self):
         """
@@ -270,19 +277,34 @@ class ArchariosFrameworkModule:
         """
         def run():
             Run the module.
+
+            If API is from API, return tuple ``(0, "transcipt")``.
+            tuple[0] is return code, and tuple[1] is transcript of result.
         """
 
         try:
             ip = requests.get('https://api.ipify.org/').text
 
         except(ConnectionError, requests.exceptions.ConnectionError):
-            print(error.ErrorClass().ERROR0006())
-            return 6
+            if self.from_API is False:
+                print(error.ErrorClass().ERROR0006())
+                return 6
+
+            else:
+                return((6, error.ErrorClass().ERROR0006()))
 
         except Exception as error_msg:
-            print("[E] {0}".format(str(error_msg)))
-            return 999
+            if self.from_API is False:
+                print("[E] {0}".format(str(error_msg)))
+                return 999
+
+            else:
+                return((999, str(error_msg)))
 
         else:
-            print("Your public IP Address is '" + str(ip) + "'.")
-            return 0
+            if self.from_API is False:
+                print("Your public IP Address is '" + str(ip) + "'.")
+                return 0
+
+            else:
+                return(0, "Your public IP Address is '" + str(ip) + "'.")
