@@ -121,6 +121,11 @@ def web_run(port, debug):
 ".format('0.0.0.0', prt), 2)
             ArchariosFramework(from_API=True)._proper_exit(256)
 
+# +++++ Error Handlers +++++ #
+
+#@errorhandler(301)
+
+
 # +++++ Web pages +++++ #
 
 @APP.route('/index.html', methods=['GET', 'POST'])

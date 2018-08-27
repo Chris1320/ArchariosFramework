@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>{{ title }}</title>
+
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/bterm.css') }}">
+        
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="">
+        <meta name="author" content="">
+        
+    </head>
+    <body>
+        <div>
+            <ul>
+                {% for file in repository %}
+                <li><a href="/repository/file/{{ file }}">{{ file }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+        </br>
+        <a href="/">Back to homepage</a>
+    </body>
+</html>
