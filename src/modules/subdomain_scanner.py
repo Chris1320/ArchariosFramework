@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import os
 import random
 
 from core import misc
 from core import error
 from core import logger
+from core import printer
 from core import exceptions
 
 # Put all needed dependencies here!
@@ -50,7 +52,7 @@ class ArchariosFrameworkModule:
                 # Module brief description
                 "bdesc": "Searches for subdomains of a specified website.",
                 # Module version
-                "version": 1.0,
+                "version": 1.1,
                 # Module author
                 "author": "Catayao56",
                 # Module status
@@ -64,7 +66,15 @@ class ArchariosFrameworkModule:
 <t>Subdomain Scanner<end>
 
 This module searches for subdomains of a specified website and then you can
-do more reconnaissance on the selected subdomain.""".replace('<t>', misc.FB + misc.FU + misc.FI).replace(
+do more reconnaissance on the selected subdomain.
+
+<n>User Guide/Manual<end>
+
+Enter the target you want to scan. <b>Put an asterisk<end> (*) on the part
+where we will search. For example, to find subdomains for <u>asimple.com<end>,
+enter <u>*.asimple.com<end>. You may also use two or more asterisks, like
+<u>*.*.asimple.com<end>.
+""".replace('<t>', misc.FB + misc.FU + misc.FI).replace(
                  '<end>', misc.END).replace('<u>', misc.FU).replace(
                  '<i>', misc.FI).replace('<b>', misc.FB).replace(
                  '<h>', misc.FB + misc.FI).replace('<n>',
@@ -74,7 +84,8 @@ do more reconnaissance on the selected subdomain.""".replace('<t>', misc.FB + mi
         # NOTE: DEV0004: Modify THIS DICTIONARY ONLY!
         # Update history
         self.version_history = {
-                    1.0: "Initial update"
+                    1.0: "Initial update",
+                    1.1: "Feature update: DNS Resolution mode"
                     }
 
         self._parse_module_info()
@@ -271,13 +282,17 @@ do more reconnaissance on the selected subdomain.""".replace('<t>', misc.FB + mi
         # Format: key + default_value
                 # Example: "target": "192.168.0.1"
         values = {
-                "target": ""
+                "target": "",
+                "mode": 0,
+                "wordlist": "{0}/data/subdomains.lst".format(os.getcwd())
                 }
 
         # Format: key + info
                 # Example: "target": "The target to test."
         vhelp = {
-                "target": "Base website without the subdomain. (e.g.: google.com)"
+                "target": "Base website without the subdomain. (e.g.: *.google.com)",
+                "mode": "Mode to use; 0 = default (DNS Resolution), 1 = Web Request",
+                "wordlist": "Wordlist's absolute path."
                 }
 
         return values, vhelp
@@ -293,6 +308,164 @@ do more reconnaissance on the selected subdomain.""".replace('<t>', misc.FB + mi
             return 1
 
         else:
-            test = gethost.byname(values['target'])
-            errors =['Errno', 'Error', 'Err', 'errno', 'error', 'err']
-        return 0
+            if values['mode'] == 0:
+                pass
+
+            elif values['mode'] == 1:
+                self.request_mode(values)
+
+            else:
+                printer.Printer().print_with_status("Unknown discovery mode!", 2)
+                return 3
+
+            # Test for connection.
+            test = gethost.byname(values['target'].replace(
+                '.*.', '').replace(
+                    '.*', '').replace(
+                        '*.', '').replace(
+                            '*', ''))
+
+            if self.check_result(test) == "Passed":
+                pass
+
+            else:
+                printer.Printer().print_with_status(error.ErrorClass().ERROR0006(), 2)
+
+            # Open the wordlist.
+            try:
+                with open(values['wordlist'], 'r') as fopen:
+                    subdomains = fopen.readlines()
+
+            except(IOError, FileNotFoundError, EOFError, PermissionError):
+                print("Cannot open `{0}`! Please make sure that the file exists\
+and you arr permitted to read the file.")
+                return 1
+
+            else:
+                # Set the wordlist.
+                i = 0
+                result = []
+                while i < len(subdomains):
+
+                    if subdomains[i].endswith('\n'):
+                        subdomains[i] = subdomains[i][::-1]
+                        subdomains[i] = subdomains[i].partition('\n')[2]
+                        subdomains[i] = subdomains[i][::-1]
+
+                    try:
+                        printer.Printer().print_with_status(
+                                "Testing {0}....".format(values[
+                                    'target'].replace(
+                                        '*', subdomains[i])), 0)
+
+                        result.append(gethost.byname(values[
+                            'target'].replace('*', subdomains[i])))
+
+                    except(KeyboardInterrupt, EOFError):
+                        return 2
+
+                    finally:
+                        i += 1
+
+                # Print results
+                i = 0
+                bgcolor = misc.CGR
+                while i < len(subdomains):
+                    try:
+                        sub2print = subdomains[i]
+                        res2print = result[i]
+                        if self.check_result(res2print) == "Passed":
+                            print("{2}{0} :: {1}{3}".format(values['target'
+                                ].replace('*', sub2print), res2print, bgcolor,
+                                misc.END))
+
+                        else:
+                            pass
+
+                    except(KeyboardInterrupt, EOFError):
+                        pass
+
+                    finally:
+                        i += 1
+                        if bgcolor == misc.END:
+                            bgcolor = misc.CGR
+
+                        else:
+                            bgcolor = misc.END
+
+                print()
+                while True:
+                    try:
+                        ask_user = input("Do you want to \
+send the result to a file? (y/n) > ")
+
+                    except(KeyboardInterrupt, EOFError):
+                        continue
+
+                    else:
+                        if ask_user.lower() == 'y':
+                            try:
+                                outfile = input("Output filename: ")
+
+                            except(KeyboardInterrupt, EOFError):
+                                pass
+
+                            else:
+                                try:
+                                    with open("output/{0}".format(outfile), 'w') as f:
+                                        f.write('')
+
+                                    with open("output/{0}".format(outfile), 'a') as f:
+                                        i = 0
+                                        while i < len(subdomains):
+                                            try:
+                                                f.write('{0} :: {1}\
+\n'.format(values['target'].replace('*', subdomains[i]), result[i]))
+
+                                            except(IOError, FileNotFoundError, EOFError, UnicodeDecodeError):
+                                                pass
+
+                                            finally:
+                                                i += 1
+
+                                except(IOError, FileNotFoundError, EOFError, UnicodeDecodeError):
+                                    printer.Printer().print_with_status("Cannot write to file!", 2)
+
+                                else:
+                                    printer.Printer().print_with_status("Result written to file!", 0)
+                                    return 0
+
+                        else:
+                            return 0
+
+    def check_result(self, gethost_result):
+        """
+        def check_result():
+            The gethost module catches all exceptions.
+            So this method check if the result returned by the module
+            is an error or an expected result.
+        """
+
+        errors = ['Errno', 'Error', 'Err', 'errno', 'error', 'err']
+
+        # Test no. 1
+        if type(gethost_result) is "gaierror":
+            return "Failed"
+
+        # Test no. 2
+        for error in errors:
+            if error in str(gethost_result):
+                return "Failed"
+
+            else:
+                continue
+
+        return "Passed"
+
+    def request_mode(self, values):
+        """
+        def request_mode():
+            Web request mode instead of DNS resolution.
+        """
+
+        pass

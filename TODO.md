@@ -11,10 +11,13 @@ This document is used as a list of TO-DOs and other plans.
   |
   ``X`` if the feature is done.
 
+
+
+
+
 ## General
 + [ ] _On Hold_ More logging verbosity.
 + [ ] _On Hold_ Module logging.
-+ [X] _Finished_ Remove encodings on logger.py and asciigraphs.py
 
 ## Web Interface
 + [ ] _On Hold_ Need to fix login system
@@ -22,11 +25,10 @@ This document is used as a list of TO-DOs and other plans.
     + [ ] _On Hold_ Restricted commands (`restart`, `quit`, etc.) can be ran via
                     the web interface.
 
-+ [X] _Finished_ Online Notepad
-+ [ ] _In Development_ File Repository
++ [ ] _On Hold_ File Repository
     + [ ] Online Viewer/Editor
 
-+ [ ] _In Development_ Progress Tracker
++ [ ] _On Hold_ Progress Tracker
 
 ## Framework Commands
 + [ ] _On Hold_ Use subprocess on ``run`` command because os.system() is deprecated.
@@ -42,14 +44,11 @@ This document is used as a list of TO-DOs and other plans.
         * [X] Continue to geolocation feature.
         * [X] Fix grab_banners.
         * [ ] `harvest` feature.
-    - [X] _Finished_ WhatsYourName (Get host by a number of ways)
-        * [X] Whois method.
     - [ ] _On Hold_ IPCalc (IP Calculator)
 
 + 2.Scanning Tools
     - [ ] _On Hold_ ArcháriosScanner
     - [ ] _On Hold_ Sensitive File Detector
-    - [ ] _In Development_ Sub-Domain Scanner
     - [ ] _On Hold_ NetScan (Like Nmap)
     - [ ] _On Hold_ SimpleWP (WordPress Scanner and Backup Grabber)
 
@@ -97,6 +96,4 @@ This document is used as a list of TO-DOs and other plans.
     - [ ] _On Hold_ SimpleIM_Server (Chat server that uses raw sockets and actual IP for connection)
 
 + 15.Others
-    - [X] _Finished_ Ipify (Know your external IP Address)
-    - [X] _Finished_ MapSCII (ASCII Map via Telnet)
     - [ ] _On Hold_ SimpleIM (SimpleIM client)
