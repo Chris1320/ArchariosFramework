@@ -850,7 +850,7 @@ show_module_info()...")
                             else:
                                 return([0, eval("module_obj.{0}.\
 show_module_info()".format(self.module_call)).split('\n')])
-                                # TODO: Continue
+                                # TODO: Continue API support
 
                         except(SystemExit):
                             self.logger.info("SystemExit detected from module..")

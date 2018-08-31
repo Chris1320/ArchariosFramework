@@ -368,6 +368,44 @@ It is very customizeable so it can suit your needs.
                         printer.Printer().print_with_status("Attack stopped.", 1)
                         return 0
 
+            elif values['attack_mode'].lower() == 'arp':
+                try:
+                    if subprocess.getstatusoutput('which xterm')[0] == 0:
+                        if subprocess.getstatusoutput('which ettercap')[0] == 0:
+                            pass
+
+                        else:
+                            printer.Printer().print_with_status("Ettercap not installed!", 2)
+                            return 6
+
+                    else:
+                        printer.Printer().print_with_status("xterm not installed!", 2)
+                        return 7
+
+                    router_ip = input("Router's IP Address: ")
+                    try:
+                        conn = self.get_socket_obj(values['protocol'])
+                        conn.connect((router_ip, values['port']))
+                        conn.sendall(random._urandom(1))
+                        recieved_data = conn.recv(1024)
+
+                    except Exception as err:
+                        printer.Printer().print_with_status(str(err), 2)
+                        return 8
+
+                    else:
+                        if len(recieved_data) == 0:
+                            printer.Printer(
+                                    ).print_with_status("Cannot connect to router!", 2)
+                            return 9
+
+                        else:
+                            pass
+
+                except(KeyboardInterrupt, EOFError):
+                    printer.Printer().print_with_status("Attack stopped.", 1)
+                    return 0
+
             else:
                 printer.Printer().print_with_status("Invalid attack_mode!", 2)
                 return 5
