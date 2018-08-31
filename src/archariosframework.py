@@ -43,6 +43,7 @@ try:
     from flask_admin import Admin
     from flask_limiter import Limiter
     from flask_limiter.util import get_remote_address
+    from flask_wtf.csrf import CSRFProtect, CSRFError
 
     # Import core libraries
     from core import ansi
@@ -61,7 +62,7 @@ try:
 except ImportError as i:
     # Prints if error is encountered while importing modules.
     print("Error: " + str(i))
-    print()
+    print("")
     print("==================== TRACEBACK ====================")
     traceback.print_exc()
     print("===================================================")
@@ -69,18 +70,90 @@ except ImportError as i:
 
 else:
     # Changes the print function into printer.
-    print = printer.Printer().printt
+    # print = printer.Printer().printt
+    pass
 
 # ++++++++++++++++++++ WEB INTERFACE ++++++++++++++++++++ #
 
 # Initialize flask framework for web interface.
-APP = Flask(__name__)
-APP.secret_key = random._urandom(2048)  # Generate a random key.
-wlimiter = Limiter(
-               APP,
+web_app = Flask(__name__)
+web_app.secret_key = random._urandom(2048)  # Generate a random key.
+web_limiter = Limiter(
+               web_app,
                key_func=get_remote_address,
-               default_limits=["30 per minute"],
+               default_limits=["1 per second"],
            )
+web_csrf = CSRFProtect()
+web_csrf.init_app(web_app)
+
+# Error Handlers #
+
+
+@web_app.errorhandler(CSRFError)
+def web_csrferror(*args):
+    return render_template('error.html', title=__name__,
+            desc=args[0].description), 400
+
+
+@web_app.errorhandler(400)
+def web_misunderstood(*args):
+    return render_template('error.html', title=__name__, desc="Whaaat?!? I can't \
+ understand the request your browser (or proxy) has sent."), 400
+
+
+@web_app.errorhandler(404)
+def web_not_found(*args):
+    return render_template('error.html', title=__name__, desc='The URL you requested \
+was not found. Please check the URL.'), 404
+
+
+@web_app.errorhandler(403)
+def web_forbidden(*args):
+    return render_template('error.html', title=__name__, desc="Sorry! You're not \
+allowed to enter."), 403
+
+
+@web_app.errorhandler(410)
+def web_gone(*args):
+    return render_template('error.html', title=__name__, desc="Oops! The page here \
+has been gone!"), 410
+
+
+@web_app.errorhandler(429)
+def web_too_many_requests(*args):
+    return render_template('error.html', title=__name__, desc="Beyond the limits... \
+This page lets you request {0}. Please wait until you are good to go!".format(
+    str(args[0]).replace('429 Too Many Requests: ', '')))
+
+
+@web_app.errorhandler(500)
+def web_internal_server(*args):
+    return render_template('error.html', title=__name__, desc="It's my fault! \
+Something's happening in the servers..."), 500
+
+# Routes #
+
+
+@web_app.route("/", methods=['GET', 'POST'])
+@web_limiter.limit('1 per second')
+def web_interface():
+    return render_template("index.html", title=ArchariosFramework().name,
+            description=ArchariosFramework().description)
+
+@web_app.route("/status", methods=['GET', 'POST'])
+@web_limiter.limit('1 per second')
+def web_server_status():
+    return render_template("server_status.html",
+            title=ArchariosFramework().name,
+            name=ArchariosFramework().name,
+            version=ArchariosFramework().version,
+            codename=ArchariosFramework().codename,
+            description=ArchariosFramework().description,
+            config_file=ArchariosFramework().config_file,
+            debugging=ArchariosFramework().debug,
+            userlevel=ArchariosFramework().userlevel)
+
+# ++++++++++++++++++++ WEB INTERFACE ++++++++++++++++++++ #
 
 
 @multitasking.task
@@ -90,11 +163,13 @@ def web_run(port, debug):
         Run the server.
     """
 
+    # TODO: DEV0004: Use a production WSGI server instead.
+
     if type(port) is tuple or type(port) is list:
         for prt in port:
             try:
-                # APP.run('0.0.0.0', prt, debug)
-                APP.run('0.0.0.0', prt)
+                # web_app.run('0.0.0.0', prt, debug)
+                web_app.run('0.0.0.0', prt)
 
             except PermissionError:
                 erred = True
@@ -113,181 +188,13 @@ def web_run(port, debug):
 
     else:
         try:
-            # APP.run('0.0.0.0', prt, debug)
-            APP.run('0.0.0.0', prt)
+            # web_app.run('0.0.0.0', prt, debug)
+            web_app.run('0.0.0.0', prt)
 
         except PermissionError:
             printer.Printer().print_with_status("Cannot bind to {0}:{1}!\
 ".format('0.0.0.0', prt), 2)
             ArchariosFramework(from_API=True)._proper_exit(256)
-
-# +++++ Error Handlers +++++ #
-
-#@errorhandler(301)
-
-
-# +++++ Web pages +++++ #
-
-@APP.route('/index.html', methods=['GET', 'POST'])
-def wmain_redirect():
-    return redirect(url_for('wmain'))
-
-@APP.route('/', methods=['GET', 'POST'])
-@wlimiter.limit("30 per minute")
-def wmain():
-    return render_template("index.html", title="Archarios Framework")
-
-@APP.route('/notes', methods=['GET', 'POST'])
-@wlimiter.limit("30 per minute")
-def wnotes():
-    return render_template("notes_viewer.html", notes=wread_notes())
-
-@APP.route('/notes/add', methods=['POST'])
-@wlimiter.limit("30 per minute")
-def wnotes_add():
-    note = flask_request.form['note']
-    if note in (None, ""):
-        return render_template("error.html", desc="Cannot add blank note!")
-
-    try:
-        with open("data/notes.txt", 'a') as fopen:
-            fopen.write(note + '\n')
-
-        return redirect(url_for("wnotes"))
-
-    except(FileNotFoundError, IOError, EOFError):
-        return render_template("error.html", desc="Cannot write to file!")
-
-@APP.route('/notes/del', methods=['POST'])
-@wlimiter.limit("30 per minute")
-def wnotes_del():
-    note = flask_request.form['note']
-    try:
-        note = int(note)
-
-    except(ValueError, TypeError):
-        return render_template("error.html", desc="Note number must be an integer!!")
-
-    else:
-        try:
-            with open("data/notes.txt", 'r') as fread:
-                data = fread.readlines()
-
-        except(FileNotFoundError, IOError, EOFError):
-            return render_template("error.html", desc="Cannot read file!")
-
-        else:
-            i = 0
-            try:
-                os.remove('data/notes.txt')
-
-            except Exception as removerr:
-                return render_template("error.html", desc=str(removerr))
-
-            for notes in data:
-                i += 1
-                if i == note:
-                    continue
-
-                else:
-                    try:
-                        with open("data/notes.txt", 'a') as fwrite:
-                            fwrite.write(notes)
-
-                    except(IOError, EOFError):
-                        return render_template("error.html", desc="Cannot write to file!")
-
-            return redirect(url_for("wnotes"))
-
-def wread_notes():
-    try:
-        with open("data/notes.txt", 'r') as fopen:
-            notes = fopen.readlines()
-
-    except(FileNotFoundError, IOError, EOFError):
-        return []
-
-    else:
-        return notes
-
-@APP.route('/reports', methods=['GET', 'POST'])
-@wlimiter.limit("15 per minute")
-def wreports():
-    filed = os.listdir('output')
-    files = []
-    for flie in filed:
-        if flie == '.git_include':
-            pass
-
-        else:
-            files.append(flie)
-
-    print("Files:", len(files))
-    if len(files) != 0:
-        return render_template("reports.html", filenames=files)
-
-    else:
-        return render_template("error.html", desc="There's nothing here :(")
-
-@APP.route("/reports/viewer.py", methods=['GET', 'POST'])
-@wlimiter.limit("15 per minute")
-def wreports_viewer():
-    try:
-        filename = flask_request.form['file2view']
-        with open('output/' + filename, 'r') as fopen:
-            data = fopen.readlines()
-
-        return render_template("reports_viewer.html", data=data)
-
-    except UnicodeDecodeError:
-        try:
-            with open('output/' + filename, 'rb') as fopen:
-                data = fopen.readlines()
-
-            return render_template("reports_viewer.html", data=data)
-
-        except(FileNotFoundError, EOFError, IOError):
-            return render_template("error.html", desc="Error reading file or not found!")
-
-    except(FileNotFoundError, EOFError, IOError):
-        return render_template("error.html", desc="Error reading file or not found!")
-
-@APP.route('/admin', methods=['GET', 'POST'])
-@wlimiter.limit("1800 per hour")
-def wadmin():
-    return render_template('admin.html')
-
-@APP.route('/admin/execute.py', methods=['POST'])
-@wlimiter.limit("1800 per hour")
-def wadmin_execute():
-    command = flask_request.form['command']
-    if command in (None, ""):
-        return render_template("error.html", desc="Command cannot be none!")
-
-    else:
-        for comm in ('runpy', 'exit', 'quit', 'restart', 'reboot'):
-            if comm in command:
-                return render_template("error.html", desc="Command not supported by API!")
-
-            else:
-                try:
-                    result_command = ArchariosFramework(API=True).parse_input(command)
-
-                except BaseException as commBaseExc:
-                    return render_template("error.html", desc=str(commBaseExc))
-
-                else:
-                    # print(result_command) # DEV0005
-                    if type(result_command) not in (str, list, dict, tuple):
-                        result_command = str(result_command)
-                        result_command = result_command.split('\n')
-                        result_command = (9999, result_command)
-
-                    # print(result_command) # DEV0005
-                    return render_template("command_output.html", result=result_command[1])
-
-
-# ++++++++++++++++++++ WEB INTERFACE ++++++++++++++++++++ #
 
 
 class ArchariosFramework:

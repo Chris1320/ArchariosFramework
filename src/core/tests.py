@@ -77,6 +77,7 @@ class TestingClass:
                 continue
 
         self.test_non_ASCII()
+        print()
 
         return test_results
 

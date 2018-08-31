@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>{{ title }}</title>
+
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/bterm.css') }}">
+        
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="">
+        <meta name="author" content="">
+        
+    </head>
+    <body>
+        <h1>Server Information/Status</h1>
+        <div>
+            <h2>Software Information</h2>
+            <p>
+            Software Name: {{ name }}</br>
+            Software Version: {{ version }}</br>
+            Version Codename: {{ codename }}</br>
+            Software Description: {{ description }}</br>
+            </p>
+            </br>
+            <h2>Software Status</h2>
+            <p>
+            Current Configuration File: {{ config_file }}</br>
+            Debug Mode: {{ debugging }}</br>
+            Userlevel: {{ userlevel }}</br>
+            </p>
+            </br>
+            <!-- This may pose security issues.
+            <h2>Environment Information</h2>
+            <p>
+            Software Filename: {{ filename }}</br> [ArchariosFramework().filename]
+            Latest Exception/s: {{ latest_exceptions }}</br> [ArchariosFramework().latest_exceptions]
+            </p>
+            -->
+        </div>
+        </br>
+        <a href="/">Back to homepage</a>
+    </body>
+</html>
