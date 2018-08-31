@@ -19,17 +19,6 @@ This document is used as a list of TO-DOs and other plans.
 + [ ] _On Hold_ More logging verbosity.
 + [ ] _On Hold_ Module logging.
 
-## Web Interface
-+ [ ] _On Hold_ Need to fix login system
-+ [ ] _On Hold_ API support continuation. (Escape characters, return outputs, etc.)
-    + [ ] _On Hold_ Restricted commands (`restart`, `quit`, etc.) can be ran via
-                    the web interface.
-
-+ [ ] _On Hold_ File Repository
-    + [ ] Online Viewer/Editor
-
-+ [ ] _On Hold_ Progress Tracker
-
 ## Framework Commands
 + [ ] _On Hold_ Use subprocess on ``run`` command because os.system() is deprecated.
 + [ ] _On Hold_ Built-In Notepad.
