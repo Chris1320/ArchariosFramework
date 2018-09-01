@@ -1139,6 +1139,7 @@ for <key>.")
                                     print("show [OPTION]        Show <option> \
 to the screen.")
                                     print("run exec             Start module.")
+                                    print("clear clr cls        Clears the screen.")
                                     print("back                 Quit module \
 and go back to Archarios terminal.")
                                     print()
@@ -1244,6 +1245,12 @@ options.".format(misc.FB, misc.CR, misc.END))
                                                 ) in ('tracebacks', 'traceback'):
                                             self.parse_input("show tracebacks")
 
+                                        else:
+                                            printer.Printer().print_with_status(
+                                                    "Unknown option \
+`{0}`!".format(mod_com[1]))
+                                            continue
+
                                     except IndexError:
                                         eval("module_obj.{0}\
 .show_module_info()".format(self.module_call))
@@ -1279,6 +1286,11 @@ options)".format(self.module_call))
                                     "back"):
                                     self.logger.info("Quitting module...")
                                     return None
+
+                                elif self.module_command.lower().startswith(("clear",
+                                        "cls", "clr", "clrscrn")):
+                                    self.logger.info("Clearing the screen.")
+                                    misc.ProgramFunctions().clrscrn()
 
                                 else:
                                     self.logger.info("Unknown command: " +

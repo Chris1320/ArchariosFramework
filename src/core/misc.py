@@ -23,7 +23,23 @@ objects = ['CR', 'CG', 'CY', 'CB', 'CGR', 'CP', 'CC', 'CLM', 'CLB',
         'CLG', 'CLY', 'CLR', 'CLC', 'CLGR', 'BW', 'BR', 'BG', 'BY',
         'BB', 'BM', 'BC', 'BGR', 'BLGR', 'BLR', 'BLG', 'BLY', 'BLB',
         'BLM', 'BLC', 'BLW', 'FB', 'FI', 'FU', 'FE', 'END',
-        'ProgramFunctions']
+        'ProgramFunctions', 'ProgramFunctions().program_restart',
+        'ProgramFunctions().clrscrn',
+        'ProgramFunctions().pause',
+        'ProgramFunctions().error_except',
+        'ProgramFunctions().get_platform',
+        'ProgramFunctions().cli_color_support',
+        'ProgramFunctions().is_windows',
+        'ProgramFunctions().generate_session_id',
+        'ProgramFunctions().hash',
+        'ProgramFunctions().path_exists',
+        'ProgramFunctions().isfile',
+        'ProgramFunctions().isfolder',
+        'ProgramFunctions().pip_install',
+        'ProgramFunctions().geteuid',
+        'ProgramFunctions().random_color',
+        'ProgramFunctions().captcha_picker',
+        'ProgramFunctions().get_program_filename']
 
 import os
 import sys

@@ -1,5 +1,5 @@
 # TO-DO list
-##Information
+## Information
 This document is used as a list of TO-DOs and other plans.
 
  [X] _IN DEVELOPMENT_ Implement the login panel.
@@ -28,8 +28,6 @@ This document is used as a list of TO-DOs and other plans.
 + 1.Reconnaissance Tools
     - [ ] _In Development_ ReconMe (Web Reconnaissance Tool)
         * [X] More stable CMS detection.
-        * [ ] On step 2, What if target is not a web server? Try to
-              contact with alternate method. 
         * [X] Continue to geolocation feature.
         * [X] Fix grab_banners.
         * [ ] `harvest` feature.
