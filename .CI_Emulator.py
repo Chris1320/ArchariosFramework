@@ -191,13 +191,13 @@ def run():
     if newenv:
         # Write pipeline here if you will use virtual environment.
         setup = ['ls', 'cp -r ../src ./Archarios', 'ls', 'cd Archarios', 'pwd']
-        test = ['python3 ArchariosFramework.py --test']
+        test = ['python3 archariosframework.py --test']
         cleanup = ['cd ..', 'rm -rf Archarios/']
 
     else:
         # Write pipeline here if you will NOT use virtual environment.
         setup = ['ls', 'cd src', 'pwd']
-        test = ['python3 ArchariosFramework.py --test']
+        test = ['python3 archariosframework.py --test']
         cleanup = []
 
     print("{0} Activated switches: {1} {2}".format(sys.argv[0],
