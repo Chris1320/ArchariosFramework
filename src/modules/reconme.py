@@ -11,7 +11,6 @@ from core import exceptions
 # Put all needed dependencies here!
 try:
     import whois
-    import socket
     import requests
     import subprocess
 
@@ -56,7 +55,7 @@ class ArchariosFrameworkModule:
                 # Module brief description
                 "bdesc": "A suite of tools for information gathering.",
                 # Module version
-                "version": 1.7,
+                "version": 1.8,
                 # Module author
                 "author": "Catayao56",
                 # Module status
@@ -64,7 +63,7 @@ class ArchariosFrameworkModule:
                 # Date created (Please follow the format)
                 "created": "Jul. 28 2018",
                 # Latest update (Please follow the format)
-                "last_update": "Jul. 31 2018",
+                "last_update": "Sep. 24, 2018",
                 # Long description
                 "ldesc": """\
 <t>ReconMe :: A suite of tools for information gathering<end>
@@ -88,7 +87,6 @@ about a website or a network.
     - Perform subnet calculation.
     - Search for subdomains.
     - Perform a reverse IP lookup.
-    - `Harvest` more information from trusted sources.
 
 """.replace('<t>', misc.FB + misc.FU + misc.FI).replace(
                  '<end>', misc.END).replace('<u>', misc.FU).replace(
@@ -106,7 +104,8 @@ about a website or a network.
                     1.4: "Added version history when `module info reconme` is entered.",
                     1.5: "Added grab_banners and dns_lookup features.",
                     1.6: "Added subdomain scanner.",
-                    1.7: "Added Reverse IP lookup feature."
+                    1.7: "Added Reverse IP lookup feature.",
+                    1.8: "Some tweaks and improvements."
                     }
 
         self._parse_module_info()
@@ -185,7 +184,7 @@ about a website or a network.
         if len(mo_in['author']) < 1 or len(mo_in['author']) > 50:
             raise ValueError("`author` variable must be 1-50 characters!")
 
-	# Will be a mess for sure...
+        # Will be a mess for sure...
         try:
             created = mo_in['created'].split(' ')
             if created[0].replace('.', '') not in ('Jan', 'Feb', 'Mar',
@@ -319,8 +318,7 @@ ca786dd8892d941a8bfecbf4125e5fced3b30",
                 "dns_lookup": True,
                 "subnet_calc": True,
                 "subdomain": False,
-                "reverse_ip_lookup": False,
-                "harvester": False
+                "reverse_ip_lookup": False
                 }
 
         # Format: key + info
@@ -342,8 +340,7 @@ please don't abuse this public API key. Change this if you have another API.",
                 "dns_lookup": "Perform DNS lookup using hackertarget.com API.",
                 "subnet_calc": "Perform subnet calculation using hackertarget.com API.",
                 "subdomain": "Search for subdomains. (Wider than cloudflare_resolve)",
-                "reverse_ip_lookup": "Perform a reverse IP lookup using yougetsignal.com API.",
-                "harvester": "`Harvest` more information from trusted sources."
+                "reverse_ip_lookup": "Perform a reverse IP lookup using yougetsignal.com API."
                 }
 
         return values, vhelp
@@ -723,7 +720,7 @@ com/reverseiplookup/?q={0}".format(target_site)).text
             print("[i] reverse_ip_lookup is false, now skipping...")
             result_reverseIP = ""
 
-        # Step 16: Print the results.
+        # Step 15: Print the results.
         print(misc.FB + misc.CC + \
                 "Results for `{0}`:".format(values['target']) + misc.END)
         print()
@@ -732,7 +729,7 @@ com/reverseiplookup/?q={0}".format(target_site)).text
         print(misc.CG + "CMS Name:" + misc.END, result_cms_name,
                 "\t(with", result_cms_confidence, "confidence)")
         print(misc.CG + "CMS Version:" + misc.END, result_cms_version)
-        print(misc.CY + "\t[i] More information about the CMS:" + \
+        print(misc.CY + "\t[i] More information about the CMS:" +
                 misc.END, result_cms_url)
         print(misc.CG + "Cloudflare Protection:" + misc.END, result_cloudflare_protected)
         print(misc.CG + "Default IP Address:" + misc.END, result_default_ip)
