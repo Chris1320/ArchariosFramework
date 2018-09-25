@@ -73,7 +73,8 @@ except ImportError as i:
 else:
     # Changes the print function into printer.
     # print = printer.Printer().printt
-    pass
+    global started
+    started = False
 
 # ++++++++++++++++++++ WEB INTERFACE ++++++++++++++++++++ #
 
@@ -345,6 +346,16 @@ userlevel=self.userlevel, logger=self.logger, API=self.from_API)"""
 
         # Do some work before starting the program. #
 
+        global started
+        if started is False:
+            self._initialize()
+
+    def _initialize(self):
+        """
+        def _initialize():
+            Do some work before starting program.
+        """
+
         asciigraphs.ASCIIGraphs().animated_loading_screen(3,
                 "Starting {0}...".format(self.name), 'swapcase', 0.10)
 
@@ -381,6 +392,10 @@ userlevel=self.userlevel, logger=self.logger, API=self.from_API)"""
         else:
             printer.Printer().print_with_status(error.ErrorClass().ERROR0009(), 2)
             self._proper_exit(9)
+
+        # Set the variable to mark the program has started.
+        global started
+        started = time.strftime("%b %d %Y | %I:%M:%S %p")
 
     def help(self, rtype='default'):
         """
