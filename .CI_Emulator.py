@@ -176,10 +176,10 @@ class testEnvLinux:
                 pass
 
         if self.success_percentage < 0 or self.success_percentage > 100:
-            print(self.CGR + "Error calculating pipeline success result!")
+            print(self.CGR + "Error calculating test success rate!")
 
         else:
-            print(self.CGR + "Pipeline Result: {0}% success (over 100%)".format(
+            print(self.CGR + "Test Result: {0}% success (over 100%)".format(
                 self.success_percentage) + self.END)
         print()
         return(retcode)

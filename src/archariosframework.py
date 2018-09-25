@@ -223,8 +223,8 @@ class ArchariosFramework:
         self.logger.info('Defining program information.')
         # self.name = "Archários Framework"
         self.name = "Archarios Framework"
-        self.version = "0.0.1.9"
-        self.codename = "Beta"
+        self.version = "0.0.2.0"
+        self.codename = "Checksum"
         self.description = "The Novice's Ethical Hacking Framework"
         self.banner = r"""{0}
    _          _     {3}/\/|{0}     _            ___                                  _
@@ -340,6 +340,45 @@ userlevel=self.userlevel, logger=self.logger, API=self.from_API)"""
 
         # Set terminal title.
         ansi.set_title("{0} v{1}".format(self.name, self.version))
+
+        # Do some work before starting the program. #
+
+        asciigraphs.ASCIIGraphs().animated_loading_screen(3,
+                "Starting {0}...".format(self.name), 'swapcase', 0.10)
+
+        # Check file integrity.
+        self.logger.info("Now performing file integrity test...")
+        FIT_result = tests.TestingClass(self.name).FileIntegrityTest()
+        if FIT_result is True:
+            printer.Printer().print_with_status("Data Integrity Test finished.", 0)
+            if os.name == 'nt':
+                subprocess.call(
+                        ['del',
+                    tests.TestingClass(self.name).file_integrity_filename])
+
+            else:
+                subprocess.call(['rm',
+                    tests.TestingClass(self.name).file_integrity_filename])
+
+            printer.Printer().print_with_status("Updating Data Integrity List...", 0)
+            NFIT_result = tests.TestingClass(self.name).FileIntegrityTest(True)
+            # print(NFIT_result)  # DEV0005
+            if NFIT_result not in [True, "True string"]:
+                printer.Printer().print_with_status(
+                        "Cannot generate new data integrity lit!", 2)
+                print()
+
+            else:
+                printer.Printer().print_with_status(
+                        "Data Integrity List updated!", 0)
+                print()
+
+        elif FIT_result == "True string":
+            print()
+
+        else:
+            printer.Printer().print_with_status(error.ErrorClass().ERROR0009(), 2)
+            self._proper_exit(9)
 
     def help(self, rtype='default'):
         """
@@ -597,6 +636,7 @@ Reloading None.".format(module, str(err)))
             Enter interactive mode.
         """
 
+        # Start the interactive terminal.
         self.logger.info("Starting interactive terminal...")
         time.sleep(1)
         print('\n' * 5)

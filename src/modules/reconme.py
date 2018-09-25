@@ -63,7 +63,7 @@ class ArchariosFrameworkModule:
                 # Date created (Please follow the format)
                 "created": "Jul. 28 2018",
                 # Latest update (Please follow the format)
-                "last_update": "Sep. 24, 2018",
+                "last_update": "Sept. 24 2018",
                 # Long description
                 "ldesc": """\
 <t>ReconMe :: A suite of tools for information gathering<end>

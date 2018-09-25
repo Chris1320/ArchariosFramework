@@ -36,12 +36,6 @@ class ArchariosFrameworkModule:
     """
 
     def __init__(self, *args, **kwargs):
-        if importerror is not False:
-            return 8
-
-        else:
-            pass
-
         # Module Information
 
         # NOTE: DEV0004: Modify THIS DICTIONARY ONLY!
