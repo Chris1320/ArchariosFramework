@@ -52,12 +52,6 @@ class ArchariosFrameworkModule:
     """
 
     def __init__(self, *args, **kwargs):
-        if importerror is not False:
-            return 8
-
-        else:
-            pass
-
         # Module Information
 
         # NOTE: DEV0004: Modify THIS DICTIONARY ONLY!
@@ -448,6 +442,9 @@ Please manually kill ettercap by typing `killall ettercap` in your terminal.", 1
 
                     printer.Printer().print_with_status("Attack stopped.", 1)
                     return 0
+
+            # DEV0003
+            # elif values['attack_mode'].lower() == 'web':
 
             else:
                 printer.Printer().print_with_status("Invalid attack_mode!", 2)

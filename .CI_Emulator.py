@@ -165,6 +165,22 @@ class testEnvLinux:
                 """
                 print()
 
+        self.success_percentage = 0
+        no_of_jobs = len(self.report)
+        one = 100 / no_of_jobs
+        for result in self.report:
+            if result[0] == 0:
+                self.success_percentage += one
+
+            else:
+                pass
+
+        if self.success_percentage < 0 or self.success_percentage > 100:
+            print(self.CGR + "Error calculating test success rate!")
+
+        else:
+            print(self.CGR + "Test Result: {0}% success (over 100%)".format(
+                self.success_percentage) + self.END)
         print()
         return(retcode)
 

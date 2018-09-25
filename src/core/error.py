@@ -127,3 +127,11 @@ possible exit points of the code. If not, please contact the developer."""
         """
 
         return """Your system does not properly handle non-ASCII characters."""
+
+    def ERROR0009(self):
+        """
+        def ERROR0009():
+            Call this module if Data Integrity Test failed.
+        """
+
+        return """The Data Integrity Test has failed!"""

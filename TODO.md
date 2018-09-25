@@ -18,6 +18,7 @@ This document is used as a list of TO-DOs and other plans.
 ## General
 + [ ] _On Hold_ More logging verbosity.
 + [ ] _On Hold_ Module logging.
++ [ ] _In Development_ Check for file integrity on boot.
 
 ## Framework Commands
 + [ ] _On Hold_ Use subprocess on ``run`` command because os.system() is deprecated.
@@ -26,11 +27,10 @@ This document is used as a list of TO-DOs and other plans.
 
 ## Framework Modules
 + 1.Reconnaissance Tools
-    - [ ] _In Development_ ReconMe (Web Reconnaissance Tool)
+    - [X] _Finished_ ReconMe (Web Reconnaissance Tool)
         * [X] More stable CMS detection.
         * [X] Continue to geolocation feature.
         * [X] Fix grab_banners.
-        * [ ] `harvest` feature.
     - [ ] _On Hold_ IPCalc (IP Calculator)
 
 + 2.Scanning Tools
@@ -43,8 +43,8 @@ This document is used as a list of TO-DOs and other plans.
     - [ ] _In Development_ ArcháriosFlooder (DoS Tool)
         * [X] Validation of options.
         * [X] Default Attack
-        * [ ] ARP Attack
-        * [ ] DHCP Attack
+        * [X] ARP Attack
+        * [X] DHCP Attack
         * [ ] Web Attack
     - [ ] _On Hold_ WPEnum (WordPress Username Enumerator)
     - [ ] _On Hold_ Cross-Site Scripter (XSS Vulnerability Analysis Tool)
