@@ -272,7 +272,9 @@ class TestingClass:
         else:
             good = 0
             erred = 0
+            notfound = 0
             mismatch = 0
+            lostfiles = []
             mismatched = {}
 
             for pair in integrity_list:
@@ -280,7 +282,8 @@ class TestingClass:
                 pair = pair.split('\n')
                 pair = pair[0].partition(' :: ')
                 new_hash = self.hash_file(pair[0])
-                if pair[2].upper() == str(new_hash.upper()):
+
+                if str(pair[2]).upper() == str(new_hash).upper():
                     printer.Printer().print_with_status(
                     "The hash of {0} matched the \
 checksum.".format(pair[0]), 0)
@@ -292,6 +295,12 @@ checksum.".format(pair[0]), 0)
 checksum for {0}.".format(pair[0]), 2)
                     erred += 1
 
+                elif new_hash == 2:
+                    printer.Printer().print_with_status(
+                    "{0} was not found!".format(pair[0]), 2)
+                    notfound += 1
+                    lostfiles.append(str(pair[0]))
+
                 else:
                     printer.Printer().print_with_status(
                     "The hash of {0} doesn't match the \
@@ -299,9 +308,17 @@ checksum!".format(pair[0]), 1)
                     mismatch += 1
                     mismatched[pair[0]] = [pair[2].upper(), new_hash.upper()]
 
-            if mismatch != 0 or erred != 0:
+            if (erred + notfound + mismatch) != 0:
                 print()
                 printer.Printer().print_with_status("Errors found!", 1)
+                print()
+
+            if notfound != 0:
+                print()
+                for lost in lostfiles:
+                    print("`{0}` was missing from the directory tree.".format(lost))
+
+            if mismatch != 0:
                 print()
                 for missed in mismatched:
                     print("Filename: {0} | Old Hash: {1} | New Hash: {2}".format(
@@ -368,11 +385,14 @@ checksum!".format(pair[0]), 1)
                 with open(filename, 'rb') as fopen:
                     data = fopen.read()
 
-        except(FileNotFoundError, IOError, EOFError,
+        except FileNotFoundError:
+            return 2
+
+        except(IOError, EOFError,
                 PermissionError, UnicodeDecodeError):
             printer.Printer().print_with_status("Cannot read {0}!".format(
                 filename), 2)
-            return 1
+            return ""
 
         else:
             # This is the only hash function used ;)
