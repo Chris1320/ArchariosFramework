@@ -2,11 +2,11 @@
 ## Information
 This document is used as a list of TO-DOs and other plans.
 
- [X] _IN DEVELOPMENT_ Implement the login panel.
-  ^       ^                 ^
-  |       |                 |
-  |       |        Description of the plan.
-  |       |
+ [X] _IN DEVELOPMENT_ +++Implement the login panel.
+  ^       ^            ^           ^
+  |       |            |           |
+  |       |            | Description of the plan.
+  |       | If the description has three plus symbols (`+`), it is prioritized.
   |      Must be _On Hold_, _In Development_, or _Finished_.
   |
   ``X`` if the feature is done.
@@ -18,7 +18,9 @@ This document is used as a list of TO-DOs and other plans.
 ## General
 + [ ] _On Hold_ More logging verbosity.
 + [ ] _On Hold_ Module logging.
-+ [ ] _In Development_ Check for file integrity on boot.
++ [X] _Finished_ Check for file integrity on boot.
++ [ ] _In Development_ +++User can include arbitrary code when generating new module. (See dev/FUTURE/archarios_ace.cast)
++ [X] _Finished_ +++When checking integrity of files, what if the file was not found?
 
 ## Framework Commands
 + [ ] _On Hold_ Use subprocess on ``run`` command because os.system() is deprecated.

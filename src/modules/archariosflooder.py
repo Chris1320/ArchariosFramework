@@ -443,8 +443,9 @@ Please manually kill ettercap by typing `killall ettercap` in your terminal.", 1
                     printer.Printer().print_with_status("Attack stopped.", 1)
                     return 0
 
-            # DEV0003
-            # elif values['attack_mode'].lower() == 'web':
+            elif values['attack_mode'].lower() == 'web':
+                printer.Printer().print_with_status("Not yet implemented.", 1)
+                return 0
 
             else:
                 printer.Printer().print_with_status("Invalid attack_mode!", 2)

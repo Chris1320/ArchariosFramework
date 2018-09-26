@@ -226,7 +226,7 @@ class ArchariosFramework:
         self.logger.info('Defining program information.')
         # self.name = "Archários Framework"
         self.name = "Archarios Framework"
-        self.version = "0.0.2.0"
+        self.version = "0.0.2.1"
         self.codename = "Checksum"
         self.description = "The Novice's Ethical Hacking Framework"
         self.banner = r"""{0}
@@ -733,6 +733,9 @@ CTRL+C when you are ready.").replace('(oo)', '(==)'))
                         elif ctrl_d_option == 2:
                             self.logger.critical("Forcing to quit")
                             sys.exit(1024)
+
+                        elif ctrl_d_option == 99:
+                            break
 
                         else:
                             printer.Printer().print_with_status(
