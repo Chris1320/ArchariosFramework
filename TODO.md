@@ -19,13 +19,15 @@ This document is used as a list of TO-DOs and other plans.
 + [ ] _On Hold_ More logging verbosity.
 + [ ] _On Hold_ Module logging.
 + [X] _Finished_ Check for file integrity on boot.
-+ [ ] _In Development_ +++User can include arbitrary code when generating new module. (See dev/FUTURE/archarios_ace.cast)
++ [X] _Finished_ +++User can include arbitrary code when generating new module.
 + [X] _Finished_ +++When checking integrity of files, what if the file was not found?
++ [ ] _In Development_ +++Configuration Files (files to exclude in file integrity test, default softwares to call, etc.)
 
 ## Framework Commands
 + [ ] _On Hold_ Use subprocess on ``run`` command because os.system() is deprecated.
 + [ ] _On Hold_ Built-In Notepad.
 + [ ] _On Hold_ Module Manager (Included in `module` command.)
++ [ ] _On Hold_ Program and System Status / Information
 
 ## Framework Modules
 + 1.Reconnaissance Tools
