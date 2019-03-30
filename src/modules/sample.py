@@ -33,7 +33,7 @@ class ArchariosFrameworkModule:
                 # Module brief description
                 "bdesc": "A sample module for Archários Framework.",
                 # Module version
-                "version": 1.2,
+                "version": 1.3,
                 # Module author
                 "author": "Catayao56",
                 # Module status
@@ -99,6 +99,9 @@ harassment-free experience.
              <n>This is a note,<end> and this is not.
 
              <t>F<end> <h>A<end> <u>N<end> <i>C<end> <b>Y<end> <n>!<end>
+             
+    <t>About Windows Operating Systems<end>:
+        <n>There are no formatting support on windows!
 
              """.replace('<t>', misc.FB + misc.FU + misc.FI).replace(
                  '<end>', misc.END).replace('<u>', misc.FU).replace(

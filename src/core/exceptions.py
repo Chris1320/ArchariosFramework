@@ -68,3 +68,11 @@ class CommandNotAllowedError(Exception):
     """
 
     pass
+
+class ConfigFileIOError(Exception):
+    """
+    class ConfigFileIOError():
+        An exception class.
+    """
+
+    pass

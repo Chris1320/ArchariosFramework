@@ -1,6 +1,6 @@
-# Archários Framework v0.0.2.1 :: The Novice's Ethical Hacking Framework
-## Copyright (C) 2018 :: Catayao56 <Catayao56@gmail.com>
-[Archarios Framework](https://gitlab.com/Catayao56/ArchariosFramework.git) is an Ethical Hacking Framework.
+# Archários Framework v0.0.2.2 :: The Novice's Ethical Hacking Framework
+## Copyright (C) 2018, 2019 :: Catayao56 <Catayao56@gmail.com>
+[Archarios Framework](https://github.com/Catayao56/ArchariosFramework.git) is an Ethical Hacking Framework.
 It was created on Wednesday, June 27, 2018.
 It provides tools that you need for
 reconnaissance, scanning, exploitation,
@@ -10,14 +10,19 @@ and is the child of the old toolkit and framework,
 Shadow Suite Toolkit.
 
 ## What's new?
++ Archarios Framework now supports Windows Operating Systems!
 + File Integrity Test
++ Transitioning to new `config_handler` module.
++ `module info`, `module test`, and `module reload` commands now test all modules if `*` is supplied.
++ MODULE UPDATE: Updated sample module description.
++ FIX: userlevel error when running as root/administrator.
++ FIX: Added `shell=True` argument on subprocess calls.
 
 + ATTENTION: Contributors needed!
      * I can't do this without contributors or even testers,
        please help me!
           + Co-Developers
     	  + Testers (Windows and Linux systems)
-	      + End-users (Seriously)
 
 ## Full Feature List
 + Open Source
@@ -77,7 +82,7 @@ Shadow Suite Toolkit.
 ## Requirements
 + Tested Operating Systems are Kali, Mint, Ubuntu, and Termux Terminal Emulator for Android.
 	
-+ Not yet tested for Windows Operating Systems... And sorry, we are not planning to suppport Windows OS.
++ Not yet tested for Windows Operating Systems...
 
 + Internet Connection. (for performing remote attacks and/or updating)
 + Python Interpreter version 3.
@@ -89,7 +94,7 @@ Shadow Suite Toolkit.
 ## Installing & Running
 ------------------------
 1.Installing and Running
-      -Enter these commands in your terminal:
+      - [LINUX] Enter these commands in your terminal:
 
       $ sudo apt update && apt upgrade -y [1]
       $ sudo apt install python3 git [2]

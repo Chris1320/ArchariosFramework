@@ -1,0 +1,5 @@
+multitasking
+flask
+flask_admin
+flask_limiter
+flask_wtf
