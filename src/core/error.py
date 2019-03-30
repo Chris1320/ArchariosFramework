@@ -143,3 +143,19 @@ possible exit points of the code. If not, please contact the developer."""
         """
         
         return """An unknown error occured: {0}""".format(statement)
+    
+    def ERROR0011(self):
+        """
+        def ERROR0011():
+            Call this method if program set an invalid configuration parameter.
+        """
+        
+        return """Cannot set configuration value! Invalid configuration parameter."""
+    
+    def ERROR0012(self):
+        """
+        def ERROR0012():
+            Call this if program cannot continue because of invalid config file.
+        """
+        
+        return """Program cannot continue because of invalid configuration file..."""

@@ -232,7 +232,7 @@ class ArchariosFramework:
         self.logger.info('Defining program information.')
         # self.name = "Archários Framework"
         self.name = "Archarios Framework"
-        self.version = "0.0.2.2"
+        self.version = "0.0.2.3"
         self.codename = "Checksum"
         self.description = "The Novice's Ethical Hacking Framework"
         self.banner = r"""{0}
@@ -348,7 +348,35 @@ userlevel=self.userlevel, logger=self.logger, API=self.from_API)"""
         # Parse configuration file.
         self.logger.info("Parsing configuration file `{0}`.".format(
             self.config_file))
-        self._parse_config()
+        cfparse = self._parse_config()
+        # print(cfparse)  # DEV0005
+        if cfparse[0] == 0:
+            pass
+        
+        elif cfparse[0] == 2:
+            printer.Printer().print_with_status(
+                "Cannot verify configuration file `{0}`!".format(
+                self.config_file), 2)
+            printer.Printer().print_with_status(error.ErrorClass().ERROR0012(), 2)
+            self._proper_exit(12)
+        
+        else:
+            print("Errors/Warnings found in config file `{0}`:".format(self.config_file))
+            for cfwarnings in cfparse[2]:
+                printer.Printer().print_with_status(cfwarnings, 1)
+                
+            for cferrors in cfparse[1]:
+                printer.Printer().print_with_status(cferrors, 2)
+                
+            if len(cfparse[1]) != 0:
+                printer.Printer().print_with_status(error.ErrorClass().ERROR0012(), 2)
+                self._proper_exit(12)
+        
+        # Get data from configuration file.
+        self.username = config_handler.ConfigHandler(self.config_file).get("username")
+        self.password = config_handler.ConfigHandler(self.config_file).get("password")
+        self.rootuser = config_handler.ConfigHandler(self.config_file).get("rootuser")
+        self.rootpass = config_handler.ConfigHandler(self.config_file).get("rootpass")
 
         # Set terminal title.
         ansi.set_title("{0} v{1}".format(self.name, self.version))
@@ -580,7 +608,7 @@ will use the default settings.".format(self.name),
 
         try:
             self.logger.info("Reading {0}...".format(self.config_file))
-            config_handler.ConfigHandler(self.config_file).verify()
+            return config_handler.ConfigHandler(self.config_file).verify()
 
         except(FileNotFoundError):
             self.latest_exceptions = traceback.format_exc()
@@ -588,6 +616,7 @@ will use the default settings.".format(self.name),
             printer.Printer().print_with_status(str(
                 error.ErrorClass().ERROR0001(self.config_file)), 2)
             self._proper_exit(1)
+            return [2,]
 
     def _proper_exit(self, exit_code=0):
         """
@@ -690,13 +719,25 @@ Reloading None.".format(module, str(err)))
                     self.name, self.userlevel
                     ))
                 if self.userlevel == 2:
-                    self.command = input(self.prompt_lvl3.format(self.hostname))
+                    if self.username == "default":
+                        self.command = input(self.prompt_lvl3.format(self.hostname))
+                        
+                    else:
+                        self.command = input(self.prompt_lvl3.format(self.username))
 
                 elif self.userlevel == 1:
-                    self.command = input(self.prompt_lvl2.format(self.hostname))
+                    if self.username == "default":
+                        self.command = input(self.prompt_lvl2.format(self.hostname))
+                        
+                    else:
+                        self.command = input(self.prompt_lvl2.format(self.username))
 
                 elif self.userlevel == 0:
-                    self.command = input(self.prompt_lvl1.format(self.hostname))
+                    if self.username == "default":
+                        self.command = input(self.prompt_lvl1.format(self.hostname))
+                        
+                    else:
+                        self.command = input(self.prompt_lvl1.format(self.rootuser))
 
                 else:
                     raise exceptions.UnknownUserLevelError("There is a problem obtaining the userlevel.")
@@ -1331,17 +1372,28 @@ using module: {0}".format(str(exception)))
                         while True:
                             try:
                                 if self.userlevel == 2:
-                                    self.module_command = input(self.prompt_lvl3.format(misc.FB + command[2]))
-
+                                    if self.username == "default":
+                                        self.command = input(self.prompt_lvl3.format(self.hostname))
+                                        
+                                    else:
+                                        self.command = input(self.prompt_lvl3.format(self.username))
+                
                                 elif self.userlevel == 1:
-                                    self.module_command = input(self.prompt_lvl2.format(misc.FB + command[2]))
-
+                                    if self.username == "default":
+                                        self.command = input(self.prompt_lvl2.format(self.hostname))
+                                        
+                                    else:
+                                        self.command = input(self.prompt_lvl2.format(self.username))
+                
                                 elif self.userlevel == 0:
-                                    self.module_command = input(self.prompt_lvl1.format(misc.FB + command[2]))
-
+                                    if self.username == "default":
+                                        self.command = input(self.prompt_lvl1.format(self.hostname))
+                                        
+                                    else:
+                                        self.command = input(self.prompt_lvl1.format(self.rootuser))
+                
                                 else:
-                                    raise exceptions.UnknownUserLevelError("\
-There is a problem obtaining the userlevel.")
+                                    raise exceptions.UnknownUserLevelError("There is a problem obtaining the userlevel.")
 
                                 self.logger.info("User entered: " +
                                     self.module_command)
@@ -1773,6 +1825,24 @@ the traceback on `data/tracebacks.log` and/or inform us about what is it\
 
         elif arg.lower() in ('-w', '--web',  '/w', '/web'):
             oweb = True
+            
+        elif arg.lower() in ("-c", '--config'):
+            if arg == '-c':
+                oconfig_file = sys.argv[_iterator + 1]
+                _iterator += 2
+                continue
+                
+            elif arg.startswith('--config='):
+                oconfig_file = arg.partition('=')[2]
+                continue
+                
+            else:
+                print(ArchariosFramework().banner)
+                print()
+                print('Unknown argument `{0}`'.format(arg))
+                print()
+                print(ArchariosFramework().help())
+                ArchariosFramework()._proper_exit(1)
 
         else:
             print(ArchariosFramework().banner)

@@ -21,13 +21,16 @@ This document is used as a list of TO-DOs and other plans.
 + [X] _Finished_ Check for file integrity on boot.
 + [X] _Finished_ +++User can include arbitrary code when generating new module.
 + [X] _Finished_ +++When checking integrity of files, what if the file was not found?
-+ [ ] _In Development_ +++Configuration Files (files to exclude in file integrity test, default softwares to call, etc.)
++ [X] _Finished_ +++Configuration Files (files to exclude in file integrity test, default softwares to call, etc.)
++ [ ] _On Hold_ Web Interface.
++ [ ] _On Hold_ Web Interface's security mechanisms.
 
 ## Framework Commands
 + [ ] _On Hold_ Use subprocess on ``run`` command because os.system() is deprecated.
 + [ ] _On Hold_ Built-In Notepad.
 + [ ] _On Hold_ Module Manager (Included in `module` command.)
 + [ ] _On Hold_ Program and System Status / Information
++ [ ] _In Development_ Configuration File Editor.
 
 ## Framework Modules
 + 1.Reconnaissance Tools

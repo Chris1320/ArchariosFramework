@@ -207,7 +207,7 @@ def run():
     if newenv:
         # Write pipeline here if you will use virtual environment.
         setup = ['dir', 'xcopy ..\src .\Archarios /O /X /E /H /K /Y', 'dir', 'cd Archarios', 'echo %cd%']
-        test = ['python archariosframework.py']
+        test = ['python archariosframework.py --test']
         cleanup = ['cd ..', 'rmdir Archarios /s']
 
     else:

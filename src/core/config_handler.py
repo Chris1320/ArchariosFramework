@@ -23,6 +23,8 @@ objects = ["ConfigHandler()", "ConfigHandler().get", "ConfigHandler().verify"]
 import os
 import sys
 
+import time
+
 from core import misc
 from core import error
 from core import exceptions
@@ -103,11 +105,54 @@ class ConfigHandler:
                 if content.startswith('#'):
                     continue
                 
-                elif content.startswith(data):
+                elif content.startswith(data + '='):
                     return content.replace('\n', '').partition('=')[2]
                 
                 else:
                     continue
+
+                
+    def set(self, variable=None, value=None):
+        """
+        def set():
+            Set a new value for `variable`.
+        """
+        
+        if variable is None or value is None:
+            printer.Printer().print_with_status(error.ErrorClass().ERROR0011(), 2)
+            return 11
+        
+        else:
+            try:
+                variable = str(variable)
+                value = str(value)
+                
+            except(TypeError, ValueError):
+                printer.Printer().print_with_status(error.ErrorClass().ERROR0011(), 2)
+                return 11
+        
+            else:
+                contents = self._open_config_file()
+                new_config = []
+                for content in contents:
+                    if content.startswith('#'):
+                        new_config.append(content)
+                    
+                    elif content.startswith(variable + '='):
+                        new_config.append(variable + '=' + value + '\n')
+                        
+                    else:
+                        new_config.append(content)
+                        
+                try:
+                    self._save_config_file()
+                    
+                except Exception as error:
+                    print(error)
+                    return 1
+                    
+                else:
+                    return 0
                 
     def verify(self):
         """
@@ -116,17 +161,51 @@ class ConfigHandler:
         """
         
         contents = self._open_config_file()
+        # print(contents)  # DEV0005
+        if type(contents) is not str:
+            return [2,]
+        
         contents = contents.split('\n')
         
+        warnings = []
         errors = []
         
+        line = 0
+        
         for content in contents:
-            if content.startswith("#"):
+            line += 1
+            # print(content)  # DEV0005
+            # time.sleep(1)  # DEV0005
+            if '=' not in content and not content.startswith('#') and content != '':
+                errors.append("Invalid statement `{0}` (line {1})".format(content, str(line)))
+
+            if content.startswith("#") or content == '':
                 continue
             
-            elif content.startswith("exclude_list"):
+            elif content.startswith("exclude_list="):
+                continue
+            
+            elif content.startswith("text_editor="):
+                continue
+
+            elif content.startswith("file_explorer="):
+                continue
+
+            elif content.startswith("username="):
+                continue
+
+            elif content.startswith("password="):
+                continue
+
+            elif content.startswith("rootuser="):
+                continue
+
+            elif content.startswith("rootpass="):
                 continue
             
             else:
-                errors.append("Unknown statement `{0}`".format(content))
-                continue
+                if "Invalid statement `{0}` (line {1})".format(content, str(line)) not in errors:
+                    warnings.append("Unknown statement `{0}` (line {1})".format(content, str(line)))
+                    continue
+                        
+        return [1, errors, warnings]
