@@ -223,7 +223,7 @@ def run():
 
 if __name__ == '__main__':
     if os.name == 'nt':
-        pass
+        run()
 
     else:
         run()

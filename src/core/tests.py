@@ -29,6 +29,7 @@ import traceback
 from core import error
 from core import printer
 from core import asciigraphs
+from core import config_handler
 from importlib import import_module as imprt
 
 
@@ -38,7 +39,7 @@ class TestingClass:
         The testing class of Archários Framework.
     """
 
-    def __init__(self, name):
+    def __init__(self, name, config_file=""):
         """
         def __init__():
             Initialization method for testing.
@@ -59,6 +60,11 @@ class TestingClass:
         self.excluded = ['data/logfile.log', 'data/notes.txt',
                 'data/history.log']
         self.name = str(name)
+        if config_file != "":
+            self.config_file = config_file
+            
+        else:
+            self.config_file = "data/default.dat"
 
     def main(self):
         """
@@ -67,7 +73,8 @@ class TestingClass:
         """
 
         test_results = 0
-        self.FileIntegrityTest()
+        self.FileIntegrityTest(config_handler.ConfigHandler(
+            self.config_file).get('exclude_list').split(','))
         test_results += self.test(self.main_module)
         for module in self.core_modules:
             test_result = self.test("core/" + module)
@@ -115,14 +122,16 @@ class TestingClass:
         else:
             return None
 
-        # print(module)
-        module = module.replace(os.sep, '.')
+        # print(module)  # DEV0005
+        module = module.replace('/', '.')
+        module = module.replace('\\', '.')
+        # print(module)  # DEV0005
         module = module[::-1]
-        # print(module)
+        # print(module)  # DEV0005
         module = module.partition('.')[2]
-        # print(module)
+        # print(module)  # DEV0005
         module = module[::-1]
-        # print(module)
+        # print(module)  # DEV0005
         module_import = imprt(module)
         asciigraphs.ASCIIGraphs().animated_loading_screen(1,
                 'Preparing to test {0} (`{1}` module)...'.format(self.name,
@@ -205,7 +214,7 @@ class TestingClass:
             else:
                 return 0
 
-    def FileIntegrityTest(self, gen_no_test=False):
+    def FileIntegrityTest(self, exclude_list=[], gen_no_test=False):
         """
         def FileIntegrityTest():
             Perform a file integrity test.
@@ -276,11 +285,17 @@ class TestingClass:
             mismatch = 0
             lostfiles = []
             mismatched = {}
+            ask_user4input = False
 
             for pair in integrity_list:
-                time.sleep(0.10)
+                #print(integrity_list)  # DEV0005: For debugging purposes only
+                #print(pair)  # DEV0005: For debugging purposes only
                 pair = pair.split('\n')
                 pair = pair[0].partition(' :: ')
+                #print(exclude_list)  # DEV0005: For debugging purposes only
+                if pair[0] in exclude_list:
+                    continue
+
                 new_hash = self.hash_file(pair[0])
 
                 if str(pair[2]).upper() == str(new_hash).upper():
@@ -308,6 +323,8 @@ checksum!".format(pair[0]), 1)
                     mismatch += 1
                     mismatched[pair[0]] = [pair[2].upper(), new_hash.upper()]
 
+                time.sleep(0.10)
+
             if (erred + notfound + mismatch) != 0:
                 print()
                 printer.Printer().print_with_status("Errors found!", 1)
@@ -318,6 +335,9 @@ checksum!".format(pair[0]), 1)
                 for lost in lostfiles:
                     print("`{0}` was missing from the directory tree.".format(lost))
 
+                print()
+                ask_user4input = True
+
             if mismatch != 0:
                 print()
                 for missed in mismatched:
@@ -325,6 +345,9 @@ checksum!".format(pair[0]), 1)
                         missed, mismatched[missed][0], mismatched[missed][1]))
                     print()
 
+                ask_user4input = True
+
+            if ask_user4input is True:
                 while True:
                     try:
                         ask_user = input("Do you want to continue? (y/n) > ")
@@ -396,4 +419,4 @@ checksum!".format(pair[0]), 1)
 
         else:
             # This is the only hash function used ;)
-            return hashlib.sha256(data.encode()).hexdigest()
+            return hashlib.sha256(str(data).encode()).hexdigest()
