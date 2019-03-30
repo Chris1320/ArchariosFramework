@@ -207,5 +207,11 @@ class ConfigHandler:
                 if "Invalid statement `{0}` (line {1})".format(content, str(line)) not in errors:
                     warnings.append("Unknown statement `{0}` (line {1})".format(content, str(line)))
                     continue
+                
+        if len(errors) == 0 and len(warnings) == 0:
+            code = 0
+            
+        else:
+            code = 1
                         
-        return [1, errors, warnings]
+        return [code, errors, warnings]
