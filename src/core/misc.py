@@ -44,6 +44,7 @@ objects = ['CR', 'CG', 'CY', 'CB', 'CGR', 'CP', 'CC', 'CLM', 'CLB',
 import os
 import sys
 
+import base64
 import random
 import datetime
 import hashlib
@@ -177,10 +178,10 @@ class ProgramFunctions:
 
         platform = self.is_windows()
         if platform is False:
-            subprocess.call('clear')
+            subprocess.call('clear', shell=True)
 
         elif platform is True:
-            subprocess.call('cls')
+            subprocess.call('cls', shell=True)
 
         else:
             loop = 0
@@ -357,6 +358,22 @@ class ProgramFunctions:
 
         else:
             raise exceptions.UnknownHashTypeError("An unknown hash type is entered...")
+
+    def base64_encode(self, string):
+        """
+        def base64_encode():
+            Return the base64-encoded form of `string`.
+        """
+
+        return base64.b64encode(string)
+
+    def base64_decode(self, code):
+        """
+        def base64_decode():
+            Return the plaintext form of `code`.
+        """
+
+        return base64.b64decode(code)
 
     def path_exists(self, file_path):
         """

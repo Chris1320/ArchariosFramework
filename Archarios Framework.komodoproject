@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Komodo Project File - DO NOT EDIT -->
+<project id="da2e1f85-be35-4beb-9e5c-67932d2a373f" kpf_version="5" name="Archarios Framework.komodoproject">
+<livefolder id="04536a52-50e3-40a0-a4b2-b115b4d6884f" idref="da2e1f85-be35-4beb-9e5c-67932d2a373f" name="src" url="src">
+</livefolder>
+<file id="0995a272-fa68-4c8b-a0df-b997ddf0e2fa" idref="da2e1f85-be35-4beb-9e5c-67932d2a373f" name="TODO.md" url="TODO.md">
+</file>
+<file id="4ebbcac7-63e1-4112-8ed5-e1310a125170" idref="da2e1f85-be35-4beb-9e5c-67932d2a373f" name=".gitlab-ci.yml" url=".gitlab-ci.yml">
+</file>
+<file id="502d8753-96a4-4432-a3c2-74590a5a5f75" idref="da2e1f85-be35-4beb-9e5c-67932d2a373f" name="LICENSE.md" url="LICENSE.md">
+</file>
+<file id="6ea384fb-3b7e-4a8e-82f4-be0cc571b825" idref="da2e1f85-be35-4beb-9e5c-67932d2a373f" name="ISSUE_TEMPLATE.md" url="ISSUE_TEMPLATE.md">
+</file>
+<file id="7d65ea6b-e1b7-46e0-8a9d-11931a1b9bd6" idref="da2e1f85-be35-4beb-9e5c-67932d2a373f" name="MERGE_REQUEST_TEMPLATE.md" url="MERGE_REQUEST_TEMPLATE.md">
+</file>
+<file id="8a73d303-df2d-4b78-ba95-4f7b3b510212" idref="da2e1f85-be35-4beb-9e5c-67932d2a373f" name=".backup.py" url=".backup.py">
+</file>
+<file id="9187a4d4-536d-4a35-83ef-0300c49710cd" idref="da2e1f85-be35-4beb-9e5c-67932d2a373f" name="CODE_OF_CONDUCT.md" url="CODE_OF_CONDUCT.md">
+</file>
+<file id="a14b2164-16d0-4de6-bfeb-0df2e32bdf7d" idref="da2e1f85-be35-4beb-9e5c-67932d2a373f" name=".CI_Emulator.py" url=".CI_Emulator.py">
+</file>
+<file id="ae4ef807-7aac-484e-a550-a6fd8321922a" idref="da2e1f85-be35-4beb-9e5c-67932d2a373f" name="README.md" url="README.md">
+</file>
+<file id="b8068674-7917-4d9c-9c41-7a25fd369028" idref="da2e1f85-be35-4beb-9e5c-67932d2a373f" name="CONTRIBUTING.md" url="CONTRIBUTING.md">
+</file>
+<livefolder id="c02adaa9-033d-48ed-b73e-f468d63a0ff6" idref="da2e1f85-be35-4beb-9e5c-67932d2a373f" name="test-env-3.6" url="test-env-3.6">
+</livefolder>
+<file id="e2adcdd2-e0d5-4c0e-b881-15b9f0d335dc" idref="da2e1f85-be35-4beb-9e5c-67932d2a373f" name="public_key.pem" url="public_key.pem">
+</file>
+<preference-set idref="da2e1f85-be35-4beb-9e5c-67932d2a373f" id="project" preftype="project">
+  <long id="codeintel.scanner.max_depth">0</long>
+  <string id="import_exclude_matches">*.*~;*.bak;*.tmp;CVS;.#*;*.pyo;*.pyc;.svn;_svn;.git;.hg;.bzr;*%25*;tmp*.html;.DS_Store;*.swp;*.kpf;*.komodoproject;.komodotools;__pycache__</string>
+  <long id="prefs_version">1</long>
+</preference-set>
+</project>

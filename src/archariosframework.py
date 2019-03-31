@@ -30,7 +30,12 @@ try:
     import atexit
     import random
     import signal
-    import readline
+    if os.name == 'nt':
+        pass
+    
+    else:
+        import readline
+        
     import importlib
     import traceback
     import subprocess
@@ -58,6 +63,7 @@ try:
     from core import printer
     from core import exceptions
     from core import asciigraphs
+    from core import config_handler
     from core import random_phrases
     from core import html_downloader
 
@@ -226,7 +232,7 @@ class ArchariosFramework:
         self.logger.info('Defining program information.')
         # self.name = "Archários Framework"
         self.name = "Archarios Framework"
-        self.version = "0.0.2.1"
+        self.version = "0.0.2.3"
         self.codename = "Checksum"
         self.description = "The Novice's Ethical Hacking Framework"
         self.banner = r"""{0}
@@ -309,10 +315,10 @@ class ArchariosFramework:
         self.userlevel = misc.ProgramFunctions().geteuid()
         self.logger.info("Userlevel: {0}".format(str(self.userlevel)))
         if self.userlevel != 0:
-            self.userlevel = 3
+            self.userlevel = 2
 
         else:
-            pass
+            self.userlevel = 0
 
         self.prompt_lvl3 = "[" + misc.CG + self.filename + misc.END + '@' +\
         misc.CC + "{0}" + misc.END + "] >>> "
@@ -336,10 +342,41 @@ userlevel=self.userlevel, logger=self.logger, API=self.from_API)"""
         self.history_length = 100
         self._set_interpreter_history()
 
+        self.command = ""
+        self.previous_commands = []
+
         # Parse configuration file.
         self.logger.info("Parsing configuration file `{0}`.".format(
             self.config_file))
-        self._parse_config()
+        cfparse = self._parse_config()
+        # print(cfparse)  # DEV0005
+        if cfparse[0] == 0:
+            pass
+        
+        elif cfparse[0] == 2:
+            printer.Printer().print_with_status(
+                "Cannot verify configuration file `{0}`!".format(
+                self.config_file), 2)
+            printer.Printer().print_with_status(error.ErrorClass().ERROR0012(), 2)
+            self._proper_exit(12)
+        
+        else:
+            print("Errors/Warnings found in config file `{0}`:".format(self.config_file))
+            for cfwarnings in cfparse[2]:
+                printer.Printer().print_with_status(cfwarnings, 1)
+                
+            for cferrors in cfparse[1]:
+                printer.Printer().print_with_status(cferrors, 2)
+                
+            if len(cfparse[1]) != 0:
+                printer.Printer().print_with_status(error.ErrorClass().ERROR0012(), 2)
+                self._proper_exit(12)
+        
+        # Get data from configuration file.
+        self.username = config_handler.ConfigHandler(self.config_file).get("username")
+        self.password = config_handler.ConfigHandler(self.config_file).get("password")
+        self.rootuser = config_handler.ConfigHandler(self.config_file).get("rootuser")
+        self.rootpass = config_handler.ConfigHandler(self.config_file).get("rootpass")
 
         # Set terminal title.
         ansi.set_title("{0} v{1}".format(self.name, self.version))
@@ -367,14 +404,17 @@ userlevel=self.userlevel, logger=self.logger, API=self.from_API)"""
             if os.name == 'nt':
                 subprocess.call(
                         ['del',
-                    tests.TestingClass(self.name).file_integrity_filename])
+                    tests.TestingClass(self.name).file_integrity_filename.replace('/', '\\')], shell=True)
 
             else:
                 subprocess.call(['rm',
-                    tests.TestingClass(self.name).file_integrity_filename])
+                    tests.TestingClass(self.name).file_integrity_filename], shell=True)
 
             printer.Printer().print_with_status("Updating Data Integrity List...", 0)
-            NFIT_result = tests.TestingClass(self.name).FileIntegrityTest(True)
+            NFIT_result = tests.TestingClass(self.name, self.config_file).FileIntegrityTest(
+                config_handler.ConfigHandler(self.config_file).get(
+                    'exclude_list').split(','), True)
+            
             # print(NFIT_result)  # DEV0005
             if NFIT_result not in [True, "True string"]:
                 printer.Printer().print_with_status(
@@ -417,18 +457,22 @@ userlevel=self.userlevel, logger=self.logger, API=self.from_API)"""
                 "USAGE: {0} [SWITCHES]".format(self.filename),
                 "",
                 "SWITCHES:",
-                "    Debugging Switches:",
-                "        Switch: -t --test /t /test",
+                "    Troubleshooting Switches:",
+                "        Switch: -t | --test | /t | /test",
                 "        Desc..: Test for errors and then exit.",
                 "",
-                "        Switch: -d --debug /d /debug",
+                "        Switch: -d | --debug | /d | /debug",
                 "        Desc..: Enable debugging mode; Show logs.",
                 "",
+                "    Personalization Switches:",
+                "        Switch: -c [CONFIG_FILE_PATH] | --config=[CONFIG_FILE_PATH]",
+                "        Desc..: Specify a custom configuration file to use.",
+                "",
                 "    Miscellaneous Switches:",
-                "        Switch: -h --help -? /h /help /?",
+                "        Switch: -h | --help | -? | /h | /help | /?",
                 "        Desc..: Show this help menu.",
                 "",
-                "        Switch: -w --web /w /web",
+                "        Switch: -w | --web | /w | /web",
                 # TODO: DEV0004: Remove WIP when finished developing web interface.
                 "        Desc..: (WIP) Start {0}'s web interface.".format(self.name),
                 "",
@@ -476,35 +520,40 @@ will use the default settings.".format(self.name),
             setting appropriate completer function.
         """
 
-        self.logger.info("Checking if `{0}` exists.".format(self.history_file))
-        if not os.path.exists(self.history_file):
-            self.logger.info("{0} doesn't exist, creating file.".format(
-                self.history_file
-                ))
-            with open(self.history_file, "a") as history:
-                if "libedit" in readline.__doc__:
-                    self.logger.info("Writing to history.")
-                    history.write("_HiStOrY_V2_\n\n")
-
-        self.logger.info("Reading history file.")
-        readline.read_history_file(self.history_file)
-        self.logger.info("Setting history length.")
-        readline.set_history_length(self.history_length)
-        self.logger.info("Registering readline command at exit.")
-        atexit.register(readline.write_history_file, self.history_file)
-
-        readline.parse_and_bind("set enable-keypad on")
-
-        self.logger.info("Setting up completion.")
-        readline.set_completer(self._complete)
-        readline.set_completer_delims(" \t\n;")
-        if "libedit" in readline.__doc__:
-            readline.parse_and_bind("bind ^I rl_complete")
-
+        if os.name == 'nt':
+            self.logger.info("System is running windows, setting of interpreter history cancelled.")
+            return 0
+            
         else:
-            readline.parse_and_bind("tab: complete")
-
-        return 0
+            self.logger.info("Checking if `{0}` exists.".format(self.history_file))
+            if not os.path.exists(self.history_file):
+                self.logger.info("{0} doesn't exist, creating file.".format(
+                    self.history_file
+                    ))
+                with open(self.history_file, "a") as history:
+                    if "libedit" in readline.__doc__:
+                        self.logger.info("Writing to history.")
+                        history.write("_HiStOrY_V2_\n\n")
+    
+            self.logger.info("Reading history file.")
+            readline.read_history_file(self.history_file)
+            self.logger.info("Setting history length.")
+            readline.set_history_length(self.history_length)
+            self.logger.info("Registering readline command at exit.")
+            atexit.register(readline.write_history_file, self.history_file)
+    
+            readline.parse_and_bind("set enable-keypad on")
+    
+            self.logger.info("Setting up completion.")
+            readline.set_completer(self._complete)
+            readline.set_completer_delims(" \t\n;")
+            if "libedit" in readline.__doc__:
+                readline.parse_and_bind("bind ^I rl_complete")
+    
+            else:
+                readline.parse_and_bind("tab: complete")
+    
+            return 0
 
     def _complete(self, text, state):
         """
@@ -515,36 +564,41 @@ will use the default settings.".format(self.name),
             Otherwise try to call complete_<command> to get list of completions.
         """
 
-        if state == 0:
-            original_line = readline.get_line_buffer()
-            line = original_line.lstrip()
-            stripped = len(original_line) - len(line)
-            start_index = readline.get_begidx() - stripped
-            end_index = readline.get_endidx() - stripped
-
-            if start_index > 0:
-                cmd, args = self.parse_line(line)
-                if cmd == "":
-                    complete_function = self.default_completer
-
-                else:
-                    try:
-                        complete_function = getattr(self, "complete_" + cmd)
-
-                    except AttributeError:
-                        complete_function = self.default_completer
-
-            else:
-                complete_function = self.raw_command_completer
-
-            self.completion_matches = complete_function(text, line,
-                    start_index, end_index)
-
-        try:
-            return self.completion_matches[state]
-
-        except IndexError:
+        if os.name == 'nt':
+            self.logger.info("System is running windows, setting of interpreter history cancelled.")
             return None
+            
+        else:
+            if state == 0:
+                original_line = readline.get_line_buffer()
+                line = original_line.lstrip()
+                stripped = len(original_line) - len(line)
+                start_index = readline.get_begidx() - stripped
+                end_index = readline.get_endidx() - stripped
+    
+                if start_index > 0:
+                    cmd, args = self.parse_line(line)
+                    if cmd == "":
+                        complete_function = self.default_completer
+    
+                    else:
+                        try:
+                            complete_function = getattr(self, "complete_" + cmd)
+    
+                        except AttributeError:
+                            complete_function = self.default_completer
+    
+                else:
+                    complete_function = self.raw_command_completer
+    
+                self.completion_matches = complete_function(text, line,
+                        start_index, end_index)
+    
+            try:
+                return self.completion_matches[state]
+    
+            except IndexError:
+                return None
 
     def _parse_config(self):
         """
@@ -554,15 +608,7 @@ will use the default settings.".format(self.name),
 
         try:
             self.logger.info("Reading {0}...".format(self.config_file))
-            with open(self.config_file) as conf:
-                conf_data = conf.readlines()
-
-            for data in conf_data:
-                if data.startswith('#'):
-                    continue
-
-                else:
-                    continue
+            return config_handler.ConfigHandler(self.config_file).verify()
 
         except(FileNotFoundError):
             self.latest_exceptions = traceback.format_exc()
@@ -570,6 +616,7 @@ will use the default settings.".format(self.name),
             printer.Printer().print_with_status(str(
                 error.ErrorClass().ERROR0001(self.config_file)), 2)
             self._proper_exit(1)
+            return [2,]
 
     def _proper_exit(self, exit_code=0):
         """
@@ -671,17 +718,31 @@ Reloading None.".format(module, str(err)))
                 self.logger.info("Running {0} with userlevel of {1}.".format(
                     self.name, self.userlevel
                     ))
-                if self.userlevel == 3:
-                    self.command = input(self.prompt_lvl3.format(self.hostname))
-
-                elif self.userlevel == 2:
-                    self.command = input(self.prompt_lvl2.format(self.hostname))
+                if self.userlevel == 2:
+                    if self.username == "default":
+                        self.command = input(self.prompt_lvl3.format(self.hostname))
+                        
+                    else:
+                        self.command = input(self.prompt_lvl3.format(self.username))
 
                 elif self.userlevel == 1:
-                    self.command = input(self.prompt_lvl1.format(self.hostname))
+                    if self.username == "default":
+                        self.command = input(self.prompt_lvl2.format(self.hostname))
+                        
+                    else:
+                        self.command = input(self.prompt_lvl2.format(self.username))
+
+                elif self.userlevel == 0:
+                    if self.username == "default":
+                        self.command = input(self.prompt_lvl1.format(self.hostname))
+                        
+                    else:
+                        self.command = input(self.prompt_lvl1.format(self.rootuser))
 
                 else:
                     raise exceptions.UnknownUserLevelError("There is a problem obtaining the userlevel.")
+
+                self.previous_commands.append(self.command)
 
                 if ' && ' in self.command:
                     iterator = 0
@@ -746,6 +807,13 @@ CTRL+C when you are ready.").replace('(oo)', '(==)'))
                     except(KeyboardInterrupt, EOFError, TypeError, ValueError):
                         self.logger.info("^C/^D detected, continuing loop.")
                         continue
+                    
+            except Exception as error:
+                self.latest_exceptions = traceback.format_exc()
+                printer.Printer().print_with_status(str(
+                    error.ErrorClass().ERROR0010(str(error))), 2)
+                self.logger.warning(error.ErrorClass().ERROR0010(str(error)))
+                self._proper_exit(10)
 
     def parse_input(self, command='help'):
         """
@@ -889,45 +957,112 @@ OPTIONS:
                     command[1]
                     ))
                 if command[1] == ('info'):
-                    self.logger.info("Importing {0} module...".format(
-                        command[2]
-                        ))
-                    module_obj = self._import_module(command[2])
-                    self.logger.info("Checking if importing succeeded...")
-                    if module_obj is None:
-                        self.logger.error("Importing failed.")
-                        return None
+                    if command[2] == '*':
+                        self.logger.info("Showing info of all modules...")
+                        paths = os.listdir("modules")
+                        for path in paths:
+                            time.sleep(1)
+                            path = 'modules/' + path
+                            if path in ('modules/__init__.py', 'modules/__pycache__'):
+                                continue
 
-                    else:
-                        self.logger.info("Importing succeeded; Calling \
+                            self.logger.info("Checking if {0} is file.".format(path))
+                            if misc.ProgramFunctions().isfile(path):
+                                self.logger.info("{0} is a file.".format(path))
+                                if path.endswith('.py'):
+                                    self.logger.info("{0} is a python module.".format(path))
+                                    path = path.replace('\\', '.')
+                                    path = path.replace('/', '.')
+                                    self.logger.debug(path)
+                                    path = path[::-1]
+                                    self.logger.debug(path)
+                                    path = path.partition('.')[2]
+                                    self.logger.debug(path)
+                                    path = path[::-1]
+                                    self.logger.debug(path)
+                                    path = path.partition('.')[2]
+                                    self.logger.debug(path)
+                                    self.logger.info("Importing {0} module...".format(path))
+                                    module_obj = self._import_module(path)
+                                    self.logger.info("Checking if importing succeeded...")
+                                    if module_obj is None:
+                                        self.logger.error("Importing failed.")
+                                        printer.Printer().print_with_status(
+                                            'An error occured while importing {0}.'.format(
+                                                path), 2)
+                                        continue
+    
+                                    else:
+                                        self.logger.info("Importing succeeded; Calling \
 show_module_info()...")
-                        try:
-                            if self.from_API is False:
-                                eval("module_obj.{0}.show_module_info()".format(
-                                    self.module_call
-                                    ))
-
-                            else:
-                                return([0, eval("module_obj.{0}.\
+                                        try:
+                                            if self.from_API is False:
+                                                eval("module_obj.{0}.show_module_info()".format(
+                                                    self.module_call
+                                                    ))
+    
+                                            else:
+                                                return([0, eval("module_obj.{0}.\
 show_module_info()".format(self.module_call)).split('\n')])
-                                # TODO: Continue API support
+                                                # TODO: Continue API support
 
-                        except(SystemExit):
-                            self.logger.info("SystemExit detected from module..")
-                            return None
+                                        except(SystemExit):
+                                            self.logger.info("SystemExit detected from module..")
+                                            return None
 
-                        except Exception as exception:
-                            self.latest_exceptions = traceback.format_exc()
-                            self.logger.error("An error occured while using \
+                                        except Exception as exception:
+                                            self.latest_exceptions = traceback.format_exc()
+                                            self.logger.error("An error occured while using \
 the module: `{0}`".format(str(exception)))
-                            if self.from_API is False:
-                                printer.Printer().print_with_status(
-                                    str(exception), 2
-                                    )
-                                return 1
+                                            if self.from_API is False:
+                                                printer.Printer().print_with_status(
+                                                    str(exception), 2
+                                                    )
+                                                return 1
 
-                            else:
-                                return(1, str(exception))
+                                            else:
+                                                return(1, str(exception))
+                    
+                    else:
+                        self.logger.info("Importing {0} module...".format(
+                            command[2]
+                            ))
+                        module_obj = self._import_module(command[2])
+                        self.logger.info("Checking if importing succeeded...")
+                        if module_obj is None:
+                            self.logger.error("Importing failed.")
+                            return None
+    
+                        else:
+                            self.logger.info("Importing succeeded; Calling \
+show_module_info()...")
+                            try:
+                                if self.from_API is False:
+                                    eval("module_obj.{0}.show_module_info()".format(
+                                        self.module_call
+                                        ))
+    
+                                else:
+                                    return([0, eval("module_obj.{0}.\
+show_module_info()".format(self.module_call)).split('\n')])
+                                    # TODO: Continue API support
+
+                            except(SystemExit):
+                                self.logger.info("SystemExit detected from module..")
+                                return None
+
+                            except Exception as exception:
+                                self.latest_exceptions = traceback.format_exc()
+                                self.logger.error("An error occured while using \
+the module: `{0}`".format(str(exception)))
+                                if self.from_API is False:
+                                    printer.Printer().print_with_status(
+                                        str(exception), 2
+                                        )
+                                    return 1
+
+                                else:
+                                    return(1, str(exception))
 
                 elif command[1] in ('generate', 'new'):
                     self.logger.info("Creating new custom module...")
@@ -938,10 +1073,15 @@ the module: `{0}`".format(str(exception)))
 
                         while True:
                             try:
-                                gen_module_name = input("Module name: ")
+                                gen_module_name = input(
+                                        "Module name: ").replace('"',
+                                                '').replace("'", "")
                                 gen_description = input("Brief Description about \
-the module: ")
-                                gen_author = input("Module Author's/Your Name: ")
+the module: ").replace("'", "").replace('"', '')
+                                gen_author = input(
+                                        "Module Author's/Your Name: ").replace(
+                                                "'", "").replace('"',
+                                                        '')
                                 self.logger.info("Module name is {0} characters; \
 Description is {1} characters; And Author name is {2} characters.".format(
                                             len(gen_module_name),
@@ -1054,7 +1194,8 @@ to file!")
                             if path.endswith('.py'):
                                 self.logger.info("{0} is a python module.".format(path))
                                 try:
-                                    path = path.replace(os.sep, '.')
+                                    path = path.replace('\\', '.')
+                                    path = path.replace('/', '.')
                                     self.logger.debug(path)
                                     path = path[::-1]
                                     self.logger.debug(path)
@@ -1111,36 +1252,93 @@ to file!")
                         return result
 
                 elif command[1] in ('test',):
-                    self.logger.info("Testing {0} module...".format(command[2]))
-                    module_obj = self._import_module(command[2])
-                    self.logger.info("Checking if importing succeeded...")
-                    if module_obj is None:
-                        printer.Printer().print_with_status("Importing failed.", 2)
-                        self.logger.error("Importing failed.")
-                        return None
+                    if command[2] == '*':
+                        self.logger.info("Testing all modules...")
+                        paths = os.listdir("modules")
+                        for path in paths:
+                            path = 'modules/' + path
+                            if path in ('modules/__init__.py', 'modules/__pycache__'):
+                                continue
 
-                    else:
-                        self.logger.info("Importing succeeded; getting objects list.")
-                        objects = module_obj.objects
-                        i = 0
-                        for obj in objects:
-                            i += 1
-                            asciigraphs.ASCIIGraphs().progress_bar_manual(
-                                    "Testing module...", i, len(objects))
-
-                            try:
-                                eval("module_obj.{0}".format(obj))
-
-                            except BaseException as err:
-                                self.latest_exceptions = traceback.format_exc()
-                                printer.Printer().print_with_status(
-                                        str(err) + " (type `show tracebacks` \
+                            self.logger.info("Checking if {0} is file.".format(path))
+                            if misc.ProgramFunctions().isfile(path):
+                                self.logger.info("{0} is a file.".format(path))
+                                if path.endswith('.py'):
+                                    self.logger.info("{0} is a python module.".format(path))
+                                    path = path.replace('\\', '.')
+                                    path = path.replace('/', '.')
+                                    self.logger.debug(path)
+                                    path = path[::-1]
+                                    self.logger.debug(path)
+                                    path = path.partition('.')[2]
+                                    self.logger.debug(path)
+                                    path = path[::-1]
+                                    self.logger.debug(path)
+                                    path = path.partition('.')[2]
+                                    self.logger.debug(path)
+                                    self.logger.info("Testing {0} module...".format(path))
+                                    self.logger.info("Importing {0}...".format(path))
+                                    module_obj = self._import_module(path, True)
+                                    self.logger.info("Checking if importing succeeded...")
+                                    if module_obj is None:
+                                        printer.Printer().print_with_status("Failed importing {0}.".format(path), 2)
+                                        self.logger.error("Failed importing {0}.".format(path))
+                                        continue
+                
+                                    else:
+                                        self.logger.info("Importing succeeded; getting objects list.")
+                                        objects = module_obj.objects
+                                        i = 0
+                                        for obj in objects:
+                                            i += 1
+                                            asciigraphs.ASCIIGraphs().progress_bar_manual(
+                                                    "Testing `{0}` module...".format(path), i, len(objects))
+                
+                                            try:
+                                                eval("module_obj.{0}".format(obj))
+                
+                                            except BaseException as err:
+                                                self.latest_exceptions = traceback.format_exc()
+                                                printer.Printer().print_with_status(
+                                                        str(err) + " (type `show tracebacks` \
 for more info.)", 2)
-                                time.sleep(1)
-                                break
-
-                            finally:
-                                time.sleep(0.10)
+                                                time.sleep(1)
+                                                break
+                
+                                            finally:
+                                                time.sleep(0.10)
+                        
+                    else:
+                        self.logger.info("Testing {0} module...".format(command[2]))
+                        module_obj = self._import_module(command[2])
+                        self.logger.info("Checking if importing succeeded...")
+                        if module_obj is None:
+                            printer.Printer().print_with_status("Importing failed.", 2)
+                            self.logger.error("Importing failed.")
+                            return None
+    
+                        else:
+                            self.logger.info("Importing succeeded; getting objects list.")
+                            objects = module_obj.objects
+                            i = 0
+                            for obj in objects:
+                                i += 1
+                                asciigraphs.ASCIIGraphs().progress_bar_manual(
+                                        "Testing module...", i, len(objects))
+    
+                                try:
+                                    eval("module_obj.{0}".format(obj))
+    
+                                except BaseException as err:
+                                    self.latest_exceptions = traceback.format_exc()
+                                    printer.Printer().print_with_status(
+                                            str(err) + " (type `show tracebacks` \
+for more info.)", 2)
+                                    time.sleep(1)
+                                    break
+    
+                                finally:
+                                    time.sleep(0.10)
 
                 elif command[1] in ('use', 'run', 'exec'):
                     self.logger.info("Importing {0} module...".format(
@@ -1173,18 +1371,29 @@ using module: {0}".format(str(exception)))
 
                         while True:
                             try:
-                                if self.userlevel == 3:
-                                    self.module_command = input(self.prompt_lvl3.format(misc.FB + command[2]))
-
-                                elif self.userlevel == 2:
-                                    self.module_command = input(self.prompt_lvl2.format(misc.FB + command[2]))
-
+                                if self.userlevel == 2:
+                                    if self.username == "default":
+                                        self.command = input(self.prompt_lvl3.format(self.hostname))
+                                        
+                                    else:
+                                        self.command = input(self.prompt_lvl3.format(self.username))
+                
                                 elif self.userlevel == 1:
-                                    self.module_command = input(self.prompt_lvl1.format(misc.FB + command[2]))
-
+                                    if self.username == "default":
+                                        self.command = input(self.prompt_lvl2.format(self.hostname))
+                                        
+                                    else:
+                                        self.command = input(self.prompt_lvl2.format(self.username))
+                
+                                elif self.userlevel == 0:
+                                    if self.username == "default":
+                                        self.command = input(self.prompt_lvl1.format(self.hostname))
+                                        
+                                    else:
+                                        self.command = input(self.prompt_lvl1.format(self.rootuser))
+                
                                 else:
-                                    raise exceptions.UnknownUserLevelError("\
-There is a problem obtaining the userlevel.")
+                                    raise exceptions.UnknownUserLevelError("There is a problem obtaining the userlevel.")
 
                                 self.logger.info("User entered: " +
                                     self.module_command)
@@ -1404,10 +1613,42 @@ quit module...")
 
                 elif command[1] in ('reload', 'restart', 'reboot'):
                     try:
-                        printer.Printer().print_with_status(
-                                "Restarting {0}...".format(command[2]), 0)
-                        self._reload_module(command[2])
-
+                        self.logger.info("Reloading all modules...")
+                        if command[2] == '*':
+                            paths = os.listdir('modules')
+                            self.logger.info("Contents: " + str(paths))
+                            iterator = 0
+                            result = ""
+                            for path in paths:
+                                path = 'modules/' + path
+                                if path in ('modules/__init__.py', 'modules/__pycache__'):
+                                    continue
+        
+                                self.logger.info("Checking if {0} is file.".format(path))
+                                if misc.ProgramFunctions().isfile(path):
+                                    self.logger.info("{0} is a file.".format(path))
+                                    if path.endswith('.py'):
+                                        self.logger.info("{0} is a python module.".format(path))
+                                        path = path.replace('\\', '.')
+                                        path = path.replace('/', '.')
+                                        self.logger.debug(path)
+                                        path = path[::-1]
+                                        self.logger.debug(path)
+                                        path = path.partition('.')[2]
+                                        self.logger.debug(path)
+                                        path = path[::-1]
+                                        self.logger.debug(path)
+                                        path = path.partition('.')[2]
+                                        self.logger.debug(path)
+                                        printer.Printer().print_with_status(
+                                                "Restarting {0}...".format(path), 0)
+                                        self._reload_module(path)
+                        
+                        else:
+                            printer.Printer().print_with_status(
+                                    "Restarting {0}...".format(command[2]), 0)
+                            self._reload_module(command[2])
+    
                     except Exception as reload_error:
                         self.latest_exceptions = traceback.format_exc()
                         printer.Printer().print_with_status(str(reload_error), 2)
@@ -1520,7 +1761,9 @@ OPTIONS:
                     0.10
                     )
             misc.ProgramFunctions().clrscrn()
-            readline.write_history_file()
+            if os.name != 'nt':
+                readline.write_history_file()
+                
             misc.ProgramFunctions().program_restart()
 
         elif command.lower() in ('quit', 'exit'):
@@ -1582,6 +1825,24 @@ the traceback on `data/tracebacks.log` and/or inform us about what is it\
 
         elif arg.lower() in ('-w', '--web',  '/w', '/web'):
             oweb = True
+            
+        elif arg.lower() in ("-c", '--config'):
+            if arg == '-c':
+                oconfig_file = sys.argv[_iterator + 1]
+                _iterator += 2
+                continue
+                
+            elif arg.startswith('--config='):
+                oconfig_file = arg.partition('=')[2]
+                continue
+                
+            else:
+                print(ArchariosFramework().banner)
+                print()
+                print('Unknown argument `{0}`'.format(arg))
+                print()
+                print(ArchariosFramework().help())
+                ArchariosFramework()._proper_exit(1)
 
         else:
             print(ArchariosFramework().banner)

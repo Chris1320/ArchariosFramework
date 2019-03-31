@@ -35,11 +35,11 @@ class testEnvLinux:
         self.justContinue = False
         self.report = []
         self.rootdir = ''
-        self.CG = '\033[32m'
-        self.CY = '\033[33m'
-        self.CR = '\033[31m'
-        self.CGR = '\033[90m'
-        self.END = '\033[0m'
+        self.CG = ''
+        self.CY = ''
+        self.CR = ''
+        self.CGR = ''
+        self.END = ''
 
         self.py36 = 'test-env-3.6'
 
@@ -189,8 +189,8 @@ def run():
     print()
     for arg in sys.argv:
         if arg.lower() == '--recreate':
-            gso('rm -rf ' + testEnvLinux().py36)
-            gso('ls -a')
+            gso('rmdir /s ' + testEnvLinux().py36)
+            gso('dir /b')
             recreates = "[Recreate Virtual Environment]"
 
         else:
@@ -206,14 +206,14 @@ def run():
 
     if newenv:
         # Write pipeline here if you will use virtual environment.
-        setup = ['ls', 'cp -r ../src ./Archarios', 'ls', 'cd Archarios', 'pwd']
-        test = ['python3 archariosframework.py --test']
-        cleanup = ['cd ..', 'rm -rf Archarios/']
+        setup = ['dir', 'xcopy ..\src .\Archarios /O /X /E /H /K /Y', 'dir', 'cd Archarios', 'echo %cd%']
+        test = ['python archariosframework.py --test']
+        cleanup = ['cd ..', 'rmdir Archarios /s']
 
     else:
         # Write pipeline here if you will NOT use virtual environment.
-        setup = ['ls', 'cd src', 'pwd']
-        test = ['python3 archariosframework.py --test']
+        setup = ['dir', 'cd src', 'echo %cd%']
+        test = ['python archariosframework.py --test']
         cleanup = []
 
     print("{0} Activated switches: {1} {2}".format(sys.argv[0],
@@ -223,7 +223,7 @@ def run():
 
 if __name__ == '__main__':
     if os.name == 'nt':
-        pass
+        run()
 
     else:
         run()

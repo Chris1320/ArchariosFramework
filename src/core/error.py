@@ -29,7 +29,7 @@ class ErrorClass:
 
         This class provides a more friendly way to tell the
         user that something wrong happened than the exceptions
-        module.
+        method.
     """
 
     def __init__(self, show_traceback=False):
@@ -113,7 +113,7 @@ your problem. Thank you""".format(proc_type)
     def ERROR0007(self):
         """
         def ERROR0007():
-            Call this if module's run() method doesn't return an integer.
+            Call this if method's run() method doesn't return an integer.
         """
 
         return """Module doesn't return an integer!
@@ -123,7 +123,7 @@ possible exit points of the code. If not, please contact the developer."""
     def ERROR0008(self):
         """
         def ERROR0008():
-            Call this module if machine doesn't handle non-ASCII characters.
+            Call this method if machine doesn't handle non-ASCII characters.
         """
 
         return """Your system does not properly handle non-ASCII characters."""
@@ -131,7 +131,31 @@ possible exit points of the code. If not, please contact the developer."""
     def ERROR0009(self):
         """
         def ERROR0009():
-            Call this module if Data Integrity Test failed.
+            Call this method if Data Integrity Test failed.
         """
 
         return """The Data Integrity Test has failed!"""
+
+    def ERROR0010(self, statement):
+        """
+        def ERROR0010():
+            Call this method if an unknown error has occured.
+        """
+        
+        return """An unknown error occured: {0}""".format(statement)
+    
+    def ERROR0011(self):
+        """
+        def ERROR0011():
+            Call this method if program set an invalid configuration parameter.
+        """
+        
+        return """Cannot set configuration value! Invalid configuration parameter."""
+    
+    def ERROR0012(self):
+        """
+        def ERROR0012():
+            Call this if program cannot continue because of invalid config file.
+        """
+        
+        return """Program cannot continue because of invalid configuration file..."""
