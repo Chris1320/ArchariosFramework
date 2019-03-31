@@ -1,4 +1,4 @@
-﻿# Archários Framework v0.0.2.3 :: The Novice's Ethical Hacking Framework
+﻿# Archários Framework v0.0.2.4 :: The Novice's Ethical Hacking Framework
 ## Copyright (C) 2018, 2019 :: Catayao56 <Catayao56@gmail.com>
 [Archarios Framework](https://github.com/Catayao56/ArchariosFramework.git) is an Ethical Hacking Framework.
 It was created on Wednesday, June 27, 2018.
@@ -10,6 +10,9 @@ and is the child of the old toolkit and framework,
 Shadow Suite Toolkit.
 
 ## What's new?
++ Fixed error when using modules because of wrong variable name (`self.command` instead of `self.module_command`)
++ Disable ARP method on archarios flooder when running on windows.
++ [WIP]: Web attack method on archarios flooder.
 + Archarios Framework now supports Windows Operating Systems!
 + File Integrity Test
 + Transitioning to new `config_handler` module.

@@ -232,7 +232,7 @@ class ArchariosFramework:
         self.logger.info('Defining program information.')
         # self.name = "Archários Framework"
         self.name = "Archarios Framework"
-        self.version = "0.0.2.3"
+        self.version = "0.0.2.4"
         self.codename = "Checksum"
         self.description = "The Novice's Ethical Hacking Framework"
         self.banner = r"""{0}
@@ -762,8 +762,8 @@ Reloading None.".format(module, str(err)))
 
             except(KeyboardInterrupt):
                 self.latest_exceptions = traceback.format_exc()
-                printer.Printer().print_with_status(str(
-                    error.ErrorClass().ERROR0002()), 2)
+                printer.Printer().print_with_status(
+                    str(error.ErrorClass().ERROR0002()), 2)
                 self.logger.warning(error.ErrorClass().ERROR0002())
                 self._proper_exit(2)
 
@@ -1373,24 +1373,24 @@ using module: {0}".format(str(exception)))
                             try:
                                 if self.userlevel == 2:
                                     if self.username == "default":
-                                        self.command = input(self.prompt_lvl3.format(self.hostname))
+                                        self.module_command = input(self.prompt_lvl3.format(self.hostname))
                                         
                                     else:
-                                        self.command = input(self.prompt_lvl3.format(self.username))
+                                        self.module_command = input(self.prompt_lvl3.format(self.username))
                 
                                 elif self.userlevel == 1:
                                     if self.username == "default":
-                                        self.command = input(self.prompt_lvl2.format(self.hostname))
+                                        self.module_command = input(self.prompt_lvl2.format(self.hostname))
                                         
                                     else:
-                                        self.command = input(self.prompt_lvl2.format(self.username))
+                                        self.module_command = input(self.prompt_lvl2.format(self.username))
                 
                                 elif self.userlevel == 0:
                                     if self.username == "default":
-                                        self.command = input(self.prompt_lvl1.format(self.hostname))
+                                        self.module_command = input(self.prompt_lvl1.format(self.hostname))
                                         
                                     else:
-                                        self.command = input(self.prompt_lvl1.format(self.rootuser))
+                                        self.module_command = input(self.prompt_lvl1.format(self.rootuser))
                 
                                 else:
                                     raise exceptions.UnknownUserLevelError("There is a problem obtaining the userlevel.")
