@@ -22,7 +22,7 @@ objects = ['ErrorClass']
 
 import importlib
 
-class ErrorClass:
+class ErrorClass(object):
     """
     class ErrorClass():
         Class containing error methods.

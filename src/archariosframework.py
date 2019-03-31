@@ -100,44 +100,44 @@ web_csrf.init_app(web_app)
 
 @web_app.errorhandler(CSRFError)
 def web_csrferror(*args):
-    return render_template('error.html', title=__name__,
+    return render_template('error.html', title=ArchariosFramework().name,
             desc=args[0].description), 400
 
 
 @web_app.errorhandler(400)
 def web_misunderstood(*args):
-    return render_template('error.html', title=__name__, desc="Whaaat?!? I can't \
+    return render_template('error.html', title=ArchariosFramework().name, desc="Whaaat?!? I can't \
  understand the request your browser (or proxy) has sent."), 400
 
 
 @web_app.errorhandler(404)
 def web_not_found(*args):
-    return render_template('error.html', title=__name__, desc='The URL you requested \
+    return render_template('error.html', title=ArchariosFramework().name, desc='The URL you requested \
 was not found. Please check the URL.'), 404
 
 
 @web_app.errorhandler(403)
 def web_forbidden(*args):
-    return render_template('error.html', title=__name__, desc="Sorry! You're not \
+    return render_template('error.html', title=ArchariosFramework().name, desc="Sorry! You're not \
 allowed to enter."), 403
 
 
 @web_app.errorhandler(410)
 def web_gone(*args):
-    return render_template('error.html', title=__name__, desc="Oops! The page here \
+    return render_template('error.html', title=ArchariosFramework().name, desc="Oops! The page here \
 has been gone!"), 410
 
 
 @web_app.errorhandler(429)
 def web_too_many_requests(*args):
-    return render_template('error.html', title=__name__, desc="Beyond the limits... \
+    return render_template('error.html', title=ArchariosFramework().name, desc="Beyond the limits... \
 This page lets you request {0}. Please wait until you are good to go!".format(
     str(args[0]).replace('429 Too Many Requests: ', '')))
 
 
 @web_app.errorhandler(500)
 def web_internal_server(*args):
-    return render_template('error.html', title=__name__, desc="It's my fault! \
+    return render_template('error.html', title=ArchariosFramework().name, desc="It's my fault! \
 Something's happening in the servers..."), 500
 
 # Routes #
@@ -147,7 +147,7 @@ Something's happening in the servers..."), 500
 @web_limiter.limit('1 per second')
 def web_interface():
     return render_template("index.html", title=ArchariosFramework().name,
-            description=ArchariosFramework().description)
+            description=ArchariosFramework().description,time=time.asctime())
 
 @web_app.route("/status", methods=['GET', 'POST'])
 @web_limiter.limit('1 per second')
@@ -161,6 +161,12 @@ def web_server_status():
             config_file=ArchariosFramework().config_file,
             debugging=ArchariosFramework().debug,
             userlevel=ArchariosFramework().userlevel)
+
+@web_app.route("/info", methods=['GET', 'POST'])
+@web_limiter.limit('1 per second')
+def web_info():
+    return render_template("info.html",
+            title=ArchariosFramework().name)
 
 # ++++++++++++++++++++ WEB INTERFACE ++++++++++++++++++++ #
 
@@ -1373,24 +1379,24 @@ using module: {0}".format(str(exception)))
                             try:
                                 if self.userlevel == 2:
                                     if self.username == "default":
-                                        self.module_command = input(self.prompt_lvl3.format(self.hostname))
+                                        self.module_command = input(self.prompt_lvl3.format(self.hostname).replace(self.filename, "{0}{1}/{2}{3}{4}".format(self.filename, misc.END, misc.CLG, command[2], '.py')))
                                         
                                     else:
-                                        self.module_command = input(self.prompt_lvl3.format(self.username))
+                                        self.module_command = input(self.prompt_lvl3.format(self.username).replace(self.filename, "{0}{1}/{2}{3}{4}".format(self.filename, misc.END, misc.CLG, command[2], '.py')))
                 
                                 elif self.userlevel == 1:
                                     if self.username == "default":
-                                        self.module_command = input(self.prompt_lvl2.format(self.hostname))
+                                        self.module_command = input(self.prompt_lvl2.format(self.hostname).replace(self.filename, "{0}{1}/{2}{3}{4}".format(self.filename, misc.END, misc.CLG, command[2], '.py')))
                                         
                                     else:
-                                        self.module_command = input(self.prompt_lvl2.format(self.username))
+                                        self.module_command = input(self.prompt_lvl2.format(self.username).replace(self.filename, "{0}{1}/{2}{3}{4}".format(self.filename, misc.END, misc.CLG, command[2], '.py')))
                 
                                 elif self.userlevel == 0:
                                     if self.username == "default":
-                                        self.module_command = input(self.prompt_lvl1.format(self.hostname))
+                                        self.module_command = input(self.prompt_lvl1.format(self.hostname).replace(self.filename, "{0}{1}/{2}{3}{4}".format(self.filename, misc.END, misc.CLG, command[2], '.py')))
                                         
                                     else:
-                                        self.module_command = input(self.prompt_lvl1.format(self.rootuser))
+                                        self.module_command = input(self.prompt_lvl1.format(self.rootuser).replace(self.filename, "{0}{1}/{2}{3}{4}".format(self.filename, misc.END, misc.CLG, command[2], '.py')))
                 
                                 else:
                                     raise exceptions.UnknownUserLevelError("There is a problem obtaining the userlevel.")
