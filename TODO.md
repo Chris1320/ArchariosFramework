@@ -53,6 +53,7 @@ This document is used as a list of TO-DOs and other plans.
         * [X] ARP Attack
         * [X] DHCP Attack
         * [ ] Web Attack
+        * [ ] +++DHCP error
     - [ ] _On Hold_ WPEnum (WordPress Username Enumerator)
     - [ ] _On Hold_ Cross-Site Scripter (XSS Vulnerability Analysis Tool)
 
