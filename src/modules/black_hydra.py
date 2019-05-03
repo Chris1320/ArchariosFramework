@@ -29,7 +29,9 @@ from core import exceptions
 # Put all needed dependencies here!
 try:
     # import something_here
-    pass
+    import os
+    import sys
+    import time
 
 except BaseException as err:
     print("While importing dependency modules, an error occured: {0}".format(str(err)))
@@ -54,20 +56,14 @@ class ArchariosFrameworkModule:
     """
 
     def __init__(self, *args, **kwargs):
-        if importerror is not False:
-            return 8
-
-        else:
-            pass
-
         # Module Information
 
         # NOTE: DEV0004: Modify THIS DICTIONARY ONLY!
         self.module_info = {
                 # Module name
-                "name": "Hypothesis",
+                "name": "Black Hydra",
                 # Module brief description
-                "bdesc": "Hypothesis is a wordlist generator.",
+                "bdesc": "Shorten brute force sessions on hydra.",
                 # Module version
                 "version": 1.0,
                 # Module author
@@ -75,18 +71,22 @@ class ArchariosFrameworkModule:
                 # Module status
                 "status": "Stable",
                 # Date created (Please follow the format)
-                "created": "Aug. 25 2018",
+                "created": "Apr. 20 2019",
                 # Latest update (Please follow the format)
-                "last_update": "Aug. 25 2018",
+                "last_update": "Apr. 20 2019",
                 # Long description
                 "ldesc": """\
-<t>Hypothesis<end>
+<t>Black Hydra<end>
+<h>A module to shorten bruteforce sessions in Hydra.<end>
 
-Hypothesis is a wordlist generator that can perform:
+This module uses hydra to run automated bruteforcing.
 
-    + Common user password profiling.
+<n>To be more satisfying results of the brute force, you better
+   interact directly with hydra, without having to use this module.<end>
 
-""".replace('<t>', misc.FB + misc.FU + misc.FI).replace(
+<n>Original Author<end>: <b>DedSecTL<end>
+<n>Ported by<end>: <b>Catayao56<end>
+             """.replace('<t>', misc.FB + misc.FU + misc.FI).replace(
                  '<end>', misc.END).replace('<u>', misc.FU).replace(
                  '<i>', misc.FI).replace('<b>', misc.FB).replace(
                  '<h>', misc.FB + misc.FI).replace('<n>',
