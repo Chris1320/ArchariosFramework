@@ -29,15 +29,15 @@ try:
     import time
     import atexit
     import random
-    import signal
+    # import signal
 
     # Import readline if using linux.
     if os.name == 'nt':
         pass
-    
+
     else:
         import readline
-        
+
     import importlib
     import traceback
     import subprocess
@@ -152,7 +152,7 @@ Something's happening in the servers..."), 500
 @web_limiter.limit('1 per second')
 def web_interface():
     return render_template("index.html", title=ArchariosFramework().name,
-            description=ArchariosFramework().description,time=time.asctime())
+            description=ArchariosFramework().description, time=time.asctime())
 
 @web_app.route("/status", methods=['GET', 'POST'])
 @web_limiter.limit('1 per second')
@@ -534,7 +534,7 @@ will use the default settings.".format(self.name),
         if os.name == 'nt':
             self.logger.info("System is running windows, setting of interpreter history cancelled.")
             return 0
-            
+
         else:
             self.logger.info("Checking if `{0}` exists.".format(self.history_file))
             if not os.path.exists(self.history_file):
@@ -545,25 +545,25 @@ will use the default settings.".format(self.name),
                     if "libedit" in readline.__doc__:
                         self.logger.info("Writing to history.")
                         history.write("_HiStOrY_V2_\n\n")
-    
+
             self.logger.info("Reading history file.")
             readline.read_history_file(self.history_file)
             self.logger.info("Setting history length.")
             readline.set_history_length(self.history_length)
             self.logger.info("Registering readline command at exit.")
             atexit.register(readline.write_history_file, self.history_file)
-    
+
             readline.parse_and_bind("set enable-keypad on")
-    
+
             self.logger.info("Setting up completion.")
             readline.set_completer(self._complete)
             readline.set_completer_delims(" \t\n;")
             if "libedit" in readline.__doc__:
                 readline.parse_and_bind("bind ^I rl_complete")
-    
+
             else:
                 readline.parse_and_bind("tab: complete")
-    
+
             return 0
 
     def _complete(self, text, state):
@@ -578,7 +578,7 @@ will use the default settings.".format(self.name),
         if os.name == 'nt':
             self.logger.info("System is running windows, setting of interpreter history cancelled.")
             return None
-            
+
         else:
             if state == 0:
                 original_line = readline.get_line_buffer()
@@ -586,28 +586,28 @@ will use the default settings.".format(self.name),
                 stripped = len(original_line) - len(line)
                 start_index = readline.get_begidx() - stripped
                 end_index = readline.get_endidx() - stripped
-    
+
                 if start_index > 0:
                     cmd, args = self.parse_line(line)
                     if cmd == "":
                         complete_function = self.default_completer
-    
+
                     else:
                         try:
                             complete_function = getattr(self, "complete_" + cmd)
-    
+
                         except AttributeError:
                             complete_function = self.default_completer
-    
+
                 else:
                     complete_function = self.raw_command_completer
-    
+
                 self.completion_matches = complete_function(text, line,
                         start_index, end_index)
-    
+
             try:
                 return self.completion_matches[state]
-    
+
             except IndexError:
                 return None
 
@@ -627,7 +627,7 @@ will use the default settings.".format(self.name),
             printer.Printer().print_with_status(str(
                 error.ErrorClass().ERROR0001(self.config_file)), 2)
             self._proper_exit(1)
-            return [2,]
+            return [2, ]
 
     def _proper_exit(self, exit_code=0):
         """
